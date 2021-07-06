@@ -1,5 +1,5 @@
-# Final Task 2021 Start
+# Iss Lab 2021
 
-This project will contain documentation related to the initial **Requirement Analysis** and **Problem Analysis** phases
-and the **Sprint planning** we're going to use for this final project. <br/>
-It will also contain code for a first prototype in the form of the an executable model, born from the initial analysis. 
+This is a repo for the "Ingegneria dei Sistemi Software M" course at UNIBO<br/>
+It will contain a project for every sprint phases we do in order to complete the final task assigned.<br/>
+Every folder will represent a project that will contain code and user docs specific to that sprint phase.
