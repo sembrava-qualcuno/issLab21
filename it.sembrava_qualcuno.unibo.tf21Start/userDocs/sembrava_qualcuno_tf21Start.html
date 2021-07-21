@@ -408,6 +408,7 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 				<li>The parking manager should be made able to stop the trolley when the temperature of the parking area reaches a certain limit.</li>
 				<li>Our system should be able to start/stop the fan when the temperature reaches or leaves a certain limit.</li>
 				<li>Our system should identify and authenticate the parking manager before letting him access the system.</li>
+				<li>Our system should be able to double-check the client statement of having his car parked in the INDOOR area through the weight sensor.</li>
 			</ol>
 			
 			<h4>Non functional requirements</h4>
@@ -446,17 +447,20 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 			
 		<h3>First test plan ideas</h3>
 		<ul>
-			<li><em>moveToIn</em>: check on the map if the position of the trolley corresponds with the indoor area (6,0)</li>
-			<li><em>moveToSlotIn/Out</em>: check on the map if the position of the trolley is adjacent to the chosen parking spot (e.g. (3,2) if the parking slot is (3,3))</li>
+			<li><em>moveToIn</em>: check on the map if the position of the trolley corresponds with the indoor area (6,0) <k>(F5)</k></li>
+			<li><em>moveToSlotIn/Out</em>: check on the map if the position of the trolley is adjacent to the chosen parking spot (e.g. (3,2) if the parking slot is (3,3)) <k>(F5-F9)</k></li>
 			<li><em>backToHome</em>: check on the map if the trolley has returned home (0,0)</li>
-			<li><em>moveToOut</em>: check on the map if the position of the trolley corresponds with the outdoor area (6,4)</li>
-			<li>The robot must transport the cars correctly. (F5-F9-NF3)</li>
-			<li>The system must enumerate the cars in the parking area correctly. (F3)</li>
-			<li>Given a correct token the system must pick up the correct car. (F6-F7-F8)</li>
-			<li>Only the parking manager must be able to log into the ParkServiceStatusGUI. (F10-F16)</li>
-			<li>The parking manager must have the priority stopping the robot. (F14-NF4)</li>
-			<li>The system must manage the fan correctly. (F15)</li>
-			<li>The system must notify the parking manager when the outdoor area is occupied for more than DTFREE time. (F11)</li>
+			<li><em>moveToOut</em>: check on the map if the position of the trolley corresponds with the outdoor area (6,4)<k>(F9)</k></li>
+			<div class="remark">
+				<k>Carefully note</k> that in every test above, one should also check if the robot behaves correctly (e.g. doesn't walk on the parking slots as per NF3, etc.) also by checking its route on the map 
+			</div>
+			<li>Check that if there are no available parking slots the system doesn't accept the request <k>(F3)</k></li>
+			<li>Check that if a client specifies a wrong token the system does not accept the request and that the system does not give back the wrong car<k>(F6-F7-F8)</k></li>
+			<li>Check that the parking manager can access the parking area information only if authenticated <k>(F10-F16)</k></li>
+			<li>Check that if the parking manager stops the robot, it immediately stops and no other task is executed by the trolley until it exits the stop state<k>(F14-NF4)</k></li>
+			<li>Check that if TA > TMAX the fan starts and viceversa<k>(F15)</k></li>
+			<li>Check that a correct notification is sent to the parking manager if a car remains in the OUTDOOR area for more than DTFREE time <k>(F11)</k></li>
+			<li>Check that the trolley does not pick up a car from the INDOOR area, if the client says there's a car but no confirmation arrived from the weight sensor<k>(F17)</k>
 		</ul>
 	</div>
 	
@@ -465,21 +469,50 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 		<h3>Main problems</h3>
 		
 			<h4>Components</h4>
-			Every single component of the system (trolley, sensors, sonars, fan, thermometer) can be properly simulated in a virtual environment that resembles the parking area requirements to speed up the design and development phase and to easily design and execute automated tests.
-			To do so one could use the virtual environment (<k>WEnv</k>) introduced in <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html">VirtualRobot2021.html</a>.<br/>
-			The WEnv scene can be easily configured by the application designer and an example that matches our requirements is available at <a href="./parkingAreaConfig.js">parkingAreaConfig.js</a>.<br/>
-			The trolley can also be simulated as the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html#interaction">virtual robot</a> introduced in the same file as the WEnv.
-			<br/> By requirements, this trolley should have 3 states: idle, working and stopped. The possible state transitions and details are presented in the coming state diagram.
-			<td style="width:50%">
-				<center><img src="./img/TrolleyFSM.png" width="70%"></center>
-			</td>			
-			All the other sensors and the fan can be simulated in our system by mock-objects or mock-actors or the code for their behaviour should be handled by the product owner himself, in case some specific communication protocol must be used. 
+			Talking with the product owner, we aknowledge that the parking area is a properly simulated space in a virtual environment.
+			The virtual environment <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/master/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html"> WEnv</a> is provided by the customer and can be easily
+			configured by the application designer and an example that matches our requirements is available at <a href="./parkingAreaConfig.js">parkingAreaConfig.js</a>.<br/>
+			
 			<div class="remark">
-				<k>NOTE THAT</k> even though the developers decide to go for the virtual route, this should be done with a fair amount of abstraction that insures 
-				some sort of technology indipendence; this would help an hypothetical subsequent phase in which the simulated components will be replaced by real ones,
-				by not changing the buisness logic. This could be achieved by developing interfaces and factory methods as well as a high level interaction protocols and architectures between components.
+					<k>NOTE THAT</k> even though we are working in a virtual environment and with virtual components, this should be done with a fair amount of abstraction that insures 
+					some sort of technology indipendence; this would help an hypothetical subsequent phase in which the simulated components will be replaced by real ones,
+					by not changing the buisness logic. This could be achieved by developing interfaces and factory methods as well as a high level interaction protocols and architectures between components.
 			</div>
-			Actors could be preferred above objects as they implement a message based type of concurrency which satisfy the demand for a high level interaction between componenets and relieves the developer of handling thread safety, as well as reducing the number of threads to be used in the system.
+			
+			<h5>Trolley</h5>
+				
+				A trolley simulation is also available in the WEnv; details on how to communicate with this virtual component can be found in the <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/master/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html#interaction">virtual robot section</a>.<br/>
+				Our job is to design and develop a component that communicates with the virtual robot and instructs it properly to match our system's needs.  <br/> 
+				By requirements, this trolley should have 3 states: idle, working and stopped. The possible state transitions and details are presented in the coming state diagram.
+				<td style="width:50%">
+					<center><img src="./img/TrolleyFSM.png" width="70%"></center>
+				</td>
+				If the trolley is both in the <k>working</k> or the <k>stopped</k> state and new client requests arrive, the trolley should be able to queue them in order to start a new job related to the new request once the current one is concluded. <br/> 
+				Given the way the problem has been mapped, the idle state was deemed by the analysts to describe both the robot presence and the returning in its home position to allow the trolley to accept incoming request by the client immediately. In fact, if the returning to home task was mapped as <k>working</k> state, the trolley should have been completing the returning to home task first and then start working on the new request, which was found a less efficient behaviour.   
+				<div class="remark">
+					In developing our trolley instructor, an actor implementation could be preferred above an object one as they implement a message based type of concurrency which satisfy the demand for a high level interaction between componenets and relieves the developer of handling thread safety, as well as reducing the number of threads to be used in the system.
+				</div>
+			<h5>Main service</h5>
+				The ParkManagerService should contain the biggest part of the buisness logic, as it is the main controller of the system. It should be able to communicate with all the components in the system to be informed about their state, react to all the events that could happen in accord to the requirements and present the results of its actions to the user interfaces.
+			<h5>User interfaces</h5>
+				There should be two types of user interfaces:
+				<ul>
+					<li>The ParkServiceGUI has to accept client interactions and communicate with the main service to accomodate the client needs if possible</li>
+					<li>ParkServiceStatusGUI has to accept the parking manager interactions (e.g. to stop/resume the trolley) and present to him/her the system state</li>
+				</ul>
+			<h5>Sensors and fan</h5>
+			Since we are working in a virtual environment and there are no specific component already available, sensors (e.g. weight sensor, thermometer, etc.) and fan can be simulated too.<br/>
+			So, our job is to design and develop these components and allow them to communicate with the main service.<br/>
+			
+			Regarding the sonar: 
+			<ul>
+				<li>a TCP-based sonar-data simulator is defined in <a href="https://raw.githubusercontent.com/anatali/issLab2021/master/it.unibo.issLabStart/resources/jupyter/sonarResourceCallerTCP.ipynb">sonarResourceCallerTCP.ipynb</a>;</li>
+				<li>a MQTT-based sonar-data simulator is defined in <a href="https://raw.githubusercontent.com/anatali/issLab2021/master/it.unibo.issLabStart/resources/jupyter/sonarResourceCallerMQTT.ipynb">sonarResourceCallerMQTT.ipynb;</a></li>
+				<li>a CoAP-based sonar-data simulator is defined in <a href="https://raw.githubusercontent.com/anatali/issLab2021/master/it.unibo.sonarAsResource/javacode/coap/SimulateSonarData.java">SimulateSonarData.java</a></li>
+			</ul>
+			A possible receiver of the sonar-data is described in the <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2021/master/it.unibo.sonarAsResource/userDocs/LabSonarAsResource.html">"resource" section of LabSonarAsResource.html</a>; this can also be used as an observable resource to let the main service receive the sonar information indirectly.<br>
+			A similar approach can be undertaken for every other sensor in the system, but the final decision is left to the designers. <br>
+			The fan can also be treated as the other sensors but, as an actuator, should present some function or method to be activeted/deactivated when needed. 
 			
 			<h4>Interaction</h4>
 			From the communication standpoint, the problem as a whole demands an hybrid approach: if some requirements (e.g. F1,F2,F3, etc.) ask for a synchronous approach, some others could benefit from an asynchronous one (e.g. firing an event, as per requirement F11).
@@ -498,7 +531,11 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 		In case of CoAP protocol usage, the californium library for java/kotlin can be a good choice for its renowned use in IoT environments and IETF usage for the standardization of the CoAP protocol.<br/>
 		<div class="remark">
 			Libraries that allow the means of communication required by the system are common in many high-level 
-		programming languages;  this fact implies that <k>no abstraction gap</k> on the operative side is identified. 
+			programming languages;  this fact implies that <k>no abstraction gap</k> on the communications side is identified. An abstraction gap is found on the 
+			functional/testing side, as our system has no clue on where the trolley is in the virtual/real space at all times: this is crucial to our system's functions
+			and with regard to our first testing plan ideas.
+			
+		
 		The choice of which language to use is delegated to the project phase but, indipendently on the choice, 
 		some form of design pattern should be used to ensure <k>maximux abstraction</k> between the buisness logic and 
 		the communication protocols used</k> (to grant reusability and possibility to change communication protocol if needed).
@@ -518,19 +555,25 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 		As a result of the analysis phase, the system could consist in service, called <em>ParkManagerService</em> per requirement, that communicates via HTTP request/responses with 3 browsers.
 		Two of the browsers (<em>ParkServiceGUI</em>) could be located either in the in/outdoor area for the client to access it and operate their actions, or on a mobile system (as a smartphone app).
 		The third one (<em>ParkServiceStatusGUI</em>) could be on location (in the parking area), as well on a mobile system and should be accessible to the manager after authorization.<br/>
-		The sensors can be either simulated or controlled by <k>observable objects with threads</k> which fire up events to the service once they acknowledge that something in their area of operation has happened (e.g. the thermometer fires up an event when the termperature has reached a value greater than TMAX). They should be observable by the main service to learn about their status at all times and to present these information to the manager as needed.  <br/>
+		The sensors can be controlled by <k>observable objects with threads</k> which fire up events to the service once they acknowledge that something in their area of operation has happened (e.g. the thermometer controller fires up an event when the termperature has reached a value greater than TMAX). They should be observable by the main service to learn about their status at all times and to present these information to the manager as needed.  <br/>
 		The robot behavior could be orchestrated by an <k>observable actor</k>, capable of both communicating and receiveing information in an asynchronous way with our service as well as presenting its state. It would be then communicating with a real robot or the WEnv by the means of HTTP or websocket protocols, as the designers will deem best fit.
-		To implement this component, a good example would be the kotlin actor <a href="https://github.com/anatali/issLab2021/it.unibo.kotlinSupports/app/src/main/kotlin/it/unibo/robotService/BasicStepRobotActor.kt">BasicStepRobotActor.kt</a>, as it is already well integrated with the WEnv service and has the capability of communicating in a high level message-based way both with HTTP and WS protocols. 
+		To implement this component, a good example is presented in <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html">BasicRobot.html</a>. This component is an observable kotlin actor which is already well integrated with the WEnv service and has the capability of communicating in a high level message-based way both with HTTP and WS protocols.
+		It also can be easily configured to work with diverse real robots as well as the virtual one, which satisfies the needs of abstraction already specified earlier in the analysis phase. Finally, some of the functionalities that comes with this component can actually fill the abstraction gap identified in the analysis phase:
+		the BasicRobot has the ability to move by "steps" of the same length as the robot.
 		<div class="remark">
 			<k>Carefully note</k> that the term "observable" is here used to express the need of accessing some information without waiting or stopping the observed entity. How this should be 
 			   implemented is a project matter (restful resource, publish/subscribe, etc.).
 		</div>
 		Finally, a map of the parking area should be considered to better understand the situation at all times and to be used during tests. This could be implemented as a simple object.
 		A usable example of map implementation that could fit the problem can be found at <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/mapRoomKotlin/mapUtil.kt" target="code">mapUtil.kt</a><br/>
-		Communication between sensors and the main service are described as <em>Events</em> because the sensors should not know the receiver of their messages; instead they should only fire an event to some not weel defined entity that is interested in knowing what they have to say.<br/>
+		Communication between sensors controllers and the main service are described as <em>Events</em> because the sensors should not know the receiver of their messages; instead they should only fire an event to some not weel defined entity that is interested in knowing what they have to say.<br/>
 		The communication between the main service and the trolley, however, is described as a <em>Dispatch</em>: in this case both entity know each other and their "positions" and can communicate with themselves. The asynchronous manner seemed best for the problem, but designers are free to change this if they deem best.
 		
-	<h2>Sprint Planning</h2>	
+	<h2>Sprint Planning</h2>
+		After talking with the product owner and the development team we decided to divide the work in 4 Sprints. Every sprint is relative to one or more PORs, to better identify their goals with a terminology which is understandable both to the product owner and scrum team.<br/>
+		The first 3 sprints are relative to the client user stories/use cases so that a deliverable subsystem should be ready for deployment as soon as possible. Furthermore, the sprint order is thought to boost the development time by designing and developing bigger components first, that can be then reused in the coming sprints.<br>
+		The last sprint would close up the project by terminating the deliverable software relative to the parking manager user stories/use cases, deemed less crucial from the product owner perspective.
+		
 		<h3>SPRINT 1</h3>
 			<p>This sprint is relative to the POR <em><a href="informin">informIN</a></em>, divided into F3, F5, F6, NF1, NF2, NF3, NF7 by the analysts. </p>
 			<table class="sprint">
@@ -568,7 +611,7 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 			</table>
 			This sprint could leverage and reuse some components created in the previous sprint so <k>four days</k> should be enough.
 		<h3>SPRINT 3</h3>
-			<p>This sprint is relative to the POR <em><a href="acceptin">acceptIN</a></em>, divided into F1, F2, F4, NF5 by the analysts. </p>
+			<p>This sprint is relative to the POR <em><a href="acceptin">acceptIN</a></em>, divided into F1, F2, F4, F17, NF5 by the analysts. </p>
 			<table class="sprint">
 				<thead>
 				<tr>
@@ -578,7 +621,7 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 				</tr>
 				</thead>
 				<tbody><tr>
-					<td>The client must successfully submit a parking request (<k>F1</k>) <br>The robot must accept a client request if it is available (<k>F2-NF5</k>) <br>The system must aknowledge from the client and/or the weight sensor when the car is in the INDOOR area (<k>F4</k>)</td>
+					<td>The client must successfully submit a parking request (<k>F1</k>) <br>The robot must accept a client request if it is available (<k>F2-NF5</k>) <br>The system must aknowledge from the client when the car is in the INDOOR area and double-check this fact through the weight sensor(<k>F4-F17</k>)</td>
 					<td></td>
 					<td>The ParkServiceGUI is supposed to show a prompt for the client to interact with for his parking request (<k>F1</k>) and to notify to the system that the car has been placed in the INDOOR area (<k>F4</k>)</td>
 				</tr>
