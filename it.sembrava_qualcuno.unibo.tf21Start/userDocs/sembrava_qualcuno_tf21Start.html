@@ -102,7 +102,7 @@ div.body{
 	 
     font-size: 18px;
 }
-k{
+k, lr{
     color: #990000;
 	font-weight: bold;
 	font-size: 90%;
@@ -204,9 +204,40 @@ div.imagedesc{
 <head>
    
 <title>Final Task Start 2021</title>
+<script type="text/javascript">
+	function setRequirementsId() {
+		var fRequirements = document.getElementsByClassName("fr")[0].children;
+		var nfRequirements = document.getElementsByClassName("nfr")[0].children;
+		var i;
+		for(i = 0; i < fRequirements.length; i++)
+			fRequirements[i].id = "F" + (i + 1);
+		for(i = 0; i < nfRequirements.length; i++)
+			nfRequirements[i].id = "NF" + (i + 1);
+	}
+
+	function addLrLinks() {
+		var lrList = document.getElementsByTagName("lr");
+
+		for(var i = 0; i < lrList.length; i++) {
+			org_html = lrList[i].outerHTML;
+			new_html = "<a href=#" + lrList[i].textContent + ">" + org_html + "</a>";
+			lrList[i].outerHTML = new_html;		
+		}
+	}
+
+	function addAutoLinks() {
+		var elements = document.getElementsByClassName("al");
+
+		for(var i = 0; i < elements.length; i++) {
+			org_html = elements[i].outerHTML;
+			new_html = "<a href=#" + elements[i].textContent + ">" + org_html + "</a>";
+			elements[i].outerHTML = new_html;	
+		}
+	}
+</script>
 </head>
     
-<body>
+<body onload="setRequirementsId(); addLrLinks(); addAutoLinks();">
 	<div id="top">
 		<h1>ISS | Final Task Start: Automated Car-Parking <font size="5"></font> </h1>
 	</div>  
@@ -427,40 +458,40 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 			As a <em>client</em> I expect to be able to:
 			<h5>Parking Phase</h5>
 			<ul>
-				<li> Request the need of parking my car by accessing the ParkServiceGUI. This request must be accepted if there is at least one <tt>parking spot</tt> available, the INDOOR area is free and the robot is not stopped by the manager as per POR <em><a href=#acceptin>acceptIN</a></em>
-				<li> Be informed about the SLOTNUM chosen by the system that refers to the parking slot where my car will be parked or that there is no space for my car to be parked at the moment as per POR <em><a href=#informin>informIN</a></em>.</li>
-				<li> If the returned SLOTNUM is a positive integer, I expect also for my car to be collected from the INDOOR area (POR <em><a href=#movetoin>moveToIn</a></em>) and parked in the right parking spot (POR <em><a href=#movetoslotin>moveToSlotIn</a></em>) as well as receiving a TOKENID to be used in the car pickup phase (POR <em><a href=#receipt>receipt</a></em>)</li>
+				<li> Request the need of parking my car by accessing the ParkServiceGUI. This request must be accepted if there is at least one <tt>parking spot</tt> available, the INDOOR area is free and the robot is not stopped by the manager as per POR <a href=#acceptin><em>acceptIN</em></a>
+				<li> Be informed about the SLOTNUM chosen by the system that refers to the parking slot where my car will be parked or that there is no space for my car to be parked at the moment as per POR <a href=#informin><em>informIN</em></a>.</li>
+				<li> If the returned SLOTNUM is a positive integer, I expect also for my car to be collected from the INDOOR area (POR <a href=#movetoin><em>moveToIn</em></a>) and parked in the right parking spot (POR <a href=#movetoslotin><em>moveToSlotIn</em></a>) as well as receiving a TOKENID to be used in the car pickup phase (POR <a href=#receipt><em>receipt</em></a>)</li>
 			</ul> 
 			<h5>Car Pickup Phase</h5>
 			<ul>
-				<li> Request the need collecting my parked car presenting to the ParkServiceGUI the TOKENID obtained in the car parking phase. This request must be accepted if the OUTDOOR area is empty and the trolley is not stopped by the manager, as per POR <em><a href=#acceptout>acceptOUT</a></em></li>
-				<li> If the token provided by me is valid, I also expect that the system automatically infers the correct parking slot of my car from the token (POR <em><a href=#findslot>findSlot</a></em>) as well as my car being transported by the trolley on the OUTDOOR area (PORs <em><a href=#movetoslotout>moveToSlotOut</a></em> and <em><a href=#movetoout>moveToOut</a></em>)</li>
+				<li> Request the need collecting my parked car presenting to the ParkServiceGUI the TOKENID obtained in the car parking phase. This request must be accepted if the OUTDOOR area is empty and the trolley is not stopped by the manager, as per POR <a href=#acceptout><em>acceptOUT</em></a></li>
+				<li> If the token provided by me is valid, I also expect that the system automatically infers the correct parking slot of my car from the token (POR <a href=#findslot><em>findSlot</em></a>) as well as my car being transported by the trolley on the OUTDOOR area (PORs <a href=#movetoslotout><em>moveToSlotOut</em></a> and <a href=#movetoout><em>moveToOut</em></a>)</li>
 				
 			</ul> 
 		<h4>Parking Manager use cases</h4>
 			As the <em>parking manager</em> I expect to be able to:
 			<ul>
-				<li>Be informed on the updated state of the parking area and system by the ParkServiceStatusGUI (POR <em><a href=#monitor>monitor</a></em> )</li>
-				<li>Stop/Resume the behavior of the trolley from the ParkServiceStatusGUI (POR <em><a href=#manage>manage</a></em> )</li>
-				<li>Being identified and authenticated by the system (POR <em><a href=#authorize>authorize</a></em> ) before letting me perform any of the above actions</li>
+				<li>Be informed on the updated state of the parking area and system by the ParkServiceStatusGUI (POR <em class="al">monitor</em>)</li>
+				<li>Stop/Resume the behavior of the trolley from the ParkServiceStatusGUI (POR <em class="al">manage</em>)</li>
+				<li>Being identified and authenticated by the system (POR <em class="al">authorize</em>) before letting me perform any of the above actions</li>
 			</ul>
 			
 		<h3>First test plan ideas</h3>
 		<ul>
-			<li><em>moveToIn</em>: check on the map if the position of the trolley corresponds with the indoor area (6,0) <k>(F5)</k></li>
-			<li><em>moveToSlotIn/Out</em>: check on the map if the position of the trolley is adjacent to the chosen parking spot (e.g. (3,2) if the parking slot is (3,3)) <k>(F5-F9)</k></li>
-			<li><em>backToHome</em>: check on the map if the trolley has returned home (0,0)</li>
-			<li><em>moveToOut</em>: check on the map if the position of the trolley corresponds with the outdoor area (6,4)<k>(F9)</k></li>
+			<li><em>moveToIn</em>: check on the map if the position of the trolley corresponds with the indoor area (6,0) <lr>F5</lr></li>
+			<li><em>moveToSlotIn/Out</em>: check on the map if the position of the trolley is adjacent to the chosen parking spot (e.g. (3,2) if the parking slot is (3,3)) (<lr>F5</lr>-<lr>F9</lr>)</li>
+			<li><em>backToHome</em>: check on the map if the trolley has returned home (0,0) (<lr>NF7</lr>)</li>
+			<li><em>moveToOut</em>: check on the map if the position of the trolley corresponds with the outdoor area (6,4) (<lr>F9</lr>)</li>
 			<div class="remark">
-				<k>Carefully note</k> that in every test above, one should also check if the robot behaves correctly (e.g. doesn't walk on the parking slots as per NF3, etc.) also by checking its route on the map 
+				<k>Carefully note</k> that in every test above, one should also check if the robot behaves correctly (e.g. doesn't walk on the parking slots as per <lr>NF3</lr>, etc.) also by checking its route on the map 
 			</div>
-			<li>Check that if there are no available parking slots the system doesn't accept the request <k>(F3)</k></li>
-			<li>Check that if a client specifies a wrong token the system does not accept the request and that the system does not give back the wrong car<k>(F6-F7-F8)</k></li>
-			<li>Check that the parking manager can access the parking area information only if authenticated <k>(F10-F16)</k></li>
-			<li>Check that if the parking manager stops the robot, it immediately stops and no other task is executed by the trolley until it exits the stop state<k>(F14-NF4)</k></li>
-			<li>Check that if TA > TMAX the fan starts and viceversa<k>(F15)</k></li>
-			<li>Check that a correct notification is sent to the parking manager if a car remains in the OUTDOOR area for more than DTFREE time <k>(F11)</k></li>
-			<li>Check that the trolley does not pick up a car from the INDOOR area, if the client says there's a car but no confirmation arrived from the weight sensor<k>(F17)</k>
+			<li>Check that if there are no available parking slots the system doesn't accept the request <lr>F3</lr></li>
+			<li>Check that if a client specifies a wrong token the system does not accept the request and that the system does not give back the wrong car (<lr>F6</lr>-<lr>F7</lr>-<lr>F8</lr>)</li>
+			<li>Check that the parking manager can access the parking area information only if authenticated (<lr>F10</lr>-<lr>F16</lr>)</li>
+			<li>Check that if the parking manager stops the robot, it immediately stops and no other task is executed by the trolley until it exits the stop state (<lr>F14</lr>-<lr>NF14</lr>)</li>
+			<li>Check that if TA > TMAX the fan starts and viceversa (<lr>F15</lr>)</li>
+			<li>Check that a correct notification is sent to the parking manager if a car remains in the OUTDOOR area for more than DTFREE time (<lr>F11</lr>)</li>
+			<li>Check that the trolley does not pick up a car from the INDOOR area, if the client says there's a car but no confirmation arrived from the weight sensor (<lr>F17</lr>)</li>	
 		</ul>
 	</div>
 	
@@ -559,16 +590,16 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 		The robot behavior could be orchestrated by an <k>observable actor</k>, capable of both communicating and receiveing information in an asynchronous way with our service as well as presenting its state. It would be then communicating with a real robot or the WEnv by the means of HTTP or websocket protocols, as the designers will deem best fit.
 		To implement this component, a good example is presented in <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html">BasicRobot.html</a>. This component is an observable kotlin actor which is already well integrated with the WEnv service and has the capability of communicating in a high level message-based way both with HTTP and WS protocols.
 		It also can be easily configured to work with diverse real robots as well as the virtual one, which satisfies the needs of abstraction already specified earlier in the analysis phase. Finally, some of the functionalities that comes with this component can actually fill the abstraction gap identified in the analysis phase:
-		the BasicRobot has the ability to move by "steps" of the same length as the robot.
+		the BasicRobot has the ability to move by "steps" of the same length as the robot. This would allow the robot to also create and interact with a virtual map in which each cell is of the same leght as the step and the robot itself (so that every step would result in a one-cell movement).
+		Using the map, the service could both be updated on the trolley position and understand how to correctly instruct it to move from its current position to the one it needs to reach for that specific use case. 
+		A usable example of map implementation that could fit the problem can be found at <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/mapRoomKotlin/mapUtil.kt" target="code">mapUtil.kt</a>; furthermore a kotlin object that already uses a map to create a plan to instruct the robot with is available at <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.planner20/resources/itunibo/planner/plannerUtil.kt">plannerUtil.kt</a><br/>
 		<div class="remark">
 			<k>Carefully note</k> that the term "observable" is here used to express the need of accessing some information without waiting or stopping the observed entity. How this should be 
 			   implemented is a project matter (restful resource, publish/subscribe, etc.).
 		</div>
-		Finally, a map of the parking area should be considered to better understand the situation at all times and to be used during tests. This could be implemented as a simple object.
-		A usable example of map implementation that could fit the problem can be found at <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/mapRoomKotlin/mapUtil.kt" target="code">mapUtil.kt</a><br/>
-		Communication between sensors controllers and the main service are described as <em>Events</em> because the sensors should not know the receiver of their messages; instead they should only fire an event to some not weel defined entity that is interested in knowing what they have to say.<br/>
-		The communication between the main service and the trolley, however, is described as a <em>Dispatch</em>: in this case both entity know each other and their "positions" and can communicate with themselves. The asynchronous manner seemed best for the problem, but designers are free to change this if they deem best.
-		
+		Communication between sensors and their controllers are described as <em>Events</em> because the sensors should not know the receiver of their messages; instead they should only fire an event to some not weel defined entity that is interested in knowing what they have to say.<br/>
+		The communication between the main service and the trolley and controllers, however, is described as a <em>Dispatch</em>: in this case both entity know each other and their "positions" and can communicate with themselves. The asynchronous manner seemed best for the problem, but designers are free to change this if they deem best.
+
 	<h2>Sprint Planning</h2>
 		After talking with the product owner and the development team we decided to divide the work in 4 Sprints. Every sprint is relative to one or more PORs, to better identify their goals with a terminology which is understandable both to the product owner and scrum team.<br/>
 		The first 3 sprints are relative to the client user stories/use cases so that a deliverable subsystem should be ready for deployment as soon as possible. Furthermore, the sprint order is thought to boost the development time by designing and developing bigger components first, that can be then reused in the coming sprints.<br>
@@ -647,6 +678,15 @@ If the <tt>OUTDOOR-area</tt> is still engaged by a car, the request is not immed
 			</table>
 		This sprint should end the development cycle and should be done in <k>5 days</k>.
 	<h2>First executable model</h2>
+		Before starting with the design and production, a working prototype can be useful to begin laying down some functional test plans and to show the product owner our understanding of (part of) the requirements in a more disambiguous way. To do so, an executable model of our domain should be designed. <br>
+		We will achieve this with the help of the <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/userDocs/LabQakIntro2021.html" >QAKactor metamodel</a>, which consist in a custom modelling language (DSL) that will help creating a smaller executable version of our domain model in which every component will be substituted by actors communicating with each other and executing tasks by the means of a Moore's Finite State Machine.<br>
+		An overview of the architecture used in this section is the following:
+		<div class="remark">
+			<center><k>THE COMING FIGURE IS A SEMPLIFICATION OF THE SYSTEM WE SHOWED IN THE ANALYSIS PHASE</k></center> 
+		</div>
+		<td style="width:50%">
+			<center><img src="./img/ModelloEseguibile.png" width="70%"></center>
+		</td>
 	
 	<h2>Test Plan</h2>
 <center>	
