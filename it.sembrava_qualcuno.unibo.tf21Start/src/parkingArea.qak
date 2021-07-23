@@ -5,173 +5,148 @@
  * ASSUMPTIONS:
  *	- INDOOR  : cell (6,0)
  *  - OUTDOOR : cell (6,4)
- * 	- One client 
- *  - One free pakingslot : cell(3,2)	SLOTNUM=5
- *  - Temperature under TMAX
- *  - No parking manager
+ *  - One free parking slot : cell(3,2)	SLOTNUM=5
+ *  - One client at a time
+ *  - No sensors and fan
+ *  - Temperature over TMAX (the trolley can be stopped)
  *	- The token corresponds to the parking slot number
+ *  - The client who picks up a car waits until the trolley transports his/her car to the OUTDOOR
+ *  - The parking manager is already logged in
  */
- 
- /* 
- * BEHAVIOR:
- * 	client  using parkingservicegui | send request reqenter 
-                                      receives the reply enter(SLOTNUM)
- *  parkingmanagerservice  	        | if INDOOR is free  
- *                                           handles reqenter              			(acceptIN )
-                                             send the reply enter(5)	  			(informIN )
- *                                           PROBLEM: define a representation for the SLOTNUM
- *                                           returns to HOME (if not already there)
- *                                    else 
-                                             send the reply enter(0)
- *                                           returns to HOME (if not already there) (moveToHome)
- *  client using parkingservicegui  | moves the car to INDOOR, press the CARENTER button (send request carenter)
- *                                    receives the reply receipt(TOKENID)			(receipt)
- *                                    PROBLEM: define a representation for the TOKENID
- *  parkingmanagerservice           | handles carenter - send the reply enter(COUNTER-5)                           
- *                                    moves the car to the free pakingslot num=5	(moveToSlotIn)
- * 									  returns to HOME						        (backToHome)
- *  client using parkingservicegui  | goto the OUTDOOR  (perhaps, but he/she could be also elsewhere... )
- *                                    send dispatch (???) pickup(1000-5)
- *                                    PROBLEM dispatch or request? The client could just see the OUTDOOR opening, but ...                               
- *  parkingmanagerservice           | if OUTDOOR is free 							(acceptOUT)
- *                                          moves the car from pakingslot (32) to OUTDOOR    (findSlot, moveToSlotOut,moveToOut)
- *                                          returns to HOME								     (moveToHome)
- *                                    else
- *                                          if( OUTDOOR not released within DTFREE) 
- *                                                  send alarm to the parking-manager 
- *                                                  PERHAPS it is time to send a message to the client ...
- * 
- *  client                          | removes the car from the OUTDOOR
- *  parkingmanagerservice           | ...
- *  
- */
+
 System carparking
 
+//INDOOR CLIENT
 //acceptIN
 Request reqenter : reqenter(X)
 Reply   enter    : enter(SLOTNUM)
-
-Dispatch clientLeave : clientLeave(X)
-
-Dispatch goToWork : goToWork(X)
 
 //informIN
 Request carenter : carenter(SLOTNUM)
 Reply   receipt  : receipt(TOKENID)
 
+Dispatch goToWork : goToWork(X)
+
 Dispatch moveToPark : moveToPark(SLOTNUM)
 
+//OUTDOOR CLIENT
 //acceptOUT
-Request reqexit :  reqexit(TOKENID)
-Reply exit : exit(X)
+Request reqexit : reqexit(TOKENID)
+Reply 	exit 	: exit(X)
 
 Dispatch moveToOut : moveToOut(SLOTNUM)
 
-Dispatch stop : stop(X)
-Dispatch resume : resume(X)
+//PARK MANAGER
+Dispatch toggleState : toggleState(X)
 
+//PARK MANAGER SERVICE
+Event stop	 : stop(X)
+Event resume : resume(X)
+
+//TROLLEY
 Dispatch goToIdle : goToIdle(X)
 
 Context ctxcarparking ip[host="localhost" port=8002]
 
-//TODO: Add updateResources and println
-
-/*
- * Used at the moment as a clientmock ...
- */
-QActor indoorparkingservicegui context ctxcarparking{
+QActor indoorparkingservicegui context ctxcarparking {
 	[# var SLOTNUM = 0 #]
-	State s0 initial{
-		println("indoorparkingservicegui (client mock)  STARTS")
+	
+	State s0 initial {
+		println("indoorparkingservicegui STARTS")
+		updateResource [# "indoorparkingservicegui STARTS" #]
 	}
 	Goto requestToenter
 	
-	State requestToenter{
-		println("client requestToenter")
-		request parkingmanagerservice -m reqenter : reqenter(bob)
+	State requestToenter {
+		println("indoorparkingservicegui requestToenter")
+		updateResource [# indoorparkingservicegui requestToenter #]
+		
+		request parkclientservice -m reqenter : reqenter(bob)
 	}
 	Transition t0
-		//The client does not wait forever...
-		whenTime 1000 -> retrylater
+		whenTime 1000 -> retrylater		//The client does not wait forever...
 	    whenReply enter -> enterthecar
 	
-	State enterthecar{
+	State enterthecar {
  		onMsg(enter : enter(SLOTNUM)){
 			[# SLOTNUM = payloadArg(0).toInt() #]
-			println("client receives SLOTNUM = $SLOTNUM")
+			
+			println("indoorparkingservicegui receives SLOTNUM = $SLOTNUM")
+			updateResource [# "indoorparkingservicegui receives SLOTNUM = $SLOTNUM" #]
 		}		
 	}
 	Goto retrylater if [# SLOTNUM == 0 #] else movethecartoindoor
 	
-	State movethecartoindoor{
-		println("client moving the car in the INDOOR and press CARENTER")
-		request parkingmanagerservice -m carenter : carenter($SLOTNUM)		
+	State movethecartoindoor {
+		println("indoorparkingservicegui moving the car in the INDOOR and press CARENTER")
+		updateResource [# "indoorparkingservicegui oving the car in the INDOOR and press CARENTER" #]
+		
+		request parkclientservice -m carenter : carenter($SLOTNUM)		
 	}
 	Transition t0 
 		whenReply receipt -> afterreceipt
 	
-	State afterreceipt{
-		//The client leaves
-		printCurrentMessage
+	//The client leaves
+	State afterreceipt {
+		println("indoorparkingservicegui leaves")
+		updateResource [# "indoorparkingservicegui leaves" #]
 	}
 	
-	State retrylater{
-		println("client will retry later")
-		//The client leaves, notify it to the parkingmanagerservice
-		forward parkingmanagerservice -m clientLeave : clientLeave(bob)
+	//The client leaves, notify it to the parkclientservice
+	State retrylater {
+		println("indoorparkingservicegui will retry later")
+		updateResource [# "indoorparkingservicegui will retry later" #]
+		
+		forward parkclientservice -m goToWork : goToWork(bob)
 	}
 }
 
 QActor outdoorparkingservicegui context ctxcarparking {
 	State s0 initial {
-		println("outdoorparkingservicegui (client mock)  STARTS")
+		println("outdoorparkingservicegui STARTS")
+		updateResource [# "outdoorparkingservicegui STARTS" #]
 	}
 	Goto requestToExit
 	
 	State requestToExit {
-		println("client requestToExit")
-		request parkingmanagerservice -m reqexit : reqexit(TOKENID)
+		println("outdoorparkingservicegui requestToExit")
+		updateResource [# "outdoorparkingservicegui requestToExit" #]
+		
+		request parkclientservice -m reqexit : reqexit(TOKENID)
 	}
 	Transition t0
-		//The client does not wait forever...
-		whenTime 1000 -> retrylater
 	    whenReply exit -> afterreceipt
 	
-	State afterreceipt{
-		//The client leaves
-		printCurrentMessage
-	}
-	    
-	State retrylater{
-		println("client will retry later")
-		//The client leaves, notify it to the parkingmanagerservice
-		forward parkingmanagerservice -m clientLeave : clientLeave(alice)
+	//The client leaves
+	State afterreceipt {
+		println("outdoorparkingservicegui leaves")
+		updateResource [# "outdoorparkingservicegui leaves" #]
 	}
 }
  
-QActor parkingmanagerservice context ctxcarparking{
-	State s0 initial{
-		println("parkingmanagerservice STARTS")
-		updateResource [# "parkingmanagerservice STARTS" #]
+QActor parkclientservice context ctxcarparking {
+	State s0 initial {
+		println("parkclientservice STARTS")
+		updateResource [# "parkclientservice STARTS" #]
 	}
 	Goto work
 	
-	State work{
-		println("parkingmanagerservice waiting ...")
-		updateResource [# "parkingmanagerservice waiting ..." #]
+	State work {
+		println("parkclientservice waiting ...")
+		updateResource [# "parkclientservice waiting ..." #]
 	}
 	Transition t0 
 		whenRequest reqenter -> handleEnterRequest
 		whenRequest reqexit -> handleOutRequest
-		//TODO: Add manager requests
 	
 	State handleEnterRequest{
+		println("parkclientservice reply to reqenter")
+		updateResource [# "parkclientservice reply to reqenter" #]
 		printCurrentMessage
-		println("parkingmanagerservice reply to reqenter")
 		
 		//acceptIN
-		//TODO: Può ricavare lo stato del trolley tramite COAP utilizzando it.unibo.tf21Analisi/resources/utils/CoapObserver.kt
-		if [# utils.ParkingAreaKb2.indoorfree && utils.ParkingAreaKb2.trolleyAvailable #] {
+		//The trolley state can also be retrieved through the COAP protocol using it.unibo.tf21Analisi/resources/utils/CoapObserver.kt
+		if [# utils.ParkingAreaKb2.indoorfree && !utils.ParkingAreaKb2.trolleyStopped #] {
 			//Get first free parking spot, or 0
 			[# 
 				var SLOTNUM = 0
@@ -185,25 +160,28 @@ QActor parkingmanagerservice context ctxcarparking{
 			#]
 			
 			//informIN
-			updateResource [# "slotNum(SLOTNUM)" #]
+			println("parkclientservice reply enter($SLOTNUM)")
+			updateResource [# "parkclientservice reply enter($SLOTNUM)" #]
+			
 			replyTo reqenter with enter : enter($SLOTNUM)
 			
 			if [# SLOTNUM == 0 #] {
-				forward parkingmanagerservice -m goToWork : goToWork(enter(0))
-				//Muovi il trolley in home position (può essere evitato)
+				forward parkclientservice -m goToWork : goToWork(enter(0))
+				//backToHome requirement has been incorporated in trolley's idle state
 			}
 		}
 		else {
-			//Per semplicità risponde slotnum=0 per indicare che la indoor area e/o il trolley sono occupati
+			//Reply with slotnum=0 to indicates both indoor area and trolley are occupied
+			println("parkclientservice reply enter($SLOTNUM)")
+			updateResource [# "parkclientservice reply enter($SLOTNUM)" #]
+			
 			replyTo reqenter with enter : enter(0)
-			updateResource [# "reply(enter(0))" #]
-			forward parkingmanagerservice -m goToWork : goToWork(enter(0))
+			forward parkclientservice -m goToWork : goToWork(enter(0))
 		}
 	}
 	Transition t0
 		whenMsg goToWork -> work
 		whenRequest carenter -> enterthecar
-		whenMsg clientLeave -> work
 	
 	State enterthecar{
 		printCurrentMessage		
@@ -239,22 +217,63 @@ QActor parkingmanagerservice context ctxcarparking{
 			}
 			
 			replyTo reqexit with exit : exit($CARSLOTNUM)
-			forward parkingmanagerservice -m goToWork : goToWork(exit($CARSLOTNUM))
 		}
 	}
-	Transition t0
-		whenMsg clientLeave -> work
-		whenMsg goToWork -> work
+	Goto work
 }
 
-QActor parkingservicestatusgui context  ctxcarparking{
-	State s0 initial{
-		println("parkingservicestatusgui STARTS")
+QActor parkservicestatusgui context ctxcarparking {
+	State s0 initial {
+		println("parkservicestatusgui STARTS")
+		updateResource [# "parkservicestatusgui STARTS" #]
 	}
+	Goto toggleState
+	
+	State toggleState {
+		println("parkservicestatusgui toggle state")
+		updateResource [# "parkservicestatusgui toggle state" #]
+		forward parkmanagerservice -m toggleState : toggleState(X)
+		delay 1000
+		println("parkservicestatusgui toggle state")
+		updateResource [# "parkservicestatusgui toggle state" #]
+		forward parkmanagerservice -m toggleState : toggleState(X)
+	}
+}
+
+QActor parkmanagerservice context ctxcarparking {
+	State s0 initial {
+		println("parkmanagerservice STARTS")
+		updateResource [# "parkmanagerservice STARTS" #]
+	}
+	
+	State work {
+		println("parkmanagerservice waiting ...")
+		updateResource [# "parkmanagerservice waiting ..." #]
+	}
+	Transition t0
+		whenMsg toggleState -> toggleTrolleyState
+	
+	State toggleTrolleyState {
+		if [# utils.ParkingAreaKb2.trolleyStopped #] {
+			[# utils.ParkingAreaKb2.trolleyStopped = false #]
+			
+			println("parkmanagerservice emit resume")
+			updateResource [# "parkmanagerservice emit resume" #]
+			emit resume : resume(X)
+		}
+		else {
+			[# utils.ParkingAreaKb2.trolleyStopped = true #]
+			
+			println("parkmanagerservice emit stop")
+			updateResource [# "parkmanagerservice emit stop" #]
+			emit stop : stop(X)
+		}
+	}
+	Goto work
 }
 
 QActor trolley context  ctxcarparking{
-	State s0 initial{
+	State s0 initial {
 		println("trolley STARTS")
 		updateResource [# "trolley STARTS" #]
 	}
@@ -266,19 +285,26 @@ QActor trolley context  ctxcarparking{
 		//Moves the trolley to the home position if not there already
 	}
 	Transition t0
+		whenEvent stop -> stopped
 		whenMsg moveToPark -> working
 		whenMsg moveToOut -> working
-		whenMsg stop -> stopped
 	
 	State working {
 		printCurrentMessage
+		
 		onMsg(moveToPark : moveToPark(SLOTNUM)) {
+			println("trolley moveToPark")
+			updateResource [# "trolley moveToPark" #]
+			
 			//Move the trolley to the INDOOR area
 			
 			//Move the trolley to the specific parking slot	
 		}
 		
 		onMsg(moveToOut : moveToOut(SLOTNUM)) {
+			println("trolley moveToOut")
+			updateResource [# "trolley moveToOut" #]
+						
 			//Move the trolley to the specific parking slot
 			
 			//Move the trolley to the OUTDOOR area
@@ -287,7 +313,7 @@ QActor trolley context  ctxcarparking{
 		forward trolley -m goToIdle : goToIdle(X)
 	}
 	Transition t0
-		whenMsg stop -> stopped
+		whenEvent stop -> stopped
 		whenMsg goToIdle -> idle
 	
 	State stopped {
@@ -295,9 +321,6 @@ QActor trolley context  ctxcarparking{
 		updateResource [# "trolley STOPPED" #]
 	}
 	Transition t0
-		whenMsg resume -> working
+		whenEvent resume -> working
 }
-
-/* ======================================================================== */
-
  

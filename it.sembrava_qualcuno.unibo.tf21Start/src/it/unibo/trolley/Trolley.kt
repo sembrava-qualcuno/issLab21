@@ -30,23 +30,29 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley IDLE"  
 						)
 					}
-					 transition(edgeName="t012",targetState="working",cond=whenDispatch("moveToPark"))
-					transition(edgeName="t013",targetState="working",cond=whenDispatch("moveToOut"))
-					transition(edgeName="t014",targetState="stopped",cond=whenDispatch("stop"))
+					 transition(edgeName="t09",targetState="stopped",cond=whenEvent("stop"))
+					transition(edgeName="t010",targetState="working",cond=whenDispatch("moveToPark"))
+					transition(edgeName="t011",targetState="working",cond=whenDispatch("moveToOut"))
 				}	 
 				state("working") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("moveToPark(SLOTNUM)"), Term.createTerm("moveToPark(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("trolley moveToPark")
+								updateResourceRep( "trolley moveToPark"  
+								)
 						}
 						if( checkMsgContent( Term.createTerm("moveToOut(SLOTNUM)"), Term.createTerm("moveToOut(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("trolley moveToOut")
+								updateResourceRep( "trolley moveToOut"  
+								)
 						}
 						forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
 					}
-					 transition(edgeName="t015",targetState="stopped",cond=whenDispatch("stop"))
-					transition(edgeName="t016",targetState="idle",cond=whenDispatch("goToIdle"))
+					 transition(edgeName="t012",targetState="stopped",cond=whenEvent("stop"))
+					transition(edgeName="t013",targetState="idle",cond=whenDispatch("goToIdle"))
 				}	 
 				state("stopped") { //this:State
 					action { //it:State
@@ -54,7 +60,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley STOPPED"  
 						)
 					}
-					 transition(edgeName="t017",targetState="working",cond=whenDispatch("resume"))
+					 transition(edgeName="t014",targetState="working",cond=whenEvent("resume"))
 				}	 
 			}
 		}

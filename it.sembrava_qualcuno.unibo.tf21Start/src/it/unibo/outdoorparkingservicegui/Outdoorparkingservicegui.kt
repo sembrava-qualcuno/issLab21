@@ -19,29 +19,26 @@ class Outdoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorB
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("outdoorparkingservicegui (client mock)  STARTS")
+						println("outdoorparkingservicegui STARTS")
+						updateResourceRep( "outdoorparkingservicegui STARTS"  
+						)
 					}
 					 transition( edgeName="goto",targetState="requestToExit", cond=doswitch() )
 				}	 
 				state("requestToExit") { //this:State
 					action { //it:State
-						println("client requestToExit")
-						request("reqexit", "reqexit(TOKENID)" ,"parkingmanagerservice" )  
-						stateTimer = TimerActor("timer_requestToExit", 
-							scope, context!!, "local_tout_outdoorparkingservicegui_requestToExit", 1000.toLong() )
+						println("outdoorparkingservicegui requestToExit")
+						updateResourceRep( "outdoorparkingservicegui requestToExit"  
+						)
+						request("reqexit", "reqexit(TOKENID)" ,"parkclientservice" )  
 					}
-					 transition(edgeName="t03",targetState="retrylater",cond=whenTimeout("local_tout_outdoorparkingservicegui_requestToExit"))   
-					transition(edgeName="t04",targetState="afterreceipt",cond=whenReply("exit"))
+					 transition(edgeName="t03",targetState="afterreceipt",cond=whenReply("exit"))
 				}	 
 				state("afterreceipt") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-					}
-				}	 
-				state("retrylater") { //this:State
-					action { //it:State
-						println("client will retry later")
-						forward("clientLeave", "clientLeave(alice)" ,"parkingmanagerservice" ) 
+						println("outdoorparkingservicegui leaves")
+						updateResourceRep( "outdoorparkingservicegui leaves"  
+						)
 					}
 				}	 
 			}

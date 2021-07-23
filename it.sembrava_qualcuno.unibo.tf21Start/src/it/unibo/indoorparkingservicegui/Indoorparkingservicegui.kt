@@ -20,14 +20,18 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("indoorparkingservicegui (client mock)  STARTS")
+						println("indoorparkingservicegui STARTS")
+						updateResourceRep( "indoorparkingservicegui STARTS"  
+						)
 					}
 					 transition( edgeName="goto",targetState="requestToenter", cond=doswitch() )
 				}	 
 				state("requestToenter") { //this:State
 					action { //it:State
-						println("client requestToenter")
-						request("reqenter", "reqenter(bob)" ,"parkingmanagerservice" )  
+						println("indoorparkingservicegui requestToenter")
+						updateResourceRep( indoorparkingservicegui requestToenter  
+						)
+						request("reqenter", "reqenter(bob)" ,"parkclientservice" )  
 						stateTimer = TimerActor("timer_requestToenter", 
 							scope, context!!, "local_tout_indoorparkingservicegui_requestToenter", 1000.toLong() )
 					}
@@ -39,7 +43,9 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 						if( checkMsgContent( Term.createTerm("enter(SLOTNUM)"), Term.createTerm("enter(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 SLOTNUM = payloadArg(0).toInt()  
-								println("client receives SLOTNUM = $SLOTNUM")
+								println("indoorparkingservicegui receives SLOTNUM = $SLOTNUM")
+								updateResourceRep( "indoorparkingservicegui receives SLOTNUM = $SLOTNUM"  
+								)
 						}
 					}
 					 transition( edgeName="goto",targetState="retrylater", cond=doswitchGuarded({ SLOTNUM == 0  
@@ -49,20 +55,26 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 				}	 
 				state("movethecartoindoor") { //this:State
 					action { //it:State
-						println("client moving the car in the INDOOR and press CARENTER")
-						request("carenter", "carenter($SLOTNUM)" ,"parkingmanagerservice" )  
+						println("indoorparkingservicegui moving the car in the INDOOR and press CARENTER")
+						updateResourceRep( "indoorparkingservicegui oving the car in the INDOOR and press CARENTER"  
+						)
+						request("carenter", "carenter($SLOTNUM)" ,"parkclientservice" )  
 					}
 					 transition(edgeName="t02",targetState="afterreceipt",cond=whenReply("receipt"))
 				}	 
 				state("afterreceipt") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
+						println("indoorparkingservicegui leaves")
+						updateResourceRep( "indoorparkingservicegui leaves"  
+						)
 					}
 				}	 
 				state("retrylater") { //this:State
 					action { //it:State
-						println("client will retry later")
-						forward("clientLeave", "clientLeave(bob)" ,"parkingmanagerservice" ) 
+						println("indoorparkingservicegui will retry later")
+						updateResourceRep( "indoorparkingservicegui will retry later"  
+						)
+						forward("goToWork", "goToWork(bob)" ,"parkclientservice" ) 
 					}
 				}	 
 			}
