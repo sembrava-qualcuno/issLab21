@@ -30,7 +30,7 @@ class Outdoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorB
 						println("outdoorparkingservicegui requestToExit")
 						updateResourceRep( "outdoorparkingservicegui requestToExit"  
 						)
-						request("reqexit", "reqexit(TOKENID)" ,"parkclientservice" )  
+						request("reqexit", "reqexit(5)" ,"parkclientservice" )  
 					}
 					 transition(edgeName="t03",targetState="afterreceipt",cond=whenReply("exit"))
 				}	 

@@ -34,15 +34,15 @@ class Parkmanagerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("toggleTrolleyState") { //this:State
 					action { //it:State
-						if(  utils.ParkingAreaKb2.trolleyStopped  
-						 ){ utils.ParkingAreaKb2.trolleyStopped = false  
+						if(  ParkingAreaKb.trolleyStopped  
+						 ){ ParkingAreaKb.trolleyStopped = false  
 						println("parkmanagerservice emit resume")
 						updateResourceRep( "parkmanagerservice emit resume"  
 						)
 						emit("resume", "resume(X)" ) 
 						}
 						else
-						 { utils.ParkingAreaKb2.trolleyStopped = true  
+						 { ParkingAreaKb.trolleyStopped = true  
 						 println("parkmanagerservice emit stop")
 						 updateResourceRep( "parkmanagerservice emit stop"  
 						 )

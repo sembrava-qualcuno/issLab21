@@ -29,7 +29,7 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 				state("requestToenter") { //this:State
 					action { //it:State
 						println("indoorparkingservicegui requestToenter")
-						updateResourceRep( indoorparkingservicegui requestToenter  
+						updateResourceRep( "indoorparkingservicegui requestToenter"  
 						)
 						request("reqenter", "reqenter(bob)" ,"parkclientservice" )  
 						stateTimer = TimerActor("timer_requestToenter", 

@@ -59,7 +59,7 @@ QActor indoorparkingservicegui context ctxcarparking {
 	
 	State requestToenter {
 		println("indoorparkingservicegui requestToenter")
-		updateResource [# indoorparkingservicegui requestToenter #]
+		updateResource [# "indoorparkingservicegui requestToenter" #]
 		
 		request parkclientservice -m reqenter : reqenter(bob)
 	}
@@ -112,7 +112,7 @@ QActor outdoorparkingservicegui context ctxcarparking {
 		println("outdoorparkingservicegui requestToExit")
 		updateResource [# "outdoorparkingservicegui requestToExit" #]
 		
-		request parkclientservice -m reqexit : reqexit(TOKENID)
+		request parkclientservice -m reqexit : reqexit(5)
 	}
 	Transition t0
 	    whenReply exit -> afterreceipt
@@ -144,17 +144,18 @@ QActor parkclientservice context ctxcarparking {
 		updateResource [# "parkclientservice reply to reqenter" #]
 		printCurrentMessage
 		
+		[# var SLOTNUM = 0 #]
+		
 		//acceptIN
 		//The trolley state can also be retrieved through the COAP protocol using it.unibo.tf21Analisi/resources/utils/CoapObserver.kt
-		if [# utils.ParkingAreaKb2.indoorfree && !utils.ParkingAreaKb2.trolleyStopped #] {
+		if [# ParkingAreaKb.indoorfree && !ParkingAreaKb.trolleyStopped #] {
 			//Get first free parking spot, or 0
 			[# 
-				var SLOTNUM = 0
-				var i
-				for(i = 0; i <= 5 && SLOTNUM == 0; i++) {
-					if(utils.ParkingAreaKb2.slotStateFree[i] == true) {
+				for(i in 0..5) {
+					if(ParkingAreaKb.slotStateFree[i] == true) {
 						SLOTNUM = i + 1
-						utils.ParkingAreaKb2.slotStateFree[i] == false
+						ParkingAreaKb.slotStateFree[i] == false
+						break
 					}
 				}
 			#]
@@ -207,7 +208,7 @@ QActor parkclientservice context ctxcarparking {
 			[# var CARSLOTNUM = payloadArg(0).toInt() #]
 			
 			//Check if the tokenid is valid
-			if [# TOKENID >= 1 && TOKENID <= 6 && !utils.ParkingAreaKb2.slotStateFree[TOKENID - 1] #] {
+			if [# CARSLOTNUM >= 1 && CARSLOTNUM <= 6 && !ParkingAreaKb.slotStateFree[CARSLOTNUM - 1] #] {
 				//moveToOut
 				forward trolley -m moveToOut : moveToOut($CARSLOTNUM)
 			}
@@ -254,15 +255,15 @@ QActor parkmanagerservice context ctxcarparking {
 		whenMsg toggleState -> toggleTrolleyState
 	
 	State toggleTrolleyState {
-		if [# utils.ParkingAreaKb2.trolleyStopped #] {
-			[# utils.ParkingAreaKb2.trolleyStopped = false #]
+		if [# ParkingAreaKb.trolleyStopped #] {
+			[# ParkingAreaKb.trolleyStopped = false #]
 			
 			println("parkmanagerservice emit resume")
 			updateResource [# "parkmanagerservice emit resume" #]
 			emit resume : resume(X)
 		}
 		else {
-			[# utils.ParkingAreaKb2.trolleyStopped = true #]
+			[# ParkingAreaKb.trolleyStopped = true #]
 			
 			println("parkmanagerservice emit stop")
 			updateResource [# "parkmanagerservice emit stop" #]

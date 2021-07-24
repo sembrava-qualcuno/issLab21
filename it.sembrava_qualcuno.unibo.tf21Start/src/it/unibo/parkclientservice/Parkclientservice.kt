@@ -40,14 +40,14 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 						updateResourceRep( "parkclientservice reply to reqenter"  
 						)
 						println("$name in ${currentState.stateName} | $currentMsg")
-						if(  utils.ParkingAreaKb2.indoorfree && !utils.ParkingAreaKb2.trolleyStopped  
+						 var SLOTNUM = 0  
+						if(  ParkingAreaKb.indoorfree && !ParkingAreaKb.trolleyStopped  
 						 ){ 
-										var SLOTNUM = 0
-										var i
-										for(i = 0; i <= 5 && SLOTNUM == 0; i++) {
-											if(utils.ParkingAreaKb2.slotStateFree[i] == true) {
+										for(i in 0..5) {
+											if(ParkingAreaKb.slotStateFree[i] == true) {
 												SLOTNUM = i + 1
-												utils.ParkingAreaKb2.slotStateFree[i] == false
+												ParkingAreaKb.slotStateFree[i] == false
+												break
 											}
 										}
 						println("parkclientservice reply enter($SLOTNUM)")
@@ -89,7 +89,7 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 						if( checkMsgContent( Term.createTerm("reqexit(TOKENID)"), Term.createTerm("reqexit(TOKENID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var CARSLOTNUM = payloadArg(0).toInt()  
-								if(  TOKENID >= 1 && TOKENID <= 6 && !utils.ParkingAreaKb2.slotStateFree[TOKENID - 1]  
+								if(  CARSLOTNUM >= 1 && CARSLOTNUM <= 6 && !ParkingAreaKb.slotStateFree[CARSLOTNUM - 1]  
 								 ){forward("moveToOut", "moveToOut($CARSLOTNUM)" ,"trolley" ) 
 								}
 								else
