@@ -58,7 +58,14 @@ QActor indoorparkingservicegui context ctxcarparking {
 		println("indoorparkingservicegui STARTS")
 		updateResource [# "indoorparkingservicegui STARTS" #]
 	}
-	//Goto requestToenter
+	Goto work
+	
+	State work {
+		println("indoorparkingservicegui waiting for commands ...")
+		updateResource [# "indoorparkingservicegui waiting for commands ..." #]
+	}
+	Transition t0
+		whenMsg doAction -> requestToenter
 	
 	State requestToenter {
 		println("indoorparkingservicegui requestToenter")
@@ -109,13 +116,23 @@ QActor outdoorparkingservicegui context ctxcarparking {
 		println("outdoorparkingservicegui STARTS")
 		updateResource [# "outdoorparkingservicegui STARTS" #]
 	}
-	//Goto requestToExit
+	Goto work
+	
+	State work {
+		println("outdoorparkingservicegui waiting for commands ...")
+		updateResource [# "outdoorparkingservicegui waiting for commands ..." #]
+	}
+	Transition t0
+		whenMsg doAction -> requestToExit
 	
 	State requestToExit {
-		println("outdoorparkingservicegui requestToExit")
-		updateResource [# "outdoorparkingservicegui requestToExit" #]
+		onMsg(doAction : doAction(TOKENID)) {
+			[# var TOKENID = payloadArg(0).toInt() #]
+			println("outdoorparkingservicegui requestToExit($TOKENID)")
+			updateResource [# "outdoorparkingservicegui requestToExit($TOKENID)" #]
 		
-		request parkclientservice -m reqexit : reqexit(5)
+			request parkclientservice -m reqexit : reqexit(TOKENID)	
+		}
 	}
 	Transition t0
 	    whenReply exit -> afterreceipt

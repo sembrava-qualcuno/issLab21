@@ -23,15 +23,28 @@ class Outdoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorB
 						updateResourceRep( "outdoorparkingservicegui STARTS"  
 						)
 					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("work") { //this:State
+					action { //it:State
+						println("outdoorparkingservicegui waiting for commands ...")
+						updateResourceRep( "outdoorparkingservicegui waiting for commands ..."  
+						)
+					}
+					 transition(edgeName="t04",targetState="requestToExit",cond=whenDispatch("doAction"))
 				}	 
 				state("requestToExit") { //this:State
 					action { //it:State
-						println("outdoorparkingservicegui requestToExit")
-						updateResourceRep( "outdoorparkingservicegui requestToExit"  
-						)
-						request("reqexit", "reqexit(5)" ,"parkclientservice" )  
+						if( checkMsgContent( Term.createTerm("doAction(X)"), Term.createTerm("doAction(TOKENID)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								 var TOKENID = payloadArg(0).toInt()  
+								println("outdoorparkingservicegui requestToExit($TOKENID)")
+								updateResourceRep( "outdoorparkingservicegui requestToExit($TOKENID)"  
+								)
+								request("reqexit", "reqexit(TOKENID)" ,"parkclientservice" )  
+						}
 					}
-					 transition(edgeName="t03",targetState="afterreceipt",cond=whenReply("exit"))
+					 transition(edgeName="t05",targetState="afterreceipt",cond=whenReply("exit"))
 				}	 
 				state("afterreceipt") { //this:State
 					action { //it:State

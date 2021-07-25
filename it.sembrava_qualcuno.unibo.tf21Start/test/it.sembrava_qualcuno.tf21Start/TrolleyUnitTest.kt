@@ -21,6 +21,7 @@ import org.junit.After
 import it.unibo.qak21.basicrobot.CoapObserverForTestingOld
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import it.unibo.utils.ParkingAreaKb
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
@@ -71,6 +72,12 @@ class TrolleyUnitTest {
 			}			
 		} 
 		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "trolley", "8022")
+		
+		// Reset the knowledge base to assumption state 
+		ParkingAreaKb.indoorfree = true
+		ParkingAreaKb.outdoorfree = true
+		ParkingAreaKb.slotStateFree = booleanArrayOf(false, false, false, false, true, false)
+		ParkingAreaKb.trolleyStopped = false
   	}
 	
 	@After

@@ -32,8 +32,8 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 						updateResourceRep( "parkclientservice waiting ..."  
 						)
 					}
-					 transition(edgeName="t04",targetState="handleEnterRequest",cond=whenRequest("reqenter"))
-					transition(edgeName="t05",targetState="handleOutRequest",cond=whenRequest("reqexit"))
+					 transition(edgeName="t06",targetState="handleEnterRequest",cond=whenRequest("reqenter"))
+					transition(edgeName="t07",targetState="handleOutRequest",cond=whenRequest("reqexit"))
 				}	 
 				state("handleEnterRequest") { //this:State
 					action { //it:State
@@ -62,8 +62,8 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 						)
 						answer("reqenter", "enter", "enter($SLOTNUM)"   )  
 					}
-					 transition(edgeName="t06",targetState="work",cond=whenDispatch("goToWork"))
-					transition(edgeName="t07",targetState="enterthecar",cond=whenRequest("carenter"))
+					 transition(edgeName="t08",targetState="work",cond=whenDispatch("goToWork"))
+					transition(edgeName="t09",targetState="enterthecar",cond=whenRequest("carenter"))
 				}	 
 				state("enterthecar") { //this:State
 					action { //it:State

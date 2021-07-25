@@ -18,20 +18,20 @@ import org.junit.AfterClass
 import it.unibo.kactor.sysUtil
 import it.unibo.kactor.ApplMessage
 import org.junit.After
-import it.unibo.qak21.basicrobot.CoapObserverForTestingOld
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import it.unibo.utils.ParkingAreaKb
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
-class ManagerServiceUnitTest {
+class TestPlan3 {
 		
 	companion object {
 		var testingObserver : CoapObserverForTesting ? = null
 		var systemStarted = false
 		val channelSyncStart = Channel<String>()
-		var myactor : ActorBasic? = null
+		val actors : Array<String> = arrayOf("outdoorparkingservicegui", "parkclientservice", "trolley")
+		var myactor : ActorBasic ? = null
 		var counter = 1
 		
 		@JvmStatic
@@ -41,12 +41,9 @@ class ManagerServiceUnitTest {
 				it.unibo.ctxcarparking.main() //keep the control
 			}
 			GlobalScope.launch {
-				myactor = QakContext.getActor("parkmanagerservice")
-				
- 				while(myactor == null) {
+ 				while(!actorsReady()) {
 					println("waiting for system startup ...")
 					delay(500)
-					myactor = QakContext.getActor("parkmanagerservice")
 				}				
 				delay(2000)
 				channelSyncStart.send("starttesting")
@@ -57,7 +54,15 @@ class ManagerServiceUnitTest {
 	    @AfterClass
 		fun terminate() {
 			println("terminate the testing")
-		}	
+		}
+		
+		fun actorsReady() : Boolean {
+			for(actor in actors) {
+				if(QakContext.getActor(actor) == null)
+					return false
+			}
+			return true
+		}
 	}
 	
 	@Before
@@ -71,7 +76,7 @@ class ManagerServiceUnitTest {
 			    println("+++++++++ checkSystemStarted resumed ")
 			}			
 		} 
-		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "parkmanagerservice", "8022")
+		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "trolley", "8022")
 		
 		// Reset the knowledge base to assumption state 
 		ParkingAreaKb.indoorfree = true
@@ -92,24 +97,26 @@ class ManagerServiceUnitTest {
 		}
  	}
 	
-	//Test if the service correctly switches states after a toggle dispatch arrives (both from the CoAP-observable state and the Kwnoledge base)
+	/*
+ 	 * This test plan will work as an integration test for the OutdoorParkingServiceGUI, ParkClientService and Trolley components.
+   	 * It will also work as a functional test for client "Car Pickup" use case (PORs acceptOUT and moveToSlotOut). 
+	 */
 	@Test
-	fun testToggleTrolleyState() {
-		println("+++++++++ testToggleTrolleyState ")
+	fun testAcceptOut() {
+		println("+++++++++ testAcceptOut ")
 		
 		runBlocking {
 			val channelForObserver = Channel<String>()
  			testingObserver!!.addObserver(channelForObserver)
 			
-			var toggleState = MsgUtil.buildDispatch("managerserviceunittest", "toggleState", "toggleState(X)", "parkmanagerservice")
 			
-			MsgUtil.sendMsg(toggleState, myactor!!)
-			assertEquals(channelForObserver.receive(), "parkmanagerservice emit stop")
-			
+			var doAction = MsgUtil.buildDispatch("testplan3", "doAction", "doAction(1)", "outdoorparkingservicegui")
+
+			MsgUtil.sendMsg(doAction, QakContext.getActor("outdoorparkingservicegui")!!)
 			delay(500)
-			
-			MsgUtil.sendMsg(toggleState, myactor!!)
-			assertEquals(channelForObserver.receive(), "parkmanagerservice emit resume")
+			assertEquals(channelForObserver.receive(), "trolley WORKING")
+			delay(500)
+			assertEquals(channelForObserver.receive(), "trolley moveToOut(1)")
 		}
 	}
-}
+} 

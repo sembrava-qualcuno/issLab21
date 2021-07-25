@@ -24,6 +24,15 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 						updateResourceRep( "indoorparkingservicegui STARTS"  
 						)
 					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("work") { //this:State
+					action { //it:State
+						println("indoorparkingservicegui waiting for commands ...")
+						updateResourceRep( "indoorparkingservicegui waiting for commands ..."  
+						)
+					}
+					 transition(edgeName="t00",targetState="requestToenter",cond=whenDispatch("doAction"))
 				}	 
 				state("requestToenter") { //this:State
 					action { //it:State
@@ -34,8 +43,8 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 						stateTimer = TimerActor("timer_requestToenter", 
 							scope, context!!, "local_tout_indoorparkingservicegui_requestToenter", 1000.toLong() )
 					}
-					 transition(edgeName="t00",targetState="retrylater",cond=whenTimeout("local_tout_indoorparkingservicegui_requestToenter"))   
-					transition(edgeName="t01",targetState="enterthecar",cond=whenReply("enter"))
+					 transition(edgeName="t01",targetState="retrylater",cond=whenTimeout("local_tout_indoorparkingservicegui_requestToenter"))   
+					transition(edgeName="t02",targetState="enterthecar",cond=whenReply("enter"))
 				}	 
 				state("enterthecar") { //this:State
 					action { //it:State
@@ -59,7 +68,7 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 						)
 						request("carenter", "carenter($SLOTNUM)" ,"parkclientservice" )  
 					}
-					 transition(edgeName="t02",targetState="afterreceipt",cond=whenReply("receipt"))
+					 transition(edgeName="t03",targetState="afterreceipt",cond=whenReply("receipt"))
 				}	 
 				state("afterreceipt") { //this:State
 					action { //it:State

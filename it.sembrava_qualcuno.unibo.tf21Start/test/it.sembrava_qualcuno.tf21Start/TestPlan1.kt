@@ -78,6 +78,12 @@ class TestPlan1 {
 			}			
 		} 
 		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "trolley", "8022")
+		
+		// Reset the knowledge base to assumption state 
+		ParkingAreaKb.indoorfree = true
+		ParkingAreaKb.outdoorfree = true
+		ParkingAreaKb.slotStateFree = booleanArrayOf(false, false, false, false, true, false)
+		ParkingAreaKb.trolleyStopped = false
   	}
 	
 	@After
@@ -104,10 +110,7 @@ class TestPlan1 {
 			val channelForObserver = Channel<String>()
  			testingObserver!!.addObserver(channelForObserver)
 			
-			var doAction = MsgUtil.buildDispatch("managerserviceintegrationtest", "doAction", "doAction(X)", "parkservicestatusgui")
-			
-			//Set initial conditions
-			ParkingAreaKb.trolleyStopped = false
+			var doAction = MsgUtil.buildDispatch("testplan1", "doAction", "doAction(X)", "parkservicestatusgui")
 			
 			MsgUtil.sendMsg(doAction, QakContext.getActor("parkservicestatusgui")!!)
 			delay(500)

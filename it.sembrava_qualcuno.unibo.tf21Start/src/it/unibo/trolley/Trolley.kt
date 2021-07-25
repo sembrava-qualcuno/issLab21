@@ -31,9 +31,9 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley IDLE"  
 						)
 					}
-					 transition(edgeName="t010",targetState="stopped",cond=whenEvent("stop"))
-					transition(edgeName="t011",targetState="working",cond=whenDispatch("moveToPark"))
-					transition(edgeName="t012",targetState="working",cond=whenDispatch("moveToOut"))
+					 transition(edgeName="t012",targetState="stopped",cond=whenEvent("stop"))
+					transition(edgeName="t013",targetState="working",cond=whenDispatch("moveToPark"))
+					transition(edgeName="t014",targetState="working",cond=whenDispatch("moveToOut"))
 				}	 
 				state("working") { //this:State
 					action { //it:State
@@ -59,8 +59,8 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						}
 						forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
 					}
-					 transition(edgeName="t013",targetState="stopped",cond=whenEvent("stop"))
-					transition(edgeName="t014",targetState="idle",cond=whenDispatch("goToIdle"))
+					 transition(edgeName="t015",targetState="stopped",cond=whenEvent("stop"))
+					transition(edgeName="t016",targetState="idle",cond=whenDispatch("goToIdle"))
 				}	 
 				state("stopped") { //this:State
 					action { //it:State
@@ -68,7 +68,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley STOPPED"  
 						)
 					}
-					 transition(edgeName="t015",targetState="working",cond=whenEvent("resume"))
+					 transition(edgeName="t017",targetState="working",cond=whenEvent("resume"))
 				}	 
 			}
 		}

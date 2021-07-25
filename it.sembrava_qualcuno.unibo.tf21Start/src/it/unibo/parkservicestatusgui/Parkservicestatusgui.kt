@@ -31,7 +31,7 @@ class Parkservicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasic
 						updateResourceRep( "parkservicestatusgui waiting for commands ..."  
 						)
 					}
-					 transition(edgeName="t08",targetState="toggleState",cond=whenDispatch("doAction"))
+					 transition(edgeName="t010",targetState="toggleState",cond=whenDispatch("doAction"))
 				}	 
 				state("toggleState") { //this:State
 					action { //it:State
