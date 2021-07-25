@@ -32,7 +32,7 @@ class Parkmanagerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						updateResourceRep( "parkmanagerservice waiting ..."  
 						)
 					}
-					 transition(edgeName="t08",targetState="toggleTrolleyState",cond=whenDispatch("toggleState"))
+					 transition(edgeName="t09",targetState="toggleTrolleyState",cond=whenDispatch("toggleState"))
 				}	 
 				state("toggleTrolleyState") { //this:State
 					action { //it:State

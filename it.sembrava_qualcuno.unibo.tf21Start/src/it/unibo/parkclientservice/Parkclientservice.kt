@@ -47,7 +47,6 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 										for(i in 0..5) {
 											if(ParkingAreaKb.slotStateFree[i] == true) {
 												SLOTNUM = i + 1
-												ParkingAreaKb.slotStateFree[i] == false
 												break
 											}
 										}
@@ -74,10 +73,12 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 						)
 						if( checkMsgContent( Term.createTerm("carenter(SLOTNUM)"), Term.createTerm("carenter(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 var SLOTNUM = payloadArg(0).toInt()  
+								 
+												var SLOTNUM = payloadArg(0).toInt()
+												ParkingAreaKb.slotStateFree[SLOTNUM] = false	//Set the slot occupied
 								forward("moveToPark", "moveToPark($SLOTNUM)" ,"trolley" ) 
 								println("parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM")
-								updateResourceRep( "parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM "  
+								updateResourceRep( "parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM"  
 								)
 								answer("carenter", "receipt", "receipt($SLOTNUM)"   )  
 						}
@@ -93,8 +94,9 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 						if( checkMsgContent( Term.createTerm("reqexit(TOKENID)"), Term.createTerm("reqexit(TOKENID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var CARSLOTNUM = payloadArg(0).toInt()  
-								if(  CARSLOTNUM >= 1 && CARSLOTNUM <= 6 && !ParkingAreaKb.slotStateFree[CARSLOTNUM - 1]  
-								 ){forward("moveToOut", "moveToOut($CARSLOTNUM)" ,"trolley" ) 
+								if(  ParkingAreaKb.outdoorfree && !ParkingAreaKb.trolleyStopped && CARSLOTNUM >= 1 && CARSLOTNUM <= 6 && !ParkingAreaKb.slotStateFree[CARSLOTNUM - 1]  
+								 ){ ParkingAreaKb.slotStateFree[CARSLOTNUM] = true  
+								forward("moveToOut", "moveToOut($CARSLOTNUM)" ,"trolley" ) 
 								}
 								else
 								 { CARSLOTNUM = 0  

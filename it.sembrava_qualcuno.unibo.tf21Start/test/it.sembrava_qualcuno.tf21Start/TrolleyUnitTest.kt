@@ -22,6 +22,8 @@ import it.unibo.qak21.basicrobot.CoapObserverForTestingOld
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
+@ObsoleteCoroutinesApi
 class TrolleyUnitTest {
 		
 	companion object {
@@ -83,54 +85,125 @@ class TrolleyUnitTest {
 		}
  	}
 	
-	
+	//Test if the trolley returns in idle state at the end of a task
 	@Test
-	@ExperimentalCoroutinesApi
-	@ObsoleteCoroutinesApi
 	fun testEndJob() {
 		println("+++++++++ testEndJob ")
 		
-		//Send a job
 		runBlocking {
 			val channelForObserver = Channel<String>()
  			testingObserver!!.addObserver(channelForObserver)	 
 			
-			var msg = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToPark(1)", "trolley")
-			MsgUtil.sendMsg(msg, myactor!!)
+			//Send a job
+			var job = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToPark(1)", "trolley")
+			MsgUtil.sendMsg(job, myactor!!)
 			
 			assertEquals(channelForObserver.receive(), "trolley WORKING")
 			assertEquals(channelForObserver.receive(), "trolley moveToPark(1)")
 			assertEquals(channelForObserver.receive(), "trolley IDLE")
 		}
 	}
-
-	/*
-	@Test
-	fun testEndJobOld() {
-		println("+++++++++ testEndJob ")
-		
-		//Send a job
-		var result : String
-		runBlocking {
- 			val channelForObserver = Channel<String>()
- 			testingObserverOld!!.addObserver(channelForObserver, "trolley WORKING")	 
-		    val cmd = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToPark(1)", "trolley")
-			MsgUtil.sendMsg(cmd, myactor!!)
-			result = channelForObserver.receive()
-			println("+++++++++ testEndJob RESULT=$result")
-			assertEquals(result, "trolley WORKING")
-			
-			//testingObserverOld!!.addObserver(channelForObserver, "trolley moveToPark")
-			result = channelForObserver.receive()
-			println("+++++++++ testEndJob RESULT=$result")
-			assertEquals(result, "trolley moveToPark")
-			
-			//testingObserverOld!!.addObserver(channelForObserver, "trolley IDLE")
-			result = channelForObserver.receive()
-			println("+++++++++ testEndJob RESULT=$result")
-			assertEquals(result, "trolley IDLE")
-		}	
-	}
-	*/
 	
+	//Test the ability of the trolley to queue requests in case one arrives during the execution of a task
+	@Test
+	fun testMoreJobs() {
+		println("+++++++++ testMoreJobs ")
+		
+		runBlocking {
+			val channelForObserver = Channel<String>()
+ 			testingObserver!!.addObserver(channelForObserver)
+				
+			var job1 = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToPark(1)", "trolley")
+			var job2 = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToOut(2)", "trolley")
+			
+			//Send both jobs
+			MsgUtil.sendMsg(job1, myactor!!)
+			MsgUtil.sendMsg(job2, myactor!!)
+			
+			assertEquals(channelForObserver.receive(), "trolley WORKING")
+			assertEquals(channelForObserver.receive(), "trolley moveToPark(1)")
+			assertEquals(channelForObserver.receive(), "trolley IDLE")
+			
+			assertEquals(channelForObserver.receive(), "trolley WORKING")
+			assertEquals(channelForObserver.receive(), "trolley moveToOut(2)")
+			assertEquals(channelForObserver.receive(), "trolley IDLE")
+		}
+	}
+	
+	//Test if the trolley immediately goes to stopped state in case he is in working state and a stop event arrives.
+	//Test also if, once a resume event arrives, it returns to the working state
+	@Test
+	fun testStopAndResumeWork() {
+		println("+++++++++ testStopAndResumeWork ")
+		
+		runBlocking {
+			val channelForObserver = Channel<String>()
+ 			testingObserver!!.addObserver(channelForObserver)
+			
+			var job = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToPark(1)", "trolley")
+			var stopEvent = MsgUtil.buildEvent("trolleyunittest", "stop", "stop(X)")
+			var resumeEvent = MsgUtil.buildEvent("trolleyunittest", "resume", "resume(X)")
+			
+			MsgUtil.sendMsg(job, myactor!!)
+			
+			assertEquals(channelForObserver.receive(), "trolley WORKING")
+			MsgUtil.sendMsg(stopEvent, myactor!!)
+			assertEquals(channelForObserver.receive(), "trolley STOPPED")
+			
+			delay(500)
+			
+			MsgUtil.sendMsg(resumeEvent, myactor!!)
+			assertEquals(channelForObserver.receive(), "trolley WORKING")
+		}
+	}
+	
+	//Test if the trolley immediately goes to stopped state in case he is in idle state and a stop event arrives.
+	//Test also if, once a resume event arrives, it returns to the idle state
+	@Test
+	fun testStopAndResumeIdle() {
+		println("+++++++++ testStopAndResumeIdle ")
+		
+		runBlocking {
+			val channelForObserver = Channel<String>()
+ 			testingObserver!!.addObserver(channelForObserver)
+			
+			var stopEvent = MsgUtil.buildEvent("trolleyunittest", "stop", "stop(X)")
+			var resumeEvent = MsgUtil.buildEvent("trolleyunittest", "resume", "resume(X)")
+			
+			assertEquals(channelForObserver.receive(), "trolley IDLE")
+			MsgUtil.sendMsg(stopEvent, myactor!!)
+			assertEquals(channelForObserver.receive(), "trolley STOPPED")
+			
+			delay(500)
+			
+			MsgUtil.sendMsg(resumeEvent, myactor!!)
+			assertEquals(channelForObserver.receive(), "trolley WORKING")
+			assertEquals(channelForObserver.receive(), "trolley IDLE")
+		}
+	}
+	
+	//Test if once the trolley is in stopped state, whatever request arrives it continues to stay in the stopped state, unless a resume event arrives
+	@Test
+	fun testJobStopState() {
+		println("+++++++++ testJobStopState ")
+		
+		runBlocking {
+			val channelForObserver = Channel<String>()
+			testingObserver!!.addObserver(channelForObserver)
+			
+			var stopEvent = MsgUtil.buildEvent("trolleyunittest", "stop", "stop(X)")
+			var job = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToPark(1)", "trolley")
+			var resumeEvent = MsgUtil.buildEvent("trolleyunittest", "resume", "resume(X)")
+			
+			MsgUtil.sendMsg(stopEvent, myactor!!)
+			assertEquals(channelForObserver.receive(), "trolley STOPPED")
+			
+			MsgUtil.sendMsg(job, myactor!!)
+			delay(500)
+			assertEquals(channelForObserver.receive(), "trolley STOPPED")
+			
+			MsgUtil.sendMsg(resumeEvent, myactor!!)
+			assertEquals(channelForObserver.receive(), "trolley WORKING")
+		}
+	}
  }

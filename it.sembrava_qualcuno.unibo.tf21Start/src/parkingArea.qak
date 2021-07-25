@@ -46,6 +46,9 @@ Event resume : resume(X)
 //TROLLEY
 Dispatch goToIdle : goToIdle(X)
 
+//TEST GUI MESSAGE
+Dispatch doAction : doAction(X)
+
 Context ctxcarparking ip[host="localhost" port=8022]
 
 QActor indoorparkingservicegui context ctxcarparking {
@@ -154,7 +157,6 @@ QActor parkclientservice context ctxcarparking {
 				for(i in 0..5) {
 					if(ParkingAreaKb.slotStateFree[i] == true) {
 						SLOTNUM = i + 1
-						ParkingAreaKb.slotStateFree[i] == false
 						break
 					}
 				}
@@ -186,14 +188,17 @@ QActor parkclientservice context ctxcarparking {
 		updateResource [# "parkingmanagerservice reply to enterthecar" #]
 		
  		onMsg(carenter : carenter(SLOTNUM)) {
-			[# var SLOTNUM = payloadArg(0).toInt() #]
+			[# 
+				var SLOTNUM = payloadArg(0).toInt()
+				ParkingAreaKb.slotStateFree[SLOTNUM] = false	//Set the slot occupied
+			#]
 			
 			//moveToPark
 			forward trolley -m moveToPark : moveToPark($SLOTNUM)
 			
 			//Reply with the TOKENID
 			println("parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM")
-			updateResource [# "parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM " #]
+			updateResource [# "parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM" #]
 			replyTo carenter with receipt : receipt($SLOTNUM)
 		}		
 	}
@@ -209,7 +214,9 @@ QActor parkclientservice context ctxcarparking {
 			[# var CARSLOTNUM = payloadArg(0).toInt() #]
 			
 			//Check if the tokenid is valid
-			if [# CARSLOTNUM >= 1 && CARSLOTNUM <= 6 && !ParkingAreaKb.slotStateFree[CARSLOTNUM - 1] #] {
+			if [# ParkingAreaKb.outdoorfree && !ParkingAreaKb.trolleyStopped && CARSLOTNUM >= 1 && CARSLOTNUM <= 6 && !ParkingAreaKb.slotStateFree[CARSLOTNUM - 1] #] {
+				[# ParkingAreaKb.slotStateFree[CARSLOTNUM] = true #]	//Set the slot free
+
 				forward trolley -m moveToOut : moveToOut($CARSLOTNUM)	//moveToOut
 			}
 			else {
@@ -230,17 +237,22 @@ QActor parkservicestatusgui context ctxcarparking {
 		println("parkservicestatusgui STARTS")
 		updateResource [# "parkservicestatusgui STARTS" #]
 	}
-	//Goto toggleState
+	Goto work
+	
+	State work {
+		println("parkservicestatusgui waiting for commands ...")
+		updateResource [# "parkservicestatusgui waiting for commands ..." #]
+	}
+	Transition t0
+		whenMsg doAction -> toggleState
 	
 	State toggleState {
 		println("parkservicestatusgui toggle state")
 		updateResource [# "parkservicestatusgui toggle state" #]
-		forward parkmanagerservice -m toggleState : toggleState(X)
-		delay 1000
-		println("parkservicestatusgui toggle state")
-		updateResource [# "parkservicestatusgui toggle state" #]
+		
 		forward parkmanagerservice -m toggleState : toggleState(X)
 	}
+	Goto work
 }
 
 QActor parkmanagerservice context ctxcarparking {
@@ -314,8 +326,9 @@ QActor trolley context  ctxcarparking{
 		}
 		
 		onMsg(moveToOut : moveToOut(SLOTNUM)) {
-			println("trolley moveToOut")
-			updateResource [# "trolley moveToOut" #]
+			[# var SLOTNUM = payloadArg(0).toInt() #]
+			println("trolley moveToOut($SLOTNUM)")
+			updateResource [# "trolley moveToOut($SLOTNUM)" #]
 						
 			//Move the trolley to the specific parking slot
 			

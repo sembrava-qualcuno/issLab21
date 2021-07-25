@@ -23,6 +23,15 @@ class Parkservicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasic
 						updateResourceRep( "parkservicestatusgui STARTS"  
 						)
 					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("work") { //this:State
+					action { //it:State
+						println("parkservicestatusgui waiting for commands ...")
+						updateResourceRep( "parkservicestatusgui waiting for commands ..."  
+						)
+					}
+					 transition(edgeName="t08",targetState="toggleState",cond=whenDispatch("doAction"))
 				}	 
 				state("toggleState") { //this:State
 					action { //it:State
@@ -30,12 +39,8 @@ class Parkservicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasic
 						updateResourceRep( "parkservicestatusgui toggle state"  
 						)
 						forward("toggleState", "toggleState(X)" ,"parkmanagerservice" ) 
-						delay(1000) 
-						println("parkservicestatusgui toggle state")
-						updateResourceRep( "parkservicestatusgui toggle state"  
-						)
-						forward("toggleState", "toggleState(X)" ,"parkmanagerservice" ) 
 					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 			}
 		}

@@ -31,9 +31,9 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley IDLE"  
 						)
 					}
-					 transition(edgeName="t09",targetState="stopped",cond=whenEvent("stop"))
-					transition(edgeName="t010",targetState="working",cond=whenDispatch("moveToPark"))
-					transition(edgeName="t011",targetState="working",cond=whenDispatch("moveToOut"))
+					 transition(edgeName="t010",targetState="stopped",cond=whenEvent("stop"))
+					transition(edgeName="t011",targetState="working",cond=whenDispatch("moveToPark"))
+					transition(edgeName="t012",targetState="working",cond=whenDispatch("moveToOut"))
 				}	 
 				state("working") { //this:State
 					action { //it:State
@@ -52,14 +52,15 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						}
 						if( checkMsgContent( Term.createTerm("moveToOut(SLOTNUM)"), Term.createTerm("moveToOut(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								println("trolley moveToOut")
-								updateResourceRep( "trolley moveToOut"  
+								 var SLOTNUM = payloadArg(0).toInt()  
+								println("trolley moveToOut($SLOTNUM)")
+								updateResourceRep( "trolley moveToOut($SLOTNUM)"  
 								)
 						}
 						forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
 					}
-					 transition(edgeName="t012",targetState="stopped",cond=whenEvent("stop"))
-					transition(edgeName="t013",targetState="idle",cond=whenDispatch("goToIdle"))
+					 transition(edgeName="t013",targetState="stopped",cond=whenEvent("stop"))
+					transition(edgeName="t014",targetState="idle",cond=whenDispatch("goToIdle"))
 				}	 
 				state("stopped") { //this:State
 					action { //it:State
@@ -67,7 +68,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley STOPPED"  
 						)
 					}
-					 transition(edgeName="t014",targetState="working",cond=whenEvent("resume"))
+					 transition(edgeName="t015",targetState="working",cond=whenEvent("resume"))
 				}	 
 			}
 		}
