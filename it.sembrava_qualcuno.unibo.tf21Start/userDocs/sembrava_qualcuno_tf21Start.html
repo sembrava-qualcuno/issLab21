@@ -479,7 +479,7 @@
 						<li>Check that if there are no available parking slots the system doesn't accept the request <lr>F3</lr></li>
 						<li>Check that if a client specifies a wrong token the system does not accept the request and that the system does not give back the wrong car (<lr>F6</lr>-<lr>F7</lr>-<lr>F8</lr>)</li>
 						<li>Check that the parking manager can access the parking area information only if authenticated (<lr>F10</lr>-<lr>F16</lr>)</li>
-						<li>Check that if the parking manager stops the robot, it immediately stops and no other task is executed by the trolley until it exits the stop state (<lr>F14</lr>-<lr>NF14</lr>)</li>
+						<li>Check that if the parking manager stops the robot, it immediately stops and no other task is executed by the trolley until it exits the stop state (<lr>F14</lr>-<lr>NF4</lr>-<lr>NF5</lr>)</li>
 						<li>Check that if TA > TMAX the fan starts and viceversa (<lr>F15</lr>)</li>
 						<li>Check that a correct notification is sent to the parking manager if a car remains in the OUTDOOR area for more than DTFREE time (<lr>F11</lr>)</li>
 						<li>Check that the trolley does not pick up a car from the INDOOR area, if the client says there's a car but no confirmation arrived from the weight sensor (<lr>F17</lr>)</li>	
@@ -704,7 +704,58 @@
 				<td style="width:50%">
 					<center><img src="./img/ModelloEseguibile.png" width="70%"></center>
 				</td>
+				As one can see in the image, we decided to simplify the initial system model by removing the sensors and the fan, and focusing only on the client-service-trolley interaction which makes up for the most funtions of the system.<br>
+				The system was mapped as 2 qakactors for the main service, 3 qakactors for the clients (one to simulate a client who wants to park a car, one to simulate a client who wants to pickup a car and one to simulate the manager). <br>
+				The division of the main service into two subservices derives from the need to the express the priority of the messages of the manager (e.g. to stop/resume the behaviour of the trolley) above all other requests. As stated before, the qakactor buisness logic is modelled as a Moore's Finite State Machine: this fact implies that if the main service was already responding to a client request, the manager's need to stop the robot would have been taken into consideration only at the end of the current task, and not immediately as the requirements state.<br>
+				The usage of the qakactor metamodelling language also introduced another "abstraction gap": as fsm, the qakctors execute their tasks sequentially, without the possibility to stop one task and transit to another state before completing the current one,
+				unless an event arrives. Events, as modelled in the qakactor metamodel, are one-time only messages, and cannot be queued into the actor's message queue as Requests or Dispatches and are the only type of messages which trigger code execution. That's why the model can be called message-based, but event-driven. For this reason, the stop/resume messages sent by the <em>ParkManagerService</em> to the <em>Trolley</em> are translated in code with an Event, but we found to logically map them as a Dispatches (in the image). <br>
+				Finally, to simulate the map and to store other utility information, we decided to include a shared knowledge base between all components, implemented as a simple object. It should be also useful during the testing phase to quickly change some system parameters to observe the system's behaviour in diverse scenarios.<br>
+				The full code of the executable model is available at <a target="code" href="../src/parkingArea.qak">parkingArea.qak</a>
+				
 			<h2>Test Plan</h2>
+			Before beginning the test plan we realized that, for the qak system to be fully working and testable, we needed some way to synchronize the tests and the actors of the qak model. This is because, once a qak context is run, every actor inside it starts at the same time and there are no way to implement unit test or to test one functionality at the time. To achieve this goal we introduced a "listening" state on every actor we intended to test: this state is empty and it consists in waiting for a proper message to trigger a specific state change; 
+			in this way, we can systematically and sequentially trigger states to test by sending messages both from the testing class and other actors, to perform integration tests. This "listening" state should be engaged at an actor startup and every time it ends a task. <br>
+			Since qakactor are natively a CoAP-observable resources, we also thought to utilize a CoapObserver for each qakactor we wanted to observe for testing purposes. Its code is available at <a href="../test/it.sembrava_qualcuno.unibo.tf21Start/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a><br>
+			Finally, we divided our tests into unit tests and integration tests that also coincide with functional tests (as they test specific requirements or use cases).
+			
+			<h3>Unit tests</h3>
+				<h4>Trolley</h4>
+				Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TrolleyUnitTest.kt">TrolleyUnitTest.kt</a>
+					<ul>
+						<li>Test if the trolley returns in idle state at the end of a task</li>
+						<li>Test the ability of the trolley to queue requests in case one arrives during the execution of a task</li>
+						<li>Test if the trolley immediately goes to stopped state in case he is in working state and a stop event arrives. Test also if, once a resume event arrives, it returns to the working state</li>
+						<li>Test if the trolley immediately goes to stopped state in case he is in idle state and a stop event arrives. Test also if, once a resume event arrives, it returns to the idle state</li>
+						<li>Test if once the trolley is in stopped state, whatever request arrives it continues to stay in the stopped state, unless a resume event arrives</li>
+					</ul>
+				<h4>ParkClientService</h4>
+					Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/ClientServiceUnitTest.kt">ClientServiceUnitTest.kt</a>
+					<ul>
+						<li>Test that a client request to park a car (<k>requenter</k>) doesn't continue if the INDOOR area is not free (<k>enter</k> reply give back SLOTNUM=0, no subsequent <k>carenter</k> request, instead I expect a goToWork dispatch)</li>
+						<li>Test that a client request to park a car (<k>requenter</k>) doesn't continue if there are no free parking slots available (<k>enter</k> reply give back SLOTNUM=0, no subsequent <k>carenter</k> request, instead I expect a goToWork dispatch)</li>
+						<li>Test that if the trolley is stopped (infer this using the Knowledge base), every request is discarded (<k>enter</k> reply give back SLOTNUM=0, no subsequent <k>carenter</k> request, instead I expect a goToWork dispatch)</li>
+						<li>Test that after every task is completed, the service returns to the work state</li>
+						<li>Test that if a goToWork dispatch arrives, the service returns to the work state</li>
+						<li>Test if the service correctly sends moveToPark/moveToOut messages to the trolley (via its CoAP-observable state)</li>
+						<li>Test if the service doesn't instruct the trolley to moveToOut if the inserted token is invalid (e.g. that a exit(0) reply is sent)
+					</ul>
+				<h4>ParkManagerService</h4>
+					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/ManagerServiceUnitTest.kt">ManagerServiceUnitTest.kt</a>
+					<ul>
+						<li>Test if the service, basing on the trolley state, emits the right events after a toggle dispatch arrives (both from the CoAP-observable state and the Kwnoledge base)</li>
+					</ul>
+			<h3>Integration tests / Functional tests</h3>
+				<h4>Test Plan 1</h4>
+					This test plan will work as an integration test for the ParkServiceStatusGUI, ParkManagerService and Trolley components; it will also work as a functional test for the Parking Manager use cases (POR <em>manage</em>). <br>
+					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan1.kt">TestPlan1.kt</a>
+				<h4>Test Plan 2</h4>
+					This test plan will work as an integration test for the IndoorParkingServiceGUI, ParkClientService and Trolley components; it will also work as a functional test for client "Parking Phase" use case (PORs <em>acceptIN</em>, <em>informIN</em>, <em>moveToIn</em>, <em>moveToSlotIn and <em>receipt</em></em>). <br>
+					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan2.kt">TestPlan2.kt</a>
+				<h4>Test Plan 3</h4>
+					This test plan will work as an integration test for the OutdoorParkingServiceGUI, ParkClientService and Trolley components; it will also work as a functional test for client "Car Pickup" use case (PORs <em>acceptOUT</em> and <em>moveToSlotOut</em>). <br>
+					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan3.kt">TestPlan3.kt</a><br>
+		</div>
+		<div class="footer">
 			<center>			
 				<table style="background-color:rgba(30, 22, 255, 0.9); width:60%;text-align:center;color:white">	
 					<tr>
