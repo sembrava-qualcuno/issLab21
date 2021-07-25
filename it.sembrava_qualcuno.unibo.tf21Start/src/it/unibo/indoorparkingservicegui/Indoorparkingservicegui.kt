@@ -24,7 +24,6 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 						updateResourceRep( "indoorparkingservicegui STARTS"  
 						)
 					}
-					 transition( edgeName="goto",targetState="requestToenter", cond=doswitch() )
 				}	 
 				state("requestToenter") { //this:State
 					action { //it:State

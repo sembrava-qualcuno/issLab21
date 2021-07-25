@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import it.unibo.utils.ParkingAreaKb
 	
 class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
@@ -36,10 +37,10 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 				}	 
 				state("handleEnterRequest") { //this:State
 					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
 						println("parkclientservice reply to reqenter")
 						updateResourceRep( "parkclientservice reply to reqenter"  
 						)
-						println("$name in ${currentState.stateName} | $currentMsg")
 						 var SLOTNUM = 0  
 						if(  ParkingAreaKb.indoorfree && !ParkingAreaKb.trolleyStopped  
 						 ){ 
@@ -50,21 +51,17 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 												break
 											}
 										}
+						if(  SLOTNUM == 0  
+						 ){forward("goToWork", "goToWork(enter($SLOTNUM))" ,"parkclientservice" ) 
+						}
+						}
+						else
+						 {forward("goToWork", "goToWork(enter($SLOTNUM))" ,"parkclientservice" ) 
+						 }
 						println("parkclientservice reply enter($SLOTNUM)")
 						updateResourceRep( "parkclientservice reply enter($SLOTNUM)"  
 						)
 						answer("reqenter", "enter", "enter($SLOTNUM)"   )  
-						if(  SLOTNUM == 0  
-						 ){forward("goToWork", "goToWork(enter(0))" ,"parkclientservice" ) 
-						}
-						}
-						else
-						 {println("parkclientservice reply enter($SLOTNUM)")
-						 updateResourceRep( "parkclientservice reply enter($SLOTNUM)"  
-						 )
-						 answer("reqenter", "enter", "enter(0)"   )  
-						 forward("goToWork", "goToWork(enter(0))" ,"parkclientservice" ) 
-						 }
 					}
 					 transition(edgeName="t06",targetState="work",cond=whenDispatch("goToWork"))
 					transition(edgeName="t07",targetState="enterthecar",cond=whenRequest("carenter"))
@@ -73,19 +70,26 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						println("parkingmanagerservice reply to enterthecar")
-						if( checkMsgContent( Term.createTerm("carenter(SLOTNUM)"), Term.createTerm("carenter(SLOT)"), 
+						updateResourceRep( "parkingmanagerservice reply to enterthecar"  
+						)
+						if( checkMsgContent( Term.createTerm("carenter(SLOTNUM)"), Term.createTerm("carenter(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var SLOTNUM = payloadArg(0).toInt()  
 								forward("moveToPark", "moveToPark($SLOTNUM)" ,"trolley" ) 
+								println("parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM")
+								updateResourceRep( "parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM "  
+								)
 								answer("carenter", "receipt", "receipt($SLOTNUM)"   )  
-								println("parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM ")
 						}
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 				state("handleOutRequest") { //this:State
 					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
 						println("parkingmanagerservice reply to reqexit")
+						updateResourceRep( "parkingmanagerservice reply to reqexit"  
+						)
 						if( checkMsgContent( Term.createTerm("reqexit(TOKENID)"), Term.createTerm("reqexit(TOKENID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var CARSLOTNUM = payloadArg(0).toInt()  
@@ -95,6 +99,9 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 								else
 								 { CARSLOTNUM = 0  
 								 }
+								println("parkingmanagerservice moves the car to SLOTNUM = $CARSLOTNUM")
+								updateResourceRep( "parkingmanagerservice moves the car to SLOTNUM = $CARSLOTNUM"  
+								)
 								answer("reqexit", "exit", "exit($CARSLOTNUM)"   )  
 						}
 					}

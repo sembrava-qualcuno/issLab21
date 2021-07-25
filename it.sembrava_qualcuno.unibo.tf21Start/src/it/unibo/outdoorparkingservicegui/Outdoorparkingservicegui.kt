@@ -23,7 +23,6 @@ class Outdoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorB
 						updateResourceRep( "outdoorparkingservicegui STARTS"  
 						)
 					}
-					 transition( edgeName="goto",targetState="requestToExit", cond=doswitch() )
 				}	 
 				state("requestToExit") { //this:State
 					action { //it:State

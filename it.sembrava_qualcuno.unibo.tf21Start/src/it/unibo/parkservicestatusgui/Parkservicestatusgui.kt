@@ -23,7 +23,6 @@ class Parkservicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasic
 						updateResourceRep( "parkservicestatusgui STARTS"  
 						)
 					}
-					 transition( edgeName="goto",targetState="toggleState", cond=doswitch() )
 				}	 
 				state("toggleState") { //this:State
 					action { //it:State

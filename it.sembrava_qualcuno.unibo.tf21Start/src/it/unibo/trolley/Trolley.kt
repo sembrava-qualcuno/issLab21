@@ -23,6 +23,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley STARTS"  
 						)
 					}
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 				state("idle") { //this:State
 					action { //it:State
@@ -37,11 +38,17 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 				state("working") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
+						println("trolley WORKING")
+						updateResourceRep( "trolley WORKING"  
+						)
+						delay(1000) 
 						if( checkMsgContent( Term.createTerm("moveToPark(SLOTNUM)"), Term.createTerm("moveToPark(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								println("trolley moveToPark")
-								updateResourceRep( "trolley moveToPark"  
+								 var SLOTNUM = payloadArg(0).toInt()  
+								println("trolley moveToPark($SLOTNUM)")
+								updateResourceRep( "trolley moveToPark($SLOTNUM)"  
 								)
+								delay(1000) 
 						}
 						if( checkMsgContent( Term.createTerm("moveToOut(SLOTNUM)"), Term.createTerm("moveToOut(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList

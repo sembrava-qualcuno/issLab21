@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import it.unibo.utils.ParkingAreaKb
 	
 class Parkmanagerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
@@ -23,6 +24,7 @@ class Parkmanagerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						updateResourceRep( "parkmanagerservice STARTS"  
 						)
 					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 				state("work") { //this:State
 					action { //it:State
