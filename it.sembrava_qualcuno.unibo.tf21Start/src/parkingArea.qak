@@ -49,7 +49,7 @@ Dispatch goToIdle : goToIdle(X)
 //TEST GUI MESSAGE
 Dispatch doAction : doAction(X)
 
-Context ctxcarparking ip[host="localhost" port=8022]
+Context ctxcarparking ip[host="localhost" port=8023]
 
 QActor indoorparkingservicegui context ctxcarparking {
 	[# var SLOTNUM = 0 #]
@@ -131,7 +131,7 @@ QActor outdoorparkingservicegui context ctxcarparking {
 			println("outdoorparkingservicegui requestToExit($TOKENID)")
 			updateResource [# "outdoorparkingservicegui requestToExit($TOKENID)" #]
 		
-			request parkclientservice -m reqexit : reqexit(TOKENID)	
+			request parkclientservice -m reqexit : reqexit($TOKENID)	
 		}
 	}
 	Transition t0
@@ -201,21 +201,21 @@ QActor parkclientservice context ctxcarparking {
 	
 	State enterthecar {
 		printCurrentMessage		
-		println("parkingmanagerservice reply to enterthecar")
-		updateResource [# "parkingmanagerservice reply to enterthecar" #]
+		println("parkingclientservice reply to enterthecar")
+		updateResource [# "parkingclientservice reply to enterthecar" #]
 		
  		onMsg(carenter : carenter(SLOTNUM)) {
 			[# 
 				var SLOTNUM = payloadArg(0).toInt()
-				ParkingAreaKb.slotStateFree[SLOTNUM] = false	//Set the slot occupied
+				ParkingAreaKb.slotStateFree[SLOTNUM-1] = false	//Set the slot occupied
 			#]
 			
 			//moveToPark
 			forward trolley -m moveToPark : moveToPark($SLOTNUM)
 			
 			//Reply with the TOKENID
-			println("parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM")
-			updateResource [# "parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM" #]
+			println("parkingclientservice moves the car to SLOTNUM = $SLOTNUM")
+			updateResource [# "parkingclientservice moves the car to SLOTNUM = $SLOTNUM" #]
 			replyTo carenter with receipt : receipt($SLOTNUM)
 		}		
 	}
@@ -223,16 +223,15 @@ QActor parkclientservice context ctxcarparking {
 	
 	State handleOutRequest {
 		printCurrentMessage
-		println("parkingmanagerservice reply to reqexit")
-		updateResource [# "parkingmanagerservice reply to reqexit" #]
-		
+		println("parkingclientservice reply to reqexit")
+		updateResource [# "parkingclientservice reply to reqexit" #]
 		onMsg(reqexit : reqexit(TOKENID)) {
 			//findSlot
 			[# var CARSLOTNUM = payloadArg(0).toInt() #]
 			
 			//Check if the tokenid is valid
 			if [# ParkingAreaKb.outdoorfree && !ParkingAreaKb.trolleyStopped && CARSLOTNUM >= 1 && CARSLOTNUM <= 6 && !ParkingAreaKb.slotStateFree[CARSLOTNUM - 1] #] {
-				[# ParkingAreaKb.slotStateFree[CARSLOTNUM] = true #]	//Set the slot free
+				[# ParkingAreaKb.slotStateFree[CARSLOTNUM-1] = true #]	//Set the slot free
 
 				forward trolley -m moveToOut : moveToOut($CARSLOTNUM)	//moveToOut
 			}

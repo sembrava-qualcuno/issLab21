@@ -18,7 +18,6 @@ import org.junit.AfterClass
 import it.unibo.kactor.sysUtil
 import it.unibo.kactor.ApplMessage
 import org.junit.After
-import it.unibo.qak21.basicrobot.CoapObserverForTestingOld
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import it.unibo.utils.ParkingAreaKb

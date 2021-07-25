@@ -24,13 +24,13 @@ import it.unibo.utils.ParkingAreaKb
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
-class TestPlan1 {
+class TestPlan2 {
 		
 	companion object {
 		var testingObserver : CoapObserverForTesting ? = null
 		var systemStarted = false
 		val channelSyncStart = Channel<String>()
-		val actors : Array<String> = arrayOf("parkservicestatusgui", "parkmanagerservice", "trolley")
+		val actors : Array<String> = arrayOf("indoorparkingservicegui", "parkclientservice", "trolley")
 		var myactor : ActorBasic ? = null
 		var counter = 1
 		
@@ -76,13 +76,13 @@ class TestPlan1 {
 			    println("+++++++++ checkSystemStarted resumed ")
 			}			
 		} 
-		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "trolley", "8022")
+		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "trolley", "8023")
 		
-		// Reset the knowledge base to assumption state 
+		// Reset the knowledge base to the assumption state
 		ParkingAreaKb.indoorfree = true
-		ParkingAreaKb.outdoorfree = true
 		ParkingAreaKb.slotStateFree = booleanArrayOf(false, false, false, false, true, false)
 		ParkingAreaKb.trolleyStopped = false
+		ParkingAreaKb.outdoorfree = true
   	}
 	
 	@After
@@ -98,25 +98,23 @@ class TestPlan1 {
  	}
 	
 	/*
-  	 *	This test plan will work as an integration test for the ParkServiceStatusGUI, ParkManagerService and Trolley components
-	 *	It will also work as a functional test for the Parking Manager use cases (POR manage)
+  	 *	This test will work as an integration/functional test for the "Car Parking" client use case
 	 */
 	@Test
-	fun testToggleIntegration() {
-		println("+++++++++ testToggleIntegration ")
+	fun testCarParking() {
+		println("+++++++++ testCarParking ")
 		
 		runBlocking {
 			val channelForObserver = Channel<String>()
  			testingObserver!!.addObserver(channelForObserver)
 			
-			var doAction = MsgUtil.buildDispatch("testplan1", "doAction", "doAction(X)", "parkservicestatusgui")
+			assertEquals(channelForObserver.receive(), "trolley IDLE")
+			var doAction = MsgUtil.buildDispatch("testCarParking", "doAction", "doAction(X)", "indoorparkingservicegui")
 			
-			MsgUtil.sendMsg(doAction, QakContext.getActor("parkservicestatusgui")!!)
-			delay(500)
-			assertEquals(channelForObserver.receive(), "trolley STOPPED")
-			delay(500)
-			MsgUtil.sendMsg(doAction, QakContext.getActor("parkservicestatusgui")!!)
+			MsgUtil.sendMsg(doAction, QakContext.getActor("indoorparkingservicegui")!!)
 			assertEquals(channelForObserver.receive(), "trolley WORKING")
+			delay(1000)
+			assertEquals(channelForObserver.receive(), "trolley moveToPark(5)")
 		}
 	}
 } 

@@ -76,7 +76,7 @@ class TestPlan3 {
 			    println("+++++++++ checkSystemStarted resumed ")
 			}			
 		} 
-		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "trolley", "8022")
+		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "trolley", "8023")
 		
 		// Reset the knowledge base to assumption state 
 		ParkingAreaKb.indoorfree = true

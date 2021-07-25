@@ -68,17 +68,17 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 				state("enterthecar") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
-						println("parkingmanagerservice reply to enterthecar")
-						updateResourceRep( "parkingmanagerservice reply to enterthecar"  
+						println("parkingclientservice reply to enterthecar")
+						updateResourceRep( "parkingclientservice reply to enterthecar"  
 						)
 						if( checkMsgContent( Term.createTerm("carenter(SLOTNUM)"), Term.createTerm("carenter(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 
 												var SLOTNUM = payloadArg(0).toInt()
-												ParkingAreaKb.slotStateFree[SLOTNUM] = false	//Set the slot occupied
+												ParkingAreaKb.slotStateFree[SLOTNUM-1] = false	//Set the slot occupied
 								forward("moveToPark", "moveToPark($SLOTNUM)" ,"trolley" ) 
-								println("parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM")
-								updateResourceRep( "parkingmanagerservice moves the car to SLOTNUM = $SLOTNUM"  
+								println("parkingclientservice moves the car to SLOTNUM = $SLOTNUM")
+								updateResourceRep( "parkingclientservice moves the car to SLOTNUM = $SLOTNUM"  
 								)
 								answer("carenter", "receipt", "receipt($SLOTNUM)"   )  
 						}
@@ -88,14 +88,14 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 				state("handleOutRequest") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
-						println("parkingmanagerservice reply to reqexit")
-						updateResourceRep( "parkingmanagerservice reply to reqexit"  
+						println("parkingclientservice reply to reqexit")
+						updateResourceRep( "parkingclientservice reply to reqexit"  
 						)
 						if( checkMsgContent( Term.createTerm("reqexit(TOKENID)"), Term.createTerm("reqexit(TOKENID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var CARSLOTNUM = payloadArg(0).toInt()  
 								if(  ParkingAreaKb.outdoorfree && !ParkingAreaKb.trolleyStopped && CARSLOTNUM >= 1 && CARSLOTNUM <= 6 && !ParkingAreaKb.slotStateFree[CARSLOTNUM - 1]  
-								 ){ ParkingAreaKb.slotStateFree[CARSLOTNUM] = true  
+								 ){ ParkingAreaKb.slotStateFree[CARSLOTNUM-1] = true  
 								forward("moveToOut", "moveToOut($CARSLOTNUM)" ,"trolley" ) 
 								}
 								else

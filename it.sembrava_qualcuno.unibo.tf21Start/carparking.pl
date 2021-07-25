@@ -1,7 +1,7 @@
 %====================================================================================
 % carparking description   
 %====================================================================================
-context(ctxcarparking, "localhost",  "TCP", "8022").
+context(ctxcarparking, "localhost",  "TCP", "8023").
  qactor( indoorparkingservicegui, ctxcarparking, "it.unibo.indoorparkingservicegui.Indoorparkingservicegui").
   qactor( outdoorparkingservicegui, ctxcarparking, "it.unibo.outdoorparkingservicegui.Outdoorparkingservicegui").
   qactor( parkclientservice, ctxcarparking, "it.unibo.parkclientservice.Parkclientservice").
