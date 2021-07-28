@@ -1,0 +1,355 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "",
+    "version": "1.0.0",
+    "title": "Automated Car-Parking",
+    "contact": {
+      "url": "https://github.com/sembrava-qualcuno/issLab21"
+    }
+  },
+  "host": "github.com",
+  "basePath": "/sembrava-qualcuno/issLab21",
+  "tags": [
+    {
+      "name": "client",
+      "description": "Client request to enter the system"
+    },
+    {
+      "name": "manager",
+      "description": "Acess for the parking area manager"
+    },
+    {
+      "name": "parkingArea",
+      "description": "The parking area status"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/client/reqenter": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Request to enter a car",
+        "description": "The client request to park his/her car",
+        "operationId": "reqenter",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/ParkingSlot"
+            }
+          },
+          "403": {
+            "description": "The service can't perform this operation at the moment:\n- The trolley is stopped\n - The indoor area is engaged",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/client/carenter": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Enter a car",
+        "description": "",
+        "operationId": "carenter",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "slotnum",
+            "description": "The parking slot number",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/TokenId"
+            }
+          },
+          "400": {
+            "description": "Invalid parking slot number",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          },
+          "403": {
+            "description": "The service can't perform this operation at the moment:\n- The indoor area is free\n - No reqenter request has been sent",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/client/reqexit": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Request to exit a car",
+        "description": "",
+        "operationId": "reqexit",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "tokenid",
+            "description": "The client's car corresponding tokenId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Invalid tokenId",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          },
+          "403": {
+            "description": "The service can't perform this operation at the moment:\n- The trolley is stopped\n - The outdoor area is engaged",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/manager/login": {
+      "post": {
+        "tags": [
+          "manager"
+        ],
+        "summary": "Logs manager into the system",
+        "description": "",
+        "operationId": "loginManager",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "description": "The user name for login",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "password",
+            "description": "The password for login in clear text",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Invalid username/password supplied",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/manager/logout": {
+      "post": {
+        "tags": [
+          "manager"
+        ],
+        "summary": "Logs out current logged in manager session",
+        "description": "",
+        "operationId": "logoutManager",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "default": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/parkingArea/trolley": {
+      "get": {
+        "tags": [
+          "parkingArea"
+        ],
+        "summary": "Get the trolley state",
+        "description": "An authenticated manager can check out the trolley state",
+        "operationId": "getTrolley",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Trolley"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "parkingArea"
+        ],
+        "summary": "Update the current trolley status",
+        "description": "An authenticated manager can start or stop the trolley",
+        "operationId": "updateTrolley",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Trolley state that needs to be updated",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Trolley"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid state supplied",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/parkingArea": {
+      "get": {
+        "tags": [
+          "parkingArea"
+        ],
+        "summary": "Get the parking area state",
+        "description": "An authenticated manager can check out the parking area state",
+        "operationId": "getParkingArea",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/ParkingArea"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ParkingSlot": {
+      "type": "object",
+      "required": [
+        "parkingSlot"
+      ],
+      "properties": {
+        "parkingSlot": {
+          "type": "integer",
+          "example": "1"
+        }
+      }
+    },
+    "TokenId": {
+      "type": "object",
+      "required": [
+        "tokenId"
+      ],
+      "properties": {
+        "tokenId": {
+          "type": "string",
+          "example": ""
+        }
+      }
+    },
+    "Trolley": {
+      "type": "object",
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "example": "idle"
+        }
+      }
+    },
+    "ParkingArea": {
+      "type": "object",
+      "required": [
+        "fan",
+        "temperature"
+      ],
+      "properties": {
+        "fan": {
+          "type": "string",
+          "example": "on"
+        },
+        "temperature": {
+          "type": "number",
+          "example": "25.0"
+        }
+      }
+    },
+    "ApiError": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer",
+          "example": "1"
+        },
+        "message": {
+          "type": "string",
+          "example": "Error message"
+        }
+      }
+    }
+  }
+}

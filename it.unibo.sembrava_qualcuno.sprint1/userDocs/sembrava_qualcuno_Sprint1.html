@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+		<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+		<script type="text/javascript" src="../css/issStyle.js"></script>
+	-->
+	<style type="text/css">
+		body {
+			margin-left:  30px;
+			margin-right: 30px;
+		}
+
+		P {
+			font-family: Tahoma;
+			font-size: 10pt;
+		}
+
+		a, a:visited, a:active, a:link, a:hover {
+			text-decoration: underline;
+			color: #545454;
+			background-color: transparent;
+			font-size: 93%;
+		}
+
+		a:hover {
+			background-color: #cccccc;
+		}
+
+		hr {
+			clear: both;
+			height: 1px;
+			color: #242424;
+			background-color: transparent;
+		}
+
+		h1, h2, h3 {
+			color: #242424;
+			clear: left;
+			font: 100% Tahoma, Helvetica, Arial, sans-serif;
+			margin-bottom: 0.5em;
+			padding-top: 0.5em;
+			border-radius: 10px;
+			padding: 5px;
+		}
+
+		top {
+			width: 100%;
+		}
+
+		#i {
+			color: #ff1010;
+		}
+
+		tt {
+			font-family: "Arial";
+			font-size: 90%;
+			color: #006600;
+		}
+
+		em {
+			font-family: "Arial";
+			font-size: 80%;
+			font-weight: bold;
+			border-style:solid;
+			border-color: #abe876;
+			color: #1632cc;
+		}
+
+		bc {
+			font-family: "Arial";
+			font-size: 90%;
+			font-weight: bold;
+			color: #990000;
+			background-color: #fcf8c7;
+		}
+
+		ks {
+			font-family: "Arial";
+			font-weight: bold;
+			color: #0000CD	;
+			font-size: 90%;
+		}
+
+		kc {
+			font-family: "Arial";
+			font-weight: bold;
+			color: #008000	;
+			font-size: 90%;
+		}
+
+		pre {
+			font-family: "Consolas";
+			font-size: 85%;
+			background-color: #f5f5f5;
+			border: 1.5px solid silver;
+			padding: 5px;
+		}
+
+		m {
+			font-family: "Helvetica";
+			line-height: 100%;
+			font-size: 75%;
+		}
+
+		div.body {
+			font-size: 18px;
+		}
+
+		k, lr {
+			color: #990000;
+			font-weight: bold;
+			font-size: 90%;
+		}
+
+		h1 {
+			font-size: 150%;
+			background-color: #b2c0ff;
+			padding: 10px;
+		}
+
+		h2 {
+			background-color: #9ed8ff;
+			font-size: 130%;
+		}
+
+		h3 {
+			background-color: #e6ccff;
+			font-size: 100%;
+		}
+
+		h4 {
+			background-color: #ccffcc;
+			font-size: 100%;
+			width: 95%;
+			border-radius: 5px;
+			padding: 2px;
+		}
+
+		h5 {
+			background-color: #d5ffb0;
+			font-size: 100%;
+		}
+
+		div.req {
+			background-color: #d9ffb3;
+			font-size: 18px;
+			width: 700px;
+			border: 3px solid green;
+			padding: 15px;
+			margin: 10px;
+		}
+
+		div.remark {
+			background-color: #E3F2FD;
+			border: 1.5px solid #d5f2ed;
+			padding: 15px;
+			margin: 10px;
+			border-radius: 25px;
+		}
+
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+
+		ol, ul, li {
+			margin: 0;
+			margin-left: 10px;
+			padding: 0;
+			padding-bottom: 5px;
+		}
+
+		table, th, td {
+			border: 1px solid black;
+		}
+
+		img {
+			border: 1.5px solid #d5f2ed
+		}
+
+		a, a:visited, a:active, a:link, a:hover {
+			text-decoration: underline;
+			color: #545454;
+			background-color: transparent;
+		}
+
+		div.wrapdesc {
+			width: 90%;
+			margin: auto;
+		}
+
+		div.imagedesc {
+			width: 85%;
+			margin: auto;
+		}
+
+		.fr li::marker {
+			content: "F" counter(list-item) " ";
+			color: mediumslateblue;
+		}
+
+		.nfr li::marker {
+			content: "NF" counter(list-item) " ";
+			color: mediumslateblue;
+		}
+
+		.sprint td {
+			width: 33%;
+		}
+	</style>
+		
+	<head>
+		<title>Final Task 2021 Sprint 1</title>
+		<script type="text/javascript">
+			function onLoad() {
+				setRequirementsId();
+				addLrLinks();
+				addAutoLinks();
+			}
+
+			function setRequirementsId() {
+				var fRequirements = document.getElementsByClassName("fr")[0].children;
+				var nfRequirements = document.getElementsByClassName("nfr")[0].children;
+				var i;
+				for(i = 0; i < fRequirements.length; i++)
+					fRequirements[i].id = "F" + (i + 1);
+				for(i = 0; i < nfRequirements.length; i++)
+					nfRequirements[i].id = "NF" + (i + 1);
+			}
+
+			function addLrLinks() {
+				var lrList = document.getElementsByTagName("lr");
+
+				for(var i = 0; i < lrList.length; i++) {
+					org_html = lrList[i].outerHTML;
+					new_html = "<a href=#" + lrList[i].textContent + ">" + org_html + "</a>";
+					lrList[i].outerHTML = new_html;		
+			lrList[i].outerHTML = new_html;		
+					lrList[i].outerHTML = new_html;		
+				}
+			}
+
+			function addAutoLinks() {
+				var elements = document.getElementsByClassName("al");
+
+				for(var i = 0; i < elements.length; i++) {
+					org_html = elements[i].outerHTML;
+					new_html = "<a href=#" + elements[i].textContent + ">" + org_html + "</a>";
+					elements[i].outerHTML = new_html;	
+			elements[i].outerHTML = new_html;	
+					elements[i].outerHTML = new_html;	
+				}
+			}
+		</script>
+	</head>
+		
+	<body onload="onLoad();">
+		<div id="top">
+			<h1>ISS | Final Task Sprint 1 <font size="5"></font></h1>
+		</div>   
+
+		<div class="body"> 
+			<h2>Introduction</h2>
+				<div class="remark">
+					Our motto:<br/>   
+					<k>there is no code without a project, no project without problem analysis and no problem without requirements</k>.
+				</div>
+			The sprint backlog for this specific sprint can be found at <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#sprint1">sembrava_qualcuno_tf21Start.html</a>
+			<h2>Project</h2>
+				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase, let's now "zoom-in" into 
+				the components we have to design for this sprint: ParkServiceGUI, ParkManagerService, Trolley, Map and WeightSensorController and simulator.
+				<div class="remark">
+					<center><em>In the following diagrams, the Green color is associated with "Controller" or "Buisness logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br> 
+				</div>
+				<div class="remark">
+					<center><k>This coming figure represents the communication pattern and architecture between the ClientService, the ClientGUI and the WeightSensor</k></center><br> 
+					<td style="width:50%">
+						<center><img id="ClientService-GUI" src="./img/ClientService-ClientGUICommPattern.png" width="70%"></center>
+					</td>
+				</div>
+				<hr>
+				<div class="remark">
+					<center><k>This figure represents the communication pattern and architecture between the ClientService and the Trolley</k></center><br>
+					<td style="width:50%">
+						<center><img id="ClientService-GUI" src="./img/ClientService-TrolleyCommPattern.png" width="70%"></center>
+					</td>
+				</div>
+				<h3>ParkServiceGUI</h3>
+					Good programming practice is the single responsibility principle, which advises us to design components with one logical purpose. To fulfill this principle, we need separation from application and presentation layers. We also need separation from
+					the buisness logic, the presenting view and the code that prepares these views.
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							Accepting the hint of the analysts to use a MVC pattern to implement the GUIs and user interactions, we decided to utilize the Spring Framework to fulfill this task.<br>
+							<h4>Using the Spring Framework to implement a MVC pattern</h4>
+								The Spring Framework will be used for its ability to boost productivity with the use of annotations, Dependency Injection and easily configurable web services 
+								and for the need to focus on buisness code, leaving the generation and management of boilerplate code to the Framework.<br>
+								The new "ParkServiceGui", at this point, will be split in two components: a spring view (deployable on the client side, in the actual INDOOR area) and a sprint controller to generate the views basing on the client requests. This would also allow to delegate the 
+								real buisness logic to the ParkClientService component, which will be described later.
+						</td>
+						<td>  
+							<center><img src="./img/ParkServiceGUI.png" width="65%"></center>
+						</td></tr>
+						<tr><td style="width:60%">
+							<h4>Using RESTful APIs for the M2M interaction</h4>
+								We decided to use HTTP RESTful APIs, as they're a "de-facto" standard in API developing and for their flexibility, scalability and lightness, both on the developing side (no 
+								need to import any other libraries as REST works on HTTP) and the deploying side. Moreover, a client-server architecture with a request/response pattern 
+								seemed best for this part of the system, as the required behaviour (described in the attached Sequence Diagram) naturally tends to this approach.<br>
+								A detailed documentation of the proposed APIs is found <a href="REST-APIdocs.html"> here</a>.
+						</td>
+						<td>
+							<center><img src="./img/APISequenceDiagram.png" width="75%"></center>
+						</td></tr>
+					</table>
+				<h3>ParkClientService</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							<h4>The ParkClientService as a Moore's Finite State Machine</h4>
+								The ParkClientService is the component that contains all the buisness logic in this system use case. It will be implemented as an actor, because we need a componenent capable of accepting and queuing different requests in a non-blocking manner and to 
+								communicate and behave with a message-based strategy. In this way we can also exploit the qak infrastructure and language, implementing the service as a FSM, whose state changes are triggered by events and messages. <br>
+								The FSM Diagram attached describes the service states and the behaviour of the one which are of interest for this sprint. The diagram was designed basing on the ParkClientService designed and developed for the First Executable Model (<a target="code" href="../../it.unibo.sembrava_qualcuno.tf21Start/src/parkingArea.qak">parkingArea.qak</a>) of the system.
+						</td>
+						<td>  
+							<center><img src="./img/ParkClientServiceFSM.png" width="100%"></center>
+						</td></tr>
+					</table>
+					<br>
+				The ParkClientService will communicate with the SpringController using a request/response pattern, over TCP sessions, with the help of the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class.<br>
+				Instead, the service will communicate with the Trolley using dispatches, a fire-and-forget pattern and once again over TCP sessions and exploiting the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class.
+				Dispatches and fire-and-forget pattern are preferred over a request/response one because, in this case, the ClientService doesn't need an answer from the Trolley on how the moves of the actual robot ended, as the Trolley itself will take care of possible complications on that side. Moreover, there is no need to
+				require the Trolley to stop his tasks or let other queued tasks wait to respond to the service as it will be implemented as a CoAP-observable resource, thus these information could be presented to the service in a non-blocking manner.
+				The high-level messages exchanged between these three components are the same as the one identified in the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#execModel">First Executable Model</a> of the system.
+				<h3>WeightSensor</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							<h4>The need of a Sensor Interface</h4>
+								Differently from what identified in the analysis phase, we thought that the WeightSensorController could rather be replaced by a WeightSensorInterface. The goal of an object that implements
+								this interface will be to communicate with a weight sensor (or a mock). The need for an interface derives from our will to introduce abstraction as much as possible, so that if the physical sensor (or mock) changes, a new object 
+								that implements the interface could be introduced, whose implementation corresponds to the one needed by the sensor.<br>
+						</td>
+						<td>  
+							<center><img src="./img/WeightSensor.png" width="100%"></center>
+						</td></tr>
+					</table>
+					<br>
+					In our case, the CoapWeightSensor is a plain object that communicates with a WeightSensorMock. As a sensor is a constraint device, we 
+					thought that the CoAP protocol could be the best fit for our requirements. Moreover, the communication will be based on a request/response pattern, using a polling strategy.
+					This can be done without problems as our requirements say that we should check the weight sensor data only after the client states that a car has been placed in the INDOOR area.
+					This defines a specific moment when a request should be fired to the weight sensor, for which a polling strategy is the best option.
+				<h3>Trolley</h3>
+					The last component to be designed in this sprint is the Trolley. Once again, the Trolley component identified in the logic architecture by the analysts has been divided into two components, to grant reusability and independence between implementations and buisness logic:
+					the Trolley actor and the BasicRobot actor.
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							<h4>A layered architecture for the Trolley</h4>
+								We cannot stress enough the need for a layered architecture in the designing of this component: as a matter of fact, such architecture will insure high reusability and independence between both components and technologies,
+								so that if one wants to change the actual virtual robot implementation or introduce a real robot or the designers want to reuse some of the hereby developed components, this can be done with 0 to little effort.<br>
+								Once again we want to exploit the qak metamodel and architecture to develop the Trolley and for the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/src/basicrobot.qak">BasicRobot</a>, which is already developed and ready to use. This last component will grant the technology indipendece we wanted:
+								as described in the "configuration file" section of <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html#basicrobot">basicrobot2021.html</a>, this component 
+								can be easily configured (via a json configuration file) to work with the WEnv virtual robot as well as a variety of real robots deployed on different systems (such as Raspberry Pis or Arduinos).<br>
+								The Trolley is developed after the Trolley QActor, which is part of the First Executable Model of the system (<a target="code" href="../../it.unibo.sembrava_qualcuno.tf21Start/src/parkingArea.qak">parkingArea.qak</a>) and holds the trolley states and rules for the state changes, as well as 
+								the code to instruct the BasicRobot to create the sequence of moves to be passed to the virtual robot to perform. Thanks to the developed architecture, if one wants to change the behaviour of the system, or the way the trolley changes state, or the communication pattern between the trolley and the basic robot/ClientService, only one component
+								at a time should be subject to change, lowering the risk of system failures do to the change.
+						</td><td>  
+							<center><img src="./img/TrolleyLayeredArchitecture.png" width="100%"></center>
+						</td></tr>
+						<tr><td>
+							<h4>Instruct the robot trough a Planner</h4>
+							As correctly stated by the analysts, the BasicRobot component ability to move by "steps" is crucial to our needs in the sense that, in this way, we can monitor the robot's movement easily.
+							The only thing to consider, now, is how to make the BasicRobot work with a map of the area so that the virtual robot correctly follows the requirements (e.g. NF2, NF3, etc.) and how to 
+							send the correct sequence of moves from the Trolley actor to the BasicRobot.<br>
+							The attached figure shows our solution to the problem: the introduction of a Planner (modelled after the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/itunibo/planner/plannerUtil.kt">PlannerUtil.kt</a> class)
+							and of a Room Map (modelled after the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/mapRoomKotlin/RoomMap.kt">RoomMap.kt</a> class).<br>
+							The Planner component will use the <a href="http://aima.cs.berkeley.edu/java/doc/javadoc/aima/search/framework/package-summary.html">aima framework</a> to search for a path in the Room Map, 
+							after the Trolley actor specifies a goal as a couple of integers (identifying a cell of the map), and will return the path as a sequence of moves which both the BasicRobot and virtual WEnv robot can understand (see the <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.boundaryWalk/userDocs/BoundaryWalk.html#aril">aril language</a>)
+						</td><td>  
+							<center><img src="./img/TrolleyClassDiagram.png" width="100%"></center>
+						</td></tr>
+						</tbody>
+					</table>
+					<br>
+				
+			<h2>Testing</h2>
+			<h2>Deployment</h2>
+				
+		</div>
+		<div class="footer">
+			<center>			
+				<table style="background-color:rgba(30, 22, 255, 0.9); width:60%;text-align:center;color:white">	
+					<tr>
+						<td colspan="2">By</td>
+					</tr>
+					<tr>
+						<td style="width:50%">
+							<img src="./img/bongiovanni_luca.jpg" style="width:50%"> <br/>
+							Luca Bongiovanni <br/>
+							email: luca.bongiovanni@studio.unibo.it
+						</td>
+						<td style="width:50%">
+							<img src="./img/fototessera gmdc.jpg"  style="width:50%"><br/>
+							Gian Marco De Cola <br/>		 
+							email: gianmarco.decola@studio.unibo.it			 
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<b>PROJECT REPO</b>: <a style="color: white;" href="https://github.com/sembrava-qualcuno/issLab21/tree/master/it.sembrava_qualcuno.unibo.tf21Start">
+							https://github.com/sembrava-qualcuno/issLab21/tree/master/it.sembrava_qualcuno.unibo.tf21Start</a>
+						</td>
+					</tr>
+				</table>
+			</center>
+		</div>
+	</body>
+</html>
