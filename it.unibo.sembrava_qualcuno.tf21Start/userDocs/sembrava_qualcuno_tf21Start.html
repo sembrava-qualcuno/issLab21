@@ -453,7 +453,7 @@
 							<ul>
 								<li> Request the need of parking my car by accessing the ParkServiceGUI. This request must be accepted if there is at least one <tt>parking spot</tt> available, the INDOOR area is free and the robot is not stopped by the manager as per POR <a href=#acceptin><em>acceptIN</em></a>
 								<li> Be informed about the SLOTNUM chosen by the system that refers to the parking slot where my car will be parked or that there is no space for my car to be parked at the moment as per POR <a href=#informin><em>informIN</em></a>.</li>
-								<li> If the returned SLOTNUM is a positive integer, I expect also for my car to be collected from the INDOOR area (POR <a href=#movetoin><em>moveToIn</em></a>) and parked in the right parking spot (POR <a href=#movetoslotin><em>moveToSlotIn</em></a>) as well as receiving a TOKENID to be used in the car pickup phase (POR <a href=#receipt><em>receipt</em></a>)</li>
+								<li> If the returned SLOTNUM is a positive integer, after correctly parking my car in the INDOOR area and notify the system of this event, I expect also for my car to be collected from the INDOOR area (POR <a href=#movetoin><em>moveToIn</em></a>) and parked in the right parking spot (POR <a href=#movetoslotin><em>moveToSlotIn</em></a>) as well as receiving a TOKENID to be used in the car pickup phase (POR <a href=#receipt><em>receipt</em></a>)</li>
 							</ul> 
 						<h5>Car Pickup Phase</h5>
 							<ul>
@@ -558,7 +558,7 @@
 						the communication protocols used</k> (to grant reusability and possibility to change communication protocol if needed).
 					</div>
 				<h3>Logic Architecture</h3>
-					For the symbols used, please refer to the following key<br/>
+					For the symbols used in this document and the one that reference it, please refer to the following key<br/>
 					<td style="width:50%">
 						<center><img src="./img/legenda.png" width="30%" height="30%"></center>
 					</td>
@@ -566,7 +566,7 @@
 						<center><k>THE COMING FIGURE DOES NOT REPRESENT THE CONCRETE SYSTEM, THAT WILL BE DEFINED IN THE PROJECT PHASE</k></center> 
 					</div>
 					<td style="width:50%">
-						<center><img src="./img/ArchitetturaLogica.png" width="70%"></center>
+						<center><img id="archLogica" src="./img/ArchitetturaLogica.png" width="70%"></center>
 					</td>			
 					As a result of the analysis phase, the system could consist in service, called <em>ParkManagerService</em> per requirement, that communicates via HTTP request/responses with 3 browsers.
 					Two of the browsers (<em>ParkServiceGUI</em>) could be located either in the in/outdoor area for the client to access it and operate their actions, or on a mobile system (as a smartphone app).
@@ -588,8 +588,8 @@
 				After talking with the product owner and the development team we decided to divide the work in <k>4 Sprints</k>. Every sprint is relative to one or more PORs, to better identify their goals with a terminology which is understandable both to the product owner and scrum team.<br/>
 				The first 3 sprints are relative to the client user stories/use cases so that a deliverable subsystem should be ready for deployment as soon as possible. Furthermore, the sprint order is thought to boost the development time by designing and developing <tt>bigger components first</tt>, that can be then reused in the coming sprints.<br>
 				The last sprint would close up the project by terminating the deliverable software relative to the parking manager user stories/use cases, deemed less crucial from the product owner perspective.
-				<h3>SPRINT 1</h3>
-					This sprint is relative to the POR <a href="informin"><em>informIN</em></a>, divided into F3, F5, F6, NF1, NF2, NF3, NF7 by the analysts.
+				<h3 id="sprint1">SPRINT 1</h3>
+					This sprint is relative to the POR <a href="#informin"><em>informIN</em></a>, divided into F3, F4, F5, F6, F17, NF1, NF2, NF3, NF7 by the analysts.
 					<table class="sprint">
 						<thead>
 							<tr>
@@ -603,20 +603,22 @@
 								<td>
 									The client must be informed if no parking slots are available at the time of his request (<lr>F3</lr>)<br>
 									The ParkManagerService must successfully instruct the robot on how to move; in particular, the robot must be moved from the INDOOR AREA to one of the Parking Slots (<lr>F5</lr>)<br>
-									A unique token must be successfully generated and presented to the client (<lr>F6</lr>)
+									A unique token must be successfully generated and presented to the client (<lr>F6</lr>)<br>
+									The system must aknowledge from the client when the car is in the INDOOR area and double-check this fact through the weight sensor(<lr>F4</lr>-<lr>F17</lr>)
 								</td>
 								<td>
 									The map should be updated with the movements of the robot (<lr>NF2</lr>)<br>
 									The robot should not walk over the parking slots (<lr>NF3</lr>)<br>
 									The robot should correctly return to the home position if idle (<lr>NF7</lr>)
 								</td>
-								<td>The token is supposed to be unique and unforgeable (<lr>NF1</lr>)</td>
+								<td>The ParkServiceGUI is supposed to show a prompt for the client to interact with to notify to the system that the car has been placed in the INDOOR area (<lr>F4</lr>)
+									The token is supposed to be unique and unforgeable (<lr>NF1</lr>)</td>
 							</tr>
 						</tbody>
 					</table>
 					This sprint should be done in <k>one week</k>.
-				<h3>SPRINT 2</h3>
-					This sprint is relative to the POR <a href="acceptout"><em>acceptOUT</em></a>, divided into F2, F7, F8, F9, NF2, NF3, NF5, NF6, NF7 by the analysts.
+				<h3 id="sprint1">SPRINT 2</h3>
+					This sprint is relative to the POR <a href="#acceptout"><em>acceptOUT</em></a>, divided into F2, F7, F8, F9, NF2, NF3, NF5, NF6, NF7 by the analysts.
 					<table class="sprint">
 						<thead>
 							<tr>
@@ -646,8 +648,8 @@
 						</tbody>
 					</table>
 					This sprint could leverage and reuse some components created in the previous sprint so <k>four days</k> should be enough.
-				<h3>SPRINT 3</h3>
-					This sprint is relative to the POR <a href="acceptin"><em>acceptIN</em></a>, divided into F1, F2, F4, F17, NF5 by the analysts.
+				<h3 id="sprint1">SPRINT 3</h3>
+					This sprint is relative to the POR <a href="#acceptin"><em>acceptIN</em></a>, divided into F1, F2, NF5 by the analysts.
 					<table class="sprint">
 						<thead>
 							<tr>
@@ -661,15 +663,14 @@
 								<td>
 									The client must successfully submit a parking request (<lr>F1</lr>)<br>
 									The robot must accept a client request if it is available (<lr>F2</lr>-<lr>NF5</lr>)<br>
-									The system must aknowledge from the client when the car is in the INDOOR area and double-check this fact through the weight sensor(<lr>F4</lr>-<lr>F17</lr>)
 								</td>
 								<td></td>
-								<td>The ParkServiceGUI is supposed to show a prompt for the client to interact with for his parking request (<lr>F1</lr>) and to notify to the system that the car has been placed in the INDOOR area (<lr>F4</lr>)</td>
+								<td>The ParkServiceGUI is supposed to show a prompt for the client to interact with for his parking request (<lr>F1</lr>)</td>
 							</tr>
 						</tbody>
 					</table>
 					This sprint should conclude the client use cases and could result in a deliverable and deployable subsystem. This should be done in two day.
-				<h3>SPRINT 4</h3>
+				<h3 id="sprint4">SPRINT 4</h3>
 					This sprint is relative to the PORs <em class="al">authorize</em>, <em class="al">manage</em>, <em class="al">monitor</em>, divided into F10, F11, F12, F13, F14, F15, F16, NF4 by the analysts.
 					<table class="sprint">
 						<thead>
@@ -702,7 +703,7 @@
 					<center><k>THE COMING FIGURE IS A SEMPLIFICATION OF THE SYSTEM WE SHOWED IN THE ANALYSIS PHASE</k></center> 
 				</div>
 				<td style="width:50%">
-					<center><img src="./img/ModelloEseguibile.png" width="70%"></center>
+					<center><img id="execModel" src="./img/ModelloEseguibile.png" width="70%"></center>
 				</td>
 				As one can see in the image, we decided to simplify the initial system model by removing the sensors and the fan, and focusing only on the client-service-trolley interaction which makes up for the most funtions of the system.<br>
 				The system was mapped as 2 qakactors for the main service, 3 qakactors for the clients (one to simulate a client who wants to park a car, one to simulate a client who wants to pickup a car and one to simulate the manager). <br>
