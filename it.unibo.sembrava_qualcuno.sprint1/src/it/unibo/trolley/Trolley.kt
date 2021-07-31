@@ -16,14 +16,27 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 	@kotlinx.coroutines.ObsoleteCoroutinesApi
 	@kotlinx.coroutines.ExperimentalCoroutinesApi			
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		
+					val HOME : Pair<String,String> = Pair("0", "0")
+					val INDOOR : Pair<String,String> = Pair("5", "0")
+					//val OUTDOOR : Pair<String,String> = Pair("5", "4")
+					val SLOT1 : Pair<String,String> = Pair("1", "1")
+					val SLOT2 : Pair<String,String> = Pair("1", "2")
+					val SLOT3 : Pair<String,String> = Pair("1", "3")
+					val SLOT4 : Pair<String,String> = Pair("4", "1")
+					val SLOT5 : Pair<String,String> = Pair("4", "2")
+					val SLOT6 : Pair<String,String> = Pair("4", "3")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						println("trolley STARTS")
 						updateResourceRep( "trolley STARTS"  
 						)
-						
-										
+						itunibo.planner.plannerUtil.loadRoomMap( "parkingMap"  )
+						itunibo.planner.plannerUtil.initAI(  )
+						println("INITIAL MAP")
+						itunibo.planner.plannerUtil.showMap(  )
+						itunibo.planner.plannerUtil.startTimer(  )
 					}
 					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
@@ -32,6 +45,32 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						println("trolley IDLE")
 						updateResourceRep( "trolley IDLE"  
 						)
+						 if(!itunibo.planner.plannerUtil.atHome()){
+										itunibo.planner.plannerUtil.planForGoal(HOME.first, HOME.second)
+										var mv : String = itunibo.planner.plannerUtil.getNextPlannedMove()
+										while(! mv.equals("")){
+											when(mv){
+												"w" ->
+						request("step", "step(330)" ,"basicrobot" )  
+						
+													"s" ->
+						forward("cmd", "cmd(s)" ,"basicrobot" ) 
+						
+													"l" ->
+						forward("cmd", "cmd(l)" ,"basicrobot" ) 
+						
+													"r" ->
+						forward("cmd", "cmd(r)" ,"basicrobot" ) 
+						
+													else -> {println("Command error")}
+						 } //end when
+												delay(330)
+												itunibo.planner.plannerUtil.updateMap(mv)
+												mv = itunibo.planner.plannerUtil.getNextPlannedMove()
+						} 
+						} 
+						itunibo.planner.plannerUtil.saveRoomMap( "parkingMap"  )
+						println("trolley at HOME")
 					}
 					 transition(edgeName="t03",targetState="working",cond=whenDispatch("moveToPark"))
 				}	 
@@ -41,6 +80,37 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						println("trolley WORKING")
 						updateResourceRep( "trolley WORKING"  
 						)
+						if( checkMsgContent( Term.createTerm("moveToIndoor(X)"), Term.createTerm("moveToIndoor(WHERE)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("trolley moveToIndoor")
+								updateResourceRep( "trolley moveToIndoor"  
+								)
+								println("trolley trip to INDOOR start")
+								
+												itunibo.planner.plannerUtil.planForGoal(INDOOR.first,INDOOR.second)
+												var mv : String = itunibo.planner.plannerUtil.getNextPlannedMove()
+												while(! mv.equals("")){
+													when(mv){
+														"w" ->
+								request("step", "step(330)" ,"basicrobot" )  
+								
+															"s" ->
+								forward("cmd", "cmd(s)" ,"basicrobot" ) 
+								
+															"l" ->
+								forward("cmd", "cmd(l)" ,"basicrobot" ) 
+								
+															"r" ->
+								forward("cmd", "cmd(r)" ,"basicrobot" ) 
+								
+															else -> {println("Command error")}
+								 } //end when
+														delay(330)
+														itunibo.planner.plannerUtil.updateMap(mv)
+														mv = itunibo.planner.plannerUtil.getNextPlannedMove()
+								} 
+								itunibo.planner.plannerUtil.saveRoomMap( "parkingMap"  )
+						}
 						if( checkMsgContent( Term.createTerm("moveToPark(SLOTNUM)"), Term.createTerm("moveToPark(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var SLOTNUM = payloadArg(0).toInt()  
@@ -48,11 +118,43 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 								updateResourceRep( "trolley moveToPark($SLOTNUM)"  
 								)
 								
-												itunibo.planner.plannerUtil.planForGoal("6","0")	
+												when(SLOTNUM){
+													1 -> itunibo.planner.plannerUtil.planForGoal(SLOT1.first, SLOT1.second)
+													2 -> itunibo.planner.plannerUtil.planForGoal(SLOT2.first, SLOT2.second)
+													3 -> itunibo.planner.plannerUtil.planForGoal(SLOT3.first, SLOT3.second)
+													4 -> itunibo.planner.plannerUtil.planForGoal(SLOT4.first, SLOT4.second)
+													5 -> itunibo.planner.plannerUtil.planForGoal(SLOT5.first, SLOT5.second)
+													6 -> itunibo.planner.plannerUtil.planForGoal(SLOT6.first, SLOT6.second)
+												}
+												
+												var mv = itunibo.planner.plannerUtil.getNextPlannedMove()
+												while(! mv.equals("")){
+													when(mv){
+														"w" ->
+								request("step", "step(330)" ,"basicrobot" )  
+								
+															"s" ->
+								forward("cmd", "cmd(s)" ,"basicrobot" ) 
+								
+															"l" ->
+								forward("cmd", "cmd(l)" ,"basicrobot" ) 
+								
+															"r" ->
+								forward("cmd", "cmd(r)" ,"basicrobot" ) 
+								
+															else -> {println("Command error")}
+								 } //end when
+														delay(330)
+														itunibo.planner.plannerUtil.updateMap(mv)
+														mv = itunibo.planner.plannerUtil.getNextPlannedMove()
+								} 
+								println("trolley trip to park slot $SLOTNUM end")
+								forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
 						}
-						forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
+						itunibo.planner.plannerUtil.saveRoomMap( "parkingMap"  )
 					}
 					 transition(edgeName="t04",targetState="idle",cond=whenDispatch("goToIdle"))
+					transition(edgeName="t05",targetState="working",cond=whenDispatch("moveToPark"))
 				}	 
 			}
 		}

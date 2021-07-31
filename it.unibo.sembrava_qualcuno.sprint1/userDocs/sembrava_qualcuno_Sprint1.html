@@ -306,7 +306,8 @@
 								We decided to use HTTP RESTful APIs, as they're a "de-facto" standard in API developing and for their flexibility, scalability and lightness, both on the developing side (no 
 								need to import any other libraries as REST works on HTTP) and the deploying side. Moreover, a client-server architecture with a request/response pattern 
 								seemed best for this part of the system, as the required behaviour (described in the attached Sequence Diagram) naturally tends to this approach.<br>
-								A detailed documentation of the proposed APIs is found <a href="REST-APIdocs.html"> here</a>.
+								A detailed documentation of the proposed APIs is found <a href="REST-APIdocs.html"> here</a>. The API documentation has been redacted using the <a href="https://swagger.io/tools/swagger-editor/">swagger-editor</a> tool. This was important as the resulting <a href="Automated Car-Parking REST API.json">json file</a>
+								(written in an OpenAPI format) can be reuploaded into swagger to automatically generate some code either to send requests using this APIs (look at <a href="bash-client/README.md"> this readme file</a> to have an example of bash client) or to generate a server in numerous programming languages.
 						</td>
 						<td>
 							<center><img src="./img/APISequenceDiagram.png" width="75%"></center>
@@ -355,15 +356,21 @@
 					<table style="width:98%">
 						<tbody>
 						<tr><td style="width:60%">
-							<h4>A layered architecture for the Trolley</h4>
-								We cannot stress enough the need for a layered architecture in the designing of this component: as a matter of fact, such architecture will insure high reusability and independence between both components and technologies,
-								so that if one wants to change the actual virtual robot implementation or introduce a real robot or the designers want to reuse some of the hereby developed components, this can be done with 0 to little effort.<br>
+							<h4>Trolley buisness logic and Trolley instructor</h4>
+								The TROLLEY component identified during the analysis phase has been actually split into a "Trolley" component, that helds the buisness logic for the trolley (the states and the rules on how to switch between them as well as preparing a path for the robot to perform) and a "BasicRobot" that instructs the robot on how to move. 
 								Once again we want to exploit the qak metamodel and architecture to develop the Trolley and for the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/src/basicrobot.qak">BasicRobot</a>, which is already developed and ready to use. This last component will grant the technology indipendece we wanted:
 								as described in the "configuration file" section of <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html#basicrobot">basicrobot2021.html</a>, this component 
 								can be easily configured (via a json configuration file) to work with the WEnv virtual robot as well as a variety of real robots deployed on different systems (such as Raspberry Pis or Arduinos).<br>
+						</td><td>  
+							<center><img src="./img/TROLLEY.png" width="65%"></center>
+						</td></tr>
+						<tr><td style="width:60%">
+							<h4>A layered architecture for the Trolley</h4>
+								We cannot stress enough the need for a layered architecture in the designing of this component: as a matter of fact, such architecture will insure high reusability and independence between both components and technologies,
+								so that if one wants to change the actual virtual robot implementation or introduce a real robot or the designers want to reuse some of the hereby developed components, this can be done with 0 to little effort.<br>
 								The Trolley is developed after the Trolley QActor, which is part of the First Executable Model of the system (<a target="code" href="../../it.unibo.sembrava_qualcuno.tf21Start/src/parkingArea.qak">parkingArea.qak</a>) and holds the trolley states and rules for the state changes, as well as 
-								the code to instruct the BasicRobot to create the sequence of moves to be passed to the virtual robot to perform. Thanks to the developed architecture, if one wants to change the behaviour of the system, or the way the trolley changes state, or the communication pattern between the trolley and the basic robot/ClientService, only one component
-								at a time should be subject to change, lowering the risk of system failures do to the change.
+								the code to instruct the BasicRobot to create the sequence of moves to be passed to the virtual robot to perform. Thanks to the developed architecture, if one wants to change the behaviour of the system, the way the trolley changes state, the communication pattern between the trolley and the basic robot/ClientService, or the actual implementation of the robot, only one component
+								at a time should be subject to change, lowering the risk of system failures due to the change.
 						</td><td>  
 							<center><img src="./img/TrolleyLayeredArchitecture.png" width="100%"></center>
 						</td></tr>
