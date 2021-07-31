@@ -6,6 +6,7 @@ plugins {
 	id 'eclipse'
 	id 'java'
 	id 'application'
+	id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.32'
 }
 
 group = 'it.unibo.sembrava_qualcuno'
@@ -76,6 +77,12 @@ dependencies {
     compile name: 'it.unibo.planner20-1.0'
  	// https://mvnrepository.com/artifact/com.googlecode.aima-java/aima-core
 	compile group: 'com.googlecode.aima-java', name: 'aima-core', version: '3.0.0'
+
+	implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2'
+
+	//STRING COLORS
+	// https://mvnrepository.com/artifact/com.andreapivetta.kolor/kolor
+	implementation 'com.andreapivetta.kolor:kolor:1.0.0'
 }
 
 application {

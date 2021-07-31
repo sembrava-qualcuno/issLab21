@@ -1,25 +1,58 @@
 package it.unibo.sembrava_qualcuno.sprint1
 
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ResponseStatus
+import it.unibo.connQak.connQakBase
+import it.unibo.connQak.connQakTcp
+import it.unibo.kactor.MsgUtil
+import it.unibo.sembrava_qualcuno.exception.ApiErrorException
+import it.unibo.sembrava_qualcuno.model.ApiError
+import it.unibo.sembrava_qualcuno.model.Message
+import it.unibo.sembrava_qualcuno.model.ParkingSlot
+import it.unibo.sembrava_qualcuno.model.TokenId
+import it.unibo.sembrava_qualcuno.utils.ApplMessageUtil
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class SpringController {
-	
-	
+	final val connParkClientService : connQakBase = connQakTcp()
+
+	init {
+		connParkClientService.createConnection("localhost", 8023)
+	}
+
 	@GetMapping("/client/reqenter")
 	@ResponseBody
 	fun reqenter() : ResponseEntity<ParkingSlot> {
-		//Request to the ParkClientService for the parking slot
-		
+		var request = MsgUtil.buildRequest("springcontroller", "reqenter", "reqenter(X)", "parkclientservice")
+		val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
+
+		val message : Message = Json.decodeFromString(reply.msgContent)
+
 		//Error
-		throw NotAvailableException("errore")
-		
-		
-		//return ResponseEntity.ok(ParkingSlot(1))
+		if(message.code != 0)
+			throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
+
+		//TODO Se non ci sono posti è un errore?
+		return ResponseEntity.ok(ParkingSlot(message.message.toInt()))
+	}
+
+	@GetMapping("/client/carenter")
+	@ResponseBody
+	fun carenter(@RequestParam slotnum : Int) : ResponseEntity<TokenId> {
+		var request = MsgUtil.buildRequest("springcontroller", "carenter", "carenter($slotnum)", "parkclientservice")
+		val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
+		val message : Message = Json.decodeFromString(reply.msgContent)
+		//Error
+		if(message.code != 0) {
+			if(message.code == 3)
+				throw ApiErrorException(HttpStatus.BAD_REQUEST, ApiError(message.code, message.message))
+			else
+				throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
+		}
+
+		return ResponseEntity.ok(TokenId(message.message))
 	}
 }

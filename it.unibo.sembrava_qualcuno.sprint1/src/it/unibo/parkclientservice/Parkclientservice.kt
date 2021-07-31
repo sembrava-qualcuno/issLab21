@@ -3,14 +3,19 @@ package it.unibo.parkclientservice
 
 import it.unibo.kactor.*
 import alice.tuprolog.*
+import it.unibo.sembrava_qualcuno.model.Message
+import it.unibo.sembrava_qualcuno.sprint1.ParkingAreaKb
+import it.unibo.sembrava_qualcuno.weightsensor.CoapWeightSensor
+import it.unibo.sembrava_qualcuno.weightsensor.WeightSensorInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import it.unibo.sembrava_qualcuno.sprint1.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
-import java.util.Date
-	
+import java.util.*
+
 class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
@@ -19,7 +24,7 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 	@kotlinx.coroutines.ObsoleteCoroutinesApi
 	@kotlinx.coroutines.ExperimentalCoroutinesApi			
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
-			val weightSensor : WeightSensorInterface = CoapWeightSensor("coap:/localhost:8020/weightSensor")	 
+			val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://localhost:8020/weightSensor")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -41,8 +46,10 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						println("parkclientservice reply to reqenter")
-						 var SLOTNUM = 0  
-						if(  weightSensor.getWeight() > 0  
+						 
+									lateinit var message : Message
+									var SLOTNUM = 0  
+						if(  weightSensor.getWeight() > 0
 						 ){
 										for(i in 1..6) {
 											if(ParkingAreaKb.slot.get(i).equals("")) {
@@ -53,14 +60,17 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 						if(  SLOTNUM == 0  
 						 ){forward("goToWork", "goToWork(enter($SLOTNUM))" ,"parkclientservice" ) 
 						}
+						 message = Message(0, "$SLOTNUM")  
 						}
 						else
 						 {forward("goToWork", "goToWork(enter($SLOTNUM))" ,"parkclientservice" ) 
+						  message = Message(1, "The indoor area or trolley are engaged")  
 						 }
 						println("parkclientservice reply enter($SLOTNUM)")
 						updateResourceRep( "$SLOTNUM"  
 						)
-						answer("reqenter", "enter", "enter($SLOTNUM)"   )  
+						 val RESPONSE = Json.encodeToString(message)
+						answer("reqenter", "enter", "$RESPONSE"   )  
 					}
 					 transition(edgeName="t01",targetState="work",cond=whenDispatch("goToWork"))
 					transition(edgeName="t02",targetState="enterthecar",cond=whenRequest("carenter"))
@@ -76,7 +86,7 @@ class Parkclientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm
 												
 												//Generate token
 												val sdf = SimpleDateFormat("dd/MM/yyyy-hh:mm:ss")
-												val currentDate = sdf.format(Date())	
+												val currentDate = sdf.format(Date())
 												val TOKENID = "$SLOTNUM-$currentDate"	
 												ParkingAreaKb.slot.set(SLOTNUM, "$TOKENID") //Set the slot occupied
 								forward("moveToPark", "moveToPark($SLOTNUM)" ,"trolley" ) 

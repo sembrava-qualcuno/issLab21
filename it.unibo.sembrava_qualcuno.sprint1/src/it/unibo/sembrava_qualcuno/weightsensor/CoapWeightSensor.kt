@@ -1,4 +1,4 @@
-package it.unibo.sembrava_qualcuno.sprint1
+package it.unibo.sembrava_qualcuno.weightsensor
 
 import org.eclipse.californium.core.CoapClient
 

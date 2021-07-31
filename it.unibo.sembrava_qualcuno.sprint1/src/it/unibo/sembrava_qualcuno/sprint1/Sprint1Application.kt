@@ -8,4 +8,5 @@ class Sprint1Application
 
 fun main(args: Array<String>) {
 	runApplication<Sprint1Application>(*args)
+
 }
