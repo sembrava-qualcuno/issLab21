@@ -1,0 +1,151 @@
+System carparking
+
+//INDOOR CLIENT
+//acceptIN
+Request reqenter : reqenter(X)
+Reply   enter    : enter(SLOTNUM)
+
+//informIN
+Request carenter : carenter(SLOTNUM)
+Reply   receipt  : receipt(TOKENID)
+
+Dispatch goToWork : goToWork(X)
+
+Dispatch moveToPark : moveToPark(SLOTNUM)
+
+//TROLLEY
+Dispatch goToIdle : goToIdle(X)
+
+Context ctxparkmanagerservice ip[host="localhost" port=8023]
+Context ctxtrolley ip[host="localhost" port=8024]
+ 
+QActor parkclientservice context ctxparkmanagerservice {
+	[#	val weightSensor : WeightSensorInterface = CoapWeightSensor("coap:/localhost:8020/weightSensor")	#]
+	
+	State s0 initial {
+		println("parkclientservice STARTS")
+		updateResource [# "parkclientservice STARTS" #]
+		
+		
+	}
+	Goto work
+	
+	State work {
+		println("parkclientservice waiting ...")
+		updateResource [# "parkclientservice waiting ..." #]
+	}
+	Transition t0 
+		whenRequest reqenter -> handleEnterRequest
+	
+	State handleEnterRequest {
+		printCurrentMessage
+		println("parkclientservice reply to reqenter")
+		//updateResource [# "parkclientservice reply to reqenter" #]
+		
+		[# var SLOTNUM = 0 #]
+		
+		//acceptIN
+		if [# weightSensor.getWeight() > 0 #] { //In this sprint the trolley can not be stopped
+			//Get first free parking spot, or 0
+			[#
+				for(i in 1..6) {
+					if(ParkingAreaKb.slot.get(i).equals("")) {
+						SLOTNUM = i
+						break
+					}
+				}
+			#]
+			
+			if [# SLOTNUM == 0 #] {
+				forward parkclientservice -m goToWork : goToWork(enter($SLOTNUM))
+			}
+		}
+		else {
+			//Reply with slotnum=0 to indicates both indoor area and trolley are occupied
+			forward parkclientservice -m goToWork : goToWork(enter($SLOTNUM))
+		}
+		
+		//informIN
+		println("parkclientservice reply enter($SLOTNUM)")
+		updateResource [# "$SLOTNUM" #]
+			
+		replyTo reqenter with enter : enter($SLOTNUM)
+	}
+	Transition t0
+		whenMsg goToWork -> work
+		whenRequest carenter -> enterthecar
+	
+	State enterthecar {
+		printCurrentMessage		
+		println("parkingclientservice reply to enterthecar")
+		//updateResource [# "parkingclientservice reply to enterthecar" #]
+		
+ 		onMsg(carenter : carenter(SLOTNUM)) {
+			[# 
+				var SLOTNUM = payloadArg(0).toInt()
+				
+				//Generate token
+				val sdf = SimpleDateFormat("dd/MM/yyyy-hh:mm:ss")
+				val currentDate = sdf.format(Date())	
+				val TOKENID = "$SLOTNUM-$currentDate"	
+				ParkingAreaKb.slot.set(SLOTNUM, "$TOKENID") //Set the slot occupied
+			#]
+			
+			//moveToPark
+			forward trolley -m moveToPark : moveToPark($SLOTNUM)
+			
+			//Reply with the TOKENID
+			println("parkingclientservice moves the car to SLOTNUM = $SLOTNUM")
+			//updateResource [# "parkingclientservice moves the car to SLOTNUM = $SLOTNUM" #]
+			updateResource [# "$TOKENID" #]
+			replyTo carenter with receipt : receipt($TOKENID)
+		}		
+	}
+	Goto work
+}
+
+QActor trolley context  ctxtrolley{
+	State s0 initial {
+		println("trolley STARTS")
+		updateResource [# "trolley STARTS" #]
+		
+		[#
+				
+		#]
+	}
+	Goto idle
+	
+	State idle {
+		println("trolley IDLE")
+		updateResource [# "trolley IDLE" #]
+		
+		//Moves the trolley to the home position if not there already
+	}
+	Transition t0
+		whenMsg moveToPark -> working
+	
+	State working {
+		printCurrentMessage
+		println("trolley WORKING")
+		updateResource [# "trolley WORKING" #]
+		
+		onMsg(moveToPark : moveToPark(SLOTNUM)) {
+			[# var SLOTNUM = payloadArg(0).toInt() #]
+			println("trolley moveToPark($SLOTNUM)")
+			updateResource [# "trolley moveToPark($SLOTNUM)" #]
+			
+			[#
+				itunibo.planner.plannerUtil.planForGoal("6","0")	
+			#]
+			
+			//Move the trolley to the INDOOR area
+			
+			//Move the trolley to the specific parking slot
+		}
+		
+		forward trolley -m goToIdle : goToIdle(X)
+	}
+	Transition t0
+		whenMsg goToIdle -> idle
+}
+ 
