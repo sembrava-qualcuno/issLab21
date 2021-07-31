@@ -223,6 +223,7 @@
 				var nfRequirements = document.getElementsByClassName("nfr")[0].children;
 				var i;
 				for(i = 0; i < fRequirements.length; i++)
+					if fRequirements[i].parent.tagName == ''
 					fRequirements[i].id = "F" + (i + 1);
 				for(i = 0; i < nfRequirements.length; i++)
 					nfRequirements[i].id = "NF" + (i + 1);
@@ -411,6 +412,8 @@
 						<li><em>Parking manager</em>: a human responsible for the parking area. He should be able to check on the parking area status and handle possible critical situations.</li>
 						<li><em>Client</em>: a human that want to park his/her car in the parking space and has to use our software system.</li>
 						<li><em>Token</em>: a unique code that can identify the slot in which a certain car is parked in a specified instance of time.</li>
+						<li><em>Stop the trolley</em>: send a stop message to the trolley to halt its behaviour. The behaviour can be later resumed with a resume message. The trolley cannot be stopped while on trip.</li>
+						<li><em>Trip</em>: every movement of the trolley from the HOME position to the IN/OUTDOOR area and viceversa, from the INDOOR area to one of the parking slots or from the parking slots to the OUTDOOR area.</li>
 					</ul>
 				<h3>Schematized requirements</h3>
 					<div class="remark">
@@ -420,7 +423,7 @@
 						<ol class="fr">
 							<li>The client should be made able to notify his/her interest to park his car on a free parking spot throught the ParkServiceGUI interface.</li>
 							<li>Our system can accept a new client request only when the robot is in home position or is working. Conversely the system should notify the client to wait.</li>
-							<li>The client should be notified if no parking spot is free. Conversely he should receive the number of the chosen parking spot if available.</li>
+							<li>The client should be notified if no parking spot is free. Conversely he should receive the number of the chosen parking slot if available.</li>
 							<li>The client should be made able to notify the system when he has left his/her car in the indoor area.</li>
 							<li>Our system should instruct the trolley to escort a car from the indoor area to the specified parking slot.</li>
 							<li>When a car is parked, our system should be able to produce a unique token and send it to the client throught the ParkServiceGUI in order to identify the parking slot from which a certain car should be picked up when its owner returns.</li>
@@ -431,7 +434,7 @@
 							<li>Our system should be able to notify the parking manager if the car has not been picked up from the outdoor area in a given interval of time.</li>
 							<li>Our system should be able to collect state information from the parking area (via the sensors and thermometers) such as the temperature and the state of the fan.</li>
 							<li>Our system should be able to collect state information from the trolley (idle, working, stopped).</li>
-							<li>The parking manager should be made able to stop the trolley when the temperature of the parking area reaches a certain limit.</li>
+							<li>The parking manager should be made able to stop the trolley when the temperature of the parking area reaches a certain limit. When the temperature returns under the limit the manager should be able to resume the behaviour of the trolley.</li>
 							<li>Our system should be able to start/stop the fan when the temperature reaches or leaves a certain limit.</li>
 							<li>Our system should identify and authenticate the parking manager before letting him access the system.</li>
 							<li>Our system should be able to double-check the client statement of having his car parked in the INDOOR area through the weight sensor.</li>
@@ -451,13 +454,13 @@
 						As a <ks>client</ks> I expect to be able to:
 						<h5>Parking Phase</h5>
 							<ul>
-								<li> Request the need of parking my car by accessing the ParkServiceGUI. This request must be accepted if there is at least one <tt>parking spot</tt> available, the INDOOR area is free and the robot is not stopped by the manager as per POR <a href=#acceptin><em>acceptIN</em></a>
+								<li> Request the need of parking my car by accessing the ParkServiceGUI. This request must be accepted if there is at least one <tt>parking slot</tt> available, the INDOOR area is free and the robot is not stopped by the manager as per POR <a href=#acceptin><em>acceptIN</em></a>
 								<li> Be informed about the SLOTNUM chosen by the system that refers to the parking slot where my car will be parked or that there is no space for my car to be parked at the moment as per POR <a href=#informin><em>informIN</em></a>.</li>
 								<li> If the returned SLOTNUM is a positive integer, after correctly parking my car in the INDOOR area and notify the system of this event, I expect also for my car to be collected from the INDOOR area (POR <a href=#movetoin><em>moveToIn</em></a>) and parked in the right parking spot (POR <a href=#movetoslotin><em>moveToSlotIn</em></a>) as well as receiving a TOKENID to be used in the car pickup phase (POR <a href=#receipt><em>receipt</em></a>)</li>
 							</ul> 
 						<h5>Car Pickup Phase</h5>
 							<ul>
-								<li> Request the need collecting my parked car presenting to the ParkServiceGUI the TOKENID obtained in the car parking phase. This request must be accepted if the OUTDOOR area is empty and the trolley is not stopped by the manager, as per POR <a href=#acceptout><em>acceptOUT</em></a></li>
+								<li> Request the need to collect my parked car presenting to the ParkServiceGUI the TOKENID obtained in the car parking phase. This request must be accepted if the OUTDOOR area is empty and the trolley is not stopped by the manager, as per POR <a href=#acceptout><em>acceptOUT</em></a></li>
 								<li> If the token provided by me is valid, I also expect that the system automatically infers the correct parking slot of my car from the token (POR <a href=#findslot><em>findSlot</em></a>) as well as my car being transported by the trolley on the OUTDOOR area (PORs <a href=#movetoslotout><em>moveToSlotOut</em></a> and <a href=#movetoout><em>moveToOut</em></a>)</li>
 							</ul>
 					<h4>Parking Manager use cases</h4>
@@ -469,14 +472,14 @@
 						</ul>
 				<h3>First test plan ideas</h3>
 					<ul>
-						<li><em>moveToIn</em>: check on the map if the position of the trolley corresponds with the indoor area (6,0) <lr>F5</lr></li>
+						<li><em>moveToIn</em>: check on the map if the position of the trolley corresponds with the indoor area (6,0) (<lr>F5</lr>)</li>
 						<li><em>moveToSlotIn/Out</em>: check on the map if the position of the trolley is adjacent to the chosen parking spot (e.g. (3,2) if the parking slot is (3,3)) (<lr>F5</lr>-<lr>F9</lr>)</li>
 						<li><em>backToHome</em>: check on the map if the trolley has returned home (0,0) (<lr>NF7</lr>)</li>
 						<li><em>moveToOut</em>: check on the map if the position of the trolley corresponds with the outdoor area (6,4) (<lr>F9</lr>)</li>
 						<div class="remark">
 							<k>Carefully note</k> that in every test above, one should also check if the robot behaves correctly (e.g. doesn't walk on the parking slots as per <lr>NF3</lr>, etc.) also by checking its route on the map 
 						</div>
-						<li>Check that if there are no available parking slots the system doesn't accept the request <lr>F3</lr></li>
+						<li>Check that if there are no available parking slots the system doesn't accept the request (<lr>F3</lr>)</li>
 						<li>Check that if a client specifies a wrong token the system does not accept the request and that the system does not give back the wrong car (<lr>F6</lr>-<lr>F7</lr>-<lr>F8</lr>)</li>
 						<li>Check that the parking manager can access the parking area information only if authenticated (<lr>F10</lr>-<lr>F16</lr>)</li>
 						<li>Check that if the parking manager stops the robot, it immediately stops and no other task is executed by the trolley until it exits the stop state (<lr>F14</lr>-<lr>NF4</lr>-<lr>NF5</lr>)</li>
@@ -494,13 +497,13 @@
 						<div class="remark">
 								<k>NOTE THAT</k> even though we are working in a virtual environment and with virtual components, this should be done with a fair amount of abstraction that insures 
 								some sort of <bc>technology indipendence</bc>; this would help an hypothetical subsequent phase in which the simulated components will be replaced by real ones,
-								by not changing the buisness logic. This could be achieved by developing interfaces and factory methods as well as a high level interaction protocols and architectures between components.
+								by not changing the buisness logic. This could be achieved by developing proper interfaces as well as a high level interaction protocols and architectures between components.
 						</div>
 						
 						<h5>Trolley</h5>
 							A trolley simulation is also available in the WEnv; details on how to communicate with this virtual component can be found in the <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/master/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html#interaction">virtual robot section</a>.<br/>
 							Our job is to design and develop a component that communicates with the virtual robot and instructs it properly to match our system's needs.  <br/> 
-							By requirements, this trolley should have 3 states: <k>idle</k>, <k>working</k> and <k>stopped</k>. The possible state transitions and details are presented in the coming state diagram.
+							By requirements, this trolley should have 3 states that match the actual state of the robot: <k>idle</k>, <k>working</k> and <k>stopped</k>. The possible state transitions and details are presented in the coming state diagram.
 							
 							<td style="width:50%">
 								<center><img src="./img/TrolleyFSM.png" width="70%"></center>
@@ -508,12 +511,14 @@
 
 							If the trolley is both in the <k>working</k> or the <k>stopped</k> state and new client requests arrive, the trolley should be able to <tt>queue</tt> them in order to start a new job related to the new request once the current one is concluded. <br/> 
 							Given the way the problem has been mapped, the <k>idle</k> state was deemed by the analysts to describe both the robot presence and the returning in its home position to allow the trolley to accept incoming request by the client immediately. In fact, if the returning to home task was mapped as <k>working</k> state, the trolley should have been completing the returning to home task first and then start working on the new request, which was found a less efficient behaviour.   
-							
+							Since its behaviour can be stopped and resumed, the trolley should also save what task was he completing or what task should have it have been completing next. After a meeting with the product owner, having presented him the issue, we agreed that 
+							this problem can be faced by stopping a trolley only once a task is completed: it can then resume its behaviour from the earliest message it received by inspecting its message queue.
 							<div class="remark">
-								In developing our trolley instructor, an actor implementation could be preferred above an object one as they implement a message based type of concurrency which satisfy the demand for a high level interaction between componenets and relieves the developer of handling thread safety, as well as reducing the number of threads to be used in the system.
+								In developing our trolley, an actor implementation could be preferred above an object one as they implement a message based type of concurrency which satisfy the demand for a high level interaction between componenets and relieves the developer of handling thread safety, as well as reducing the number of threads to be used in the system. It also natively presents a message queue which is useful to our needs.<br>
 							</div>
 						<h5>Main service</h5>
 							The <tt>ParkManagerService</tt> should contain the biggest part of the <tt>buisness logic</tt>, as it is the main controller of the system. It should be able to communicate with all the components in the system to be informed about their state, react to all the events that could happen in accord to the requirements and present the results of its actions to the user interfaces.
+							It also should mantain the system state in a configuration file to be uploaded at the system's startup: in this way the system will be highly configurable without having to rely on "initial conditions" and will also be fault tolerant. The system state representation and persistance/collection will be discussed later.
 						<h5>User interfaces</h5>
 							There should be two types of user interfaces:
 							<ul>
@@ -538,10 +543,88 @@
 						From the communication standpoint, the problem as a whole demands an hybrid approach: if some requirements (e.g. F1,F2,F3, etc.) ask for a <k>synchronous</k> approach, some others could benefit from an <k>asynchronous</k> one (e.g. firing an event, as per requirement F11).
 						Moreover, some PORs (acceptIN/OUT, monitor) also require for the components' state to be known by an external object/actor. This could be either done with a synchronous request to the component, by <tt>making its state <kc>observable</kc></tt> or by
 						<tt><kc>publishing</kc> its state to a resource</tt> every time the state changes, so that every entity subscribed to that topic can receive the information asynchronously.<br/>
-						The first option is not ideal, as the component could be busy at the time of the request or it cannot afford to be stopped to supply the reply. The third approach requires the presence of a third entity to publish on/subscribe to.
-						For the <tt>synchronous interaction</tt>, the <kc>HTTP protocol</kc> is ideal as the virtual robot we proposed already support HTTP requests on port 8090; for the same reason, the <kc>websocket protocol</kc>
-						can be used for handling the <tt>asynchronous</tt> demands, on port 8091 for the robot (as stated in <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.wenvusage/userDocs/VirtualRobot2021.html#commands">virtual robot commands</a>). Both the protocols should be handled by a proper support entity that can be used by all components relieving them from the burden of handling the communication themselves. An example of this can be found at <a href="https://github.com/anatali/it.unibo.kotlinSupports/app/src/main/kotlin/it/unibo/supports/IssWsHttpKotlinSupport.kt">IssWsHttpKotlinSupport.kt</a><br/>
+						The first option is not always ideal, as the component could be busy at the time of the request or it cannot afford to be stopped to supply the reply. The third approach requires the presence of a third entity to publish on/subscribe to.
+						<br>For the <tt>synchronous interaction</tt>, the <kc>HTTP protocol</kc> is ideal as the virtual robot we proposed already support HTTP requests on port 8090; for the same reason, the <kc>websocket protocol</kc>
+						can be used for handling the <tt>asynchronous</tt> demands, on port 8091 for the robot (as stated in <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.wenvusage/userDocs/VirtualRobot2021.html#commands">virtual robot commands</a>). Both protocols should be handled by a proper support entity that can be used by all components relieving them from the burden of handling the communication themselves. An example of this can be found at <a href="https://github.com/anatali/issLab2021/tree/main/it.unibo.kotlinSupports/app/src/main/kotlin/it/unibo/supports/IssWsHttpKotlinSupport.kt">IssWsHttpKotlinSupport.kt</a><br/>
 						For what concerns the other <tt>M2M interactions</tt> and the observable states, the <kc>CoAP protocol</kc> is widely used in IoT and embedded world as it is a very lightweight but powerful protocol, but also <kc>MQTT</kc> brokers can be used to implement a publish/subscribe pattern.
+					<h4><em>Sprint review 1</em>: State representation and persistance</h4>
+						As per our requirements, we need the <em>ParkManagerService</em> to mantain the state of different resources:
+						<ul>
+							<li><tt>Parking slots</tt> free/engaged</li>
+							<li><tt>TOKENID</tt> of the parked cars</li> 
+							<li><tt>Fan</tt> working/stopped</li>
+							<li><tt>Trolley</tt> state</li>
+							<li><tt>Robot position</tt></li>
+							<li><tt>Weight Sensor</tt> data</li>
+							<li><tt>Temperature</tt> value</li>
+							<li><tt>Sonar</tt> data</li>
+						</ul>
+						Considering our analysis so far, we advise the designers to keep the trolley, sensors and fan state distributed and available when needed to the ParkManagerService. The parking slots state, however, can be
+						retained in a centralized manner by the service:  it will be responsible of the slots' state management and change as the requirements dictate.<br>
+						Regarding the <tt>slots' state</tt>, it could be modeled in a number of ways; we suggest two solutions, but pass on the choice to the designers:
+<pre>
+<tt>/* </tt><k>First choice: a boolean array</k>
+ <tt>* In this case, the index of the array would represent the SLOTNUM-1
+ * while the cell value would represent free->true, engaged->false
+ * The TOKENID could also be mapped as the SLOTNUM itself for simplicity
+ * This is a quick solution, maybe fit for prototype purposes
+ */</tt>
+var slotStateFree: BooleanArray = booleanArrayOf(false, false, false, false, true, false)
+<tt>/* </tt><k>Second choice: map</k>
+ <tt>* In this case, the key of the map would represent the SLOTNUM
+ * while the value would contain the TOKENID value if the parking slot is engaged, an empty value otherwise
+ * This is a more expressive solution, also keen to a more complex representation of the TOKENID
+ */</tt>
+var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc.)
+</pre>
+				Sensors and fan states can be easily represented as integers or strings, as the designer deem best. In this case, we assess that the weight sensor and sonar states could be retrieved
+				using a polling strategy and a request/response patter, as these information are needed in specific and fixed moments in time (when the service wants to know if the in/outdoor area is free and to check that the client has really parked a car in the indoor area after his notification).
+				The temperature, state of the fan and trolley, however, are required when the manager desires: we can predict when this event will happen. For this reason, we advise this resource to be made observable by the main service indirectly and without having to send a blocking request to the resources. How to implement this behaviour is a design matter.<br>
+				Finally, some sort of state persistance for the centralized information should be implemented: we assess that a simple file could be of assistance. The file should contain the state information of the parking slots and the tokenid related to the engaged ones. An example is the following:
+<pre>
+<tt>/*
+ * Parking slot/tokenid states could be saved in a json format
+ * The internal state of the service could be reinstated by properly parsing this file
+ * and building a proper internal representation from its infomation
+ * This could be used as a initial state of the system or a fault-tolerance mechanism
+ */</tt>
+[
+	{
+		"slotnum":"1"
+		"tokenid":"tokenid1"
+	},
+	{
+		"slotnum":"2"
+		"tokenid":"empty"
+	},
+	{
+		"slotnum":"3"
+		"tokenid":"tokenid3"
+	},
+	{
+		"slotnum":"4"
+		"tokenid":"empty"
+	},
+	{
+		"slotnum":"5"
+		"tokenid":"empty"
+	},
+	{
+		"slotnum":"6"
+		"tokenid":"tokenid6"
+	}
+]
+</pre>
+				The problem of the TOKENID representation is another difficult one: it should both convey the SLOTNUM information and be secure, unique and unforgeable. An example to satisfy all these requirements would be:
+<pre>
+<tt>/*
+ * This solution presents the SLOTNUM as first argument to be easily parsed and 
+ * attaches to it the date and time of the car enter request to make it unique
+ */</tt>
+&ltSLOTNUM&gt-&ltREQUESTDATETIME&gt
+</pre>			
+				Position information regarding the robot will be retained in a map of the parking area. Our trolley component should be able to update this map with his position every time it ends a trip. The map state should also be saved in a file for the same reasons as the parking slots' state.
+				Finally, the trolley should also save its state in a file for the same reasons.
 				<h3>Technologies and architectures</h3>
 					An object oriented programming language, as Kotlin or Java, seems the best fit to implement the services of our system. Kotlin would be preferred for its native support for coroutines and actors that would benefit developers by not having to import many libraries and
 					dependencies and, of course, in terms of resources, as coroutines are more lightweight than threads and don't need many expensive context swiches.<br/>
@@ -551,7 +634,7 @@
 					<div class="remark">
 						Libraries that allow the means of communication required by the system are common in many high-level 
 						programming languages;  this fact implies that <k>no abstraction gap</k> on the communications side is identified. An abstraction gap is found on the 
-						functional/testing side, as our system has no clue on where the trolley is in the virtual/real space at all times: this is crucial to our system's functions
+						functional/testing side, as our system has no clue on where the trolley is in the virtual/real space at all times and on how to create a sequence of actions to move to robot from point A to point B: this is crucial to our system's functions
 						and with regard to our first testing plan ideas.
 						The choice of which language to use is delegated to the project phase but, indipendently on the choice, 
 						some form of design pattern should be used to ensure <k>maximux abstraction</k> between the buisness logic and 
@@ -568,21 +651,124 @@
 					<td style="width:50%">
 						<center><img id="archLogica" src="./img/ArchitetturaLogica.png" width="70%"></center>
 					</td>			
-					As a result of the analysis phase, the system could consist in service, called <em>ParkManagerService</em> per requirement, that communicates via HTTP request/responses with 3 browsers.
-					Two of the browsers (<em>ParkServiceGUI</em>) could be located either in the in/outdoor area for the client to access it and operate their actions, or on a mobile system (as a smartphone app).
-					The third one (<em>ParkServiceStatusGUI</em>) could be on location (in the parking area), as well on a mobile system and should be accessible to the manager after authorization.<br/>
-					The sensors can be controlled by <k>observable objects with threads</k> which fire up events to the service once they acknowledge that something in their area of operation has happened (e.g. the thermometer controller fires up an event when the termperature has reached a value greater than TMAX). They should be observable by the main service to learn about their status at all times and to present these information to the manager as needed.  <br/>
-					The robot behavior could be orchestrated by an <k>observable actor</k>, capable of both communicating and receiveing information in an asynchronous way with our service as well as presenting its state. It would be then communicating with a real robot or the WEnv by the means of HTTP or websocket protocols, as the designers will deem best fit.
-					To implement this component, a good example is presented in <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html">BasicRobot.html</a>. This component is an observable kotlin actor which is already well integrated with the WEnv service and has the capability of communicating in a high level message-based way both with HTTP and WS protocols.
+					As a result of the analysis phase, the system could be modelled as the above figure and could consist in:
+					<table style="width:98%">
+						<tbody>
+						<tr><td>  
+							<center><img src="./img/ParkManagerService.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>ParkManagerService</h4>
+							<ul>
+								<li>Service that holds the buisness logic to reply to the users requests by using all the other components in the system</li>
+								<li>Communicates with 3 Browsers (two ParkServiceGUI and one ParkServiceStatusGUI) with a request/response pattern</li>
+								<li>Communicates with the Trolley using dispatches</li>
+								<li>Communicates with the WeightSensorInterface and the SonarController with a request/response pattern to obtain their data</li>
+								<li>Accepts dispatches from the Sensors controllers when something irregular happens (e.g. TA > TMAX, car in the outdoor area for more than DTFREE. etc.)</li>
+								<li>Sends a dispatch to the fan when it needs to be started/stopped</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/Trolley.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>Trolley</h4>
+							<ul>
+								<li>Actor observable by the ParkManagerService</li>
+								<li>Holds the buisness logic to implement the trolley states</li>
+								<li>Instructs a real/virtual robot on how to move via request/response and/or fire and forget pattern</li>
+								<li>Uses/Updates a map of the area to deal with the robot position</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/ParkServiceGUI.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>ParkServiceGUI</h4>
+							<ul>
+								<li>Object that implements a view for the clients for both the in/outdoor areas</li>
+								<li>Takes client inputs and sends relative requests to the ParkManagerService</li>
+								<li>Present results of buisness logic tasks</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/ParkServiceStatusGUI.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>ParkServiceStatusGUI</h4>
+							<ul>
+								<li>Object that implements a view for the parking manager</li>
+								<li>Takes parking manager inputs and sends relative requests to the ParkManagerService</li>
+								<li>Presents the system state arrived from the ParkManagerService</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/ThermometerController.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>ThermometerController</h4>
+							<ul>
+								<li>Object with runnable thread which monitors the thermometer's data</li>
+								<li>Observable by the ParkManagerService</li>
+								<li>Sends a dispatch to the ParkManagerService if the temperature raises above TMAX</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/SonarController.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>SonarController</h4>
+							<ul>
+								<li>Object with runnable thread which monitors the sonar's data</li>
+								<li>Sends a dispatch to the ParkManagerService if a car remains for more than DTFREE seconds in the outdoor area</li>
+								<li>Replies to ParkManagerService requests for sonar's data</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/Fan.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>Fan</h4>
+							<ul>
+								<li>Object that mocks a fan</li>
+								<li>Observable by the ParkManagerService</li>
+								<li>Starts/stops after a dispatch arrives from the ParkManagerService</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/WeightSensorInterface.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>WeightSensorInterface</h4>
+							<ul>
+								<li>Object that monitor a weight sensor's data</li>
+								<li>Replies to ParkManagerService requests for weight sensor's data</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/Fan.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>Fan</h4>
+							<ul>
+								<li>Object that mocks a fan</li>
+								<li>Observable by the ParkManagerService</li>
+								<li>Starts/stops after a dispatch arrives from the ParkManagerService</li>
+							</ul>
+						</td></tr>
+						<tr><td>  
+							<center><img src="./img/Map.png" width="60%"></center>
+						</td><td style="width:80%">
+							<h4>Map</h4>
+							<ul>
+								<li>Object that implements a map of the real/virtual room</li>
+								<li>Offers method to read/update the map</li>
+								<li>A possible implementation is found in <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/mapRoomKotlin/RoomMap.kt">roomMap.kt</a></li>
+								<li>An object that uses a map to instruct the robot with is available at <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.planner20/resources/itunibo/planner/plannerUtil.kt">plannerUtil.kt</a><br/></li>
+							</ul>
+						</td></tr>
+						</tbody>
+						
+					</table>
+					To implement the trolley component, a notable example is presented in <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html">BasicRobot.html</a>. This component is an observable kotlin actor which is already well integrated with the WEnv service and has the capability of communicating in a high level message-based way both with HTTP and WS protocols.
 					It also can be easily configured to work with diverse real robots as well as the virtual one, which satisfies the needs of abstraction already specified earlier in the analysis phase. Finally, some of the functionalities that comes with this component can actually <tt>fill the abstraction gap</tt> identified in the analysis phase:
 					the BasicRobot has the ability to move by "steps" of the same length as the robot. This would allow the robot to also create and interact with a virtual map in which each cell is of the same leght as the step and the robot itself (so that every step would result in a one-cell movement).
-					Using the map, the service could both be updated on the trolley position and understand how to correctly instruct it to move from its current position to the one it needs to reach for that specific use case. 
-					A usable example of map implementation that could fit the problem can be found at <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/mapRoomKotlin/mapUtil.kt" target="code">mapUtil.kt</a>; furthermore a kotlin object that already uses a map to create a plan to instruct the robot with is available at <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.planner20/resources/itunibo/planner/plannerUtil.kt">plannerUtil.kt</a><br/>
 					<div class="remark">
-						<k>Carefully note</k> that the term "observable" is here used to express the need of accessing some information without waiting or stopping the observed entity. How this should be 
-						implemented is a project matter (restful resource, publish/subscribe, etc.).
+						<k>Carefully note</k> that the term "observable" is here used to express the need of accessing some information without waiting for or stopping the observed entity. How this should be 
+						implemented is a project matter (restful CoAP resource, publish/subscribe, etc.).
 					</div>
-					Communication between sensors and their controllers are described as <em>Events</em> because the sensors should not know the receiver of their messages; instead they should only fire an event to some not weel defined entity that is interested in knowing what they have to say.<br/>
+					Communication between sensors and their controllers are described as <em>Events</em> because the sensors should not know the receiver of their messages; instead they should only fire an event to some not well defined entity that is interested in knowing what they have to say.<br/>
 					The communication between the main service and the trolley and controllers, however, is described as a <em>Dispatch</em>: in this case both entity know each other and their "positions" and can communicate with themselves. The asynchronous manner seemed best for the problem, but designers are free to change this if they deem best.
 			<h2>Sprint Planning</h2>
 				After talking with the product owner and the development team we decided to divide the work in <k>4 Sprints</k>. Every sprint is relative to one or more PORs, to better identify their goals with a terminology which is understandable both to the product owner and scrum team.<br/>
@@ -705,14 +891,14 @@
 				<td style="width:50%">
 					<center><img id="execModel" src="./img/ModelloEseguibile.png" width="70%"></center>
 				</td>
-				As one can see in the image, we decided to simplify the initial system model by removing the sensors and the fan, and focusing only on the client-service-trolley interaction which makes up for the most funtions of the system.<br>
-				The system was mapped as 2 qakactors for the main service, 3 qakactors for the clients (one to simulate a client who wants to park a car, one to simulate a client who wants to pickup a car and one to simulate the manager). <br>
-				The division of the main service into two subservices derives from the need to the express the priority of the messages of the manager (e.g. to stop/resume the behaviour of the trolley) above all other requests. As stated before, the qakactor buisness logic is modelled as a Moore's Finite State Machine: this fact implies that if the main service was already responding to a client request, the manager's need to stop the robot would have been taken into consideration only at the end of the current task, and not immediately as the requirements state.<br>
-				The usage of the qakactor metamodelling language also introduced another "abstraction gap": as fsm, the qakctors execute their tasks sequentially, without the possibility to stop one task and transit to another state before completing the current one,
-				unless an event arrives. Events, as modelled in the qakactor metamodel, are one-time only messages, and cannot be queued into the actor's message queue as Requests or Dispatches and are the only type of messages which trigger code execution. That's why the model can be called message-based, but event-driven. For this reason, the stop/resume messages sent by the <em>ParkManagerService</em> to the <em>Trolley</em> are translated in code with an Event, but we found to logically map them as a Dispatches (in the image). <br>
-				Finally, to simulate the map and to store other utility information, we decided to include a shared knowledge base between all components, implemented as a simple object. It should be also useful during the testing phase to quickly change some system parameters to observe the system's behaviour in diverse scenarios.<br>
-				The full code of the executable model is available at <a target="code" href="../src/parkingArea.qak">parkingArea.qak</a>
-				
+				The full code of the executable model is available at <a target="code" href="../src/parkingArea.qak">parkingArea.qak</a><br>
+				As one can see in the image, we decided to simplify the initial system model by removing the sensors and the fan, and focusing only on the client-service-trolley interaction which makes up for the most funtions of the system. No real trolley instructor or robot has been introduced in this model,
+				rather we decided to focus on the high-level behaviour of the components (implement the trolley states, the messages between the users and the service, etc.)<br>
+				The system was mapped as 1 qakactor for the trolley, 2 qakactors for the main service, 3 qakactors for the clients (one to simulate a client who wants to park a car, one to simulate a client who wants to pickup a car and one to simulate the manager). <br>
+				Finally, to store some utility information, we decided to include a shared knowledge base between all components, implemented as a simple object. It should also be useful during the testing phase to quickly change some system parameters to observe the system's behaviour in diverse scenarios.<br>
+				<div class="remark">
+					<k>Carefully note</k> that this new model of the system is not very far from the logic architecture we introduced earlier: the logic architecture better seizes the true nature of the components (as per the analysis we conducted), but this first executable model can be of use to begin designing and developing sprint1.
+				</div>
 			<h2>Test Plan</h2>
 			Before beginning the test plan we realized that, for the qak system to be fully working and testable, we needed some way to synchronize the tests and the actors of the qak model. This is because, once a qak context is run, every actor inside it starts at the same time and there are no way to implement unit test or to test one functionality at the time. To achieve this goal we introduced a "listening" state on every actor we intended to test: this state is empty and it consists in waiting for a proper message to trigger a specific state change; 
 			in this way, we can systematically and sequentially trigger states to test by sending messages both from the testing class and other actors, to perform integration tests. This "listening" state should be engaged at an actor startup and every time it ends a task. <br>
@@ -720,15 +906,23 @@
 			Finally, we divided our tests into unit tests and integration tests that also coincide with functional tests (as they test specific requirements or use cases).
 			
 			<h3>Unit tests</h3>
+				For all the tests we assumed these starting conditions:
+				<ul>
+					<li>The trolley is not stopped by the manager</li>
+					<li>The INDOOR is not engaged</li>
+					<li>The OUTDOOR is not engaged</li>
+					<li>There is one free parking slot</li>
+				</ul>
+				These conditions were individually changed by the single tests if they needed some other context, as described below. 
 				<h4>Trolley</h4>
-				Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TrolleyUnitTest.kt">TrolleyUnitTest.kt</a>
-					<ul>
-						<li>Test if the trolley returns in idle state at the end of a task</li>
-						<li>Test the ability of the trolley to queue requests in case one arrives during the execution of a task</li>
-						<li>Test if the trolley immediately goes to stopped state in case he is in working state and a stop event arrives. Test also if, once a resume event arrives, it returns to the working state</li>
-						<li>Test if the trolley immediately goes to stopped state in case he is in idle state and a stop event arrives. Test also if, once a resume event arrives, it returns to the idle state</li>
-						<li>Test if once the trolley is in stopped state, whatever request arrives it continues to stay in the stopped state, unless a resume event arrives</li>
-					</ul>
+				Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TrolleyUnitTest.kt">TrolleyUnitTest.kt</a><br>
+				<ul>
+					<li>Test if the trolley returns in idle state at the end of a task</li>
+					<li>Test the ability of the trolley to queue requests in case one arrives during the execution of a task</li>
+					<li>Test if the trolley goes to stopped state immediately after it ends a trip, in case he is in working state and a stop event arrives. Test also if, once a resume event arrives, it returns to the working state</li>
+					<li>Test if the trolley immediately goes to stopped state in case he is in idle state and a stop event arrives. Test also if, once a resume event arrives, it returns to the idle state</li>
+					<li>Test if once the trolley is in stopped state, whatever request arrives it continues to stay in the stopped state, unless a resume event arrives</li>
+				</ul>
 				<h4>ParkClientService</h4>
 					Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/ClientServiceUnitTest.kt">ClientServiceUnitTest.kt</a>
 					<ul>
@@ -756,6 +950,36 @@
 					This test plan will work as an integration test for the OutdoorParkingServiceGUI, ParkClientService and Trolley components; it will also work as a functional test for client "Car Pickup" use case (PORs <em>acceptOUT</em> and <em>moveToSlotOut</em>). <br>
 					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan3.kt">TestPlan3.kt</a><br>
 		</div>
+		<h2>Summary of the Analysis phase</h2>
+			<table class="sprint">
+						<thead>
+							<tr>
+								<th>Logic Architecture</th>
+								<th>First Executable Model</th>
+								<th>First Test Plans</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<center><a href="./img/ModelloEseguibile.png">ModelloEseguibile.png</center>
+								</td>
+								<td>
+									<center><a target="code" href="../src/parkingArea.qak">parkingArea.qak</a></center>
+								</td>
+								<td>
+								<center>
+									<a target="code" href="../test/it.sembrava_qualcuno.tf21Start/TrolleyUnitTest.kt">TrolleyUnitTest.kt</a><br>
+									<a target="code" href="../test/it.sembrava_qualcuno.tf21Start/ClientServiceUnitTest.kt">ClientServiceUnitTest.kt</a><br>
+									<a target="code" href="../test/it.sembrava_qualcuno.tf21Start/ManagerServiceUnitTest.kt">ManagerServiceUnitTest.kt</a><br>
+									<a target="code" href="../test/it.sembrava_qualcuno.tf21Start/TestPlan1.kt">TestPlan1.kt</a><br>
+									<a target="code" href="../test/it.sembrava_qualcuno.tf21Start/TestPlan2.kt">TestPlan2.kt</a><br>
+									<a target="code" href="../test/it.sembrava_qualcuno.tf21Start/TestPlan3.kt">TestPlan3.kt</a>
+								</center>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 		<div class="footer">
 			<center>			
 				<table style="background-color:rgba(30, 22, 255, 0.9); width:60%;text-align:center;color:white">	

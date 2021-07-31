@@ -41,14 +41,14 @@ class Parkmanagerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						println("parkmanagerservice emit resume")
 						updateResourceRep( "parkmanagerservice emit resume"  
 						)
-						emit("resume", "resume(X)" ) 
+						forward("resume", "resume(X)" ,"trolley" ) 
 						}
 						else
 						 { ParkingAreaKb.trolleyStopped = true  
 						 println("parkmanagerservice emit stop")
 						 updateResourceRep( "parkmanagerservice emit stop"  
 						 )
-						 emit("stop", "stop(X)" ) 
+						 forward("stop", "stop(X)" ,"trolley" ) 
 						 }
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )

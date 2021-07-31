@@ -147,18 +147,18 @@ class TrolleyUnitTest {
  			testingObserver!!.addObserver(channelForObserver)
 			
 			var job = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToPark(1)", "trolley")
-			var stopEvent = MsgUtil.buildEvent("trolleyunittest", "stop", "stop(X)")
-			var resumeEvent = MsgUtil.buildEvent("trolleyunittest", "resume", "resume(X)")
+			var stop = MsgUtil.buildDispatch("trolleyunittest", "stop", "stop(X)", "trolley")
+			var resume = MsgUtil.buildDispatch("trolleyunittest", "resume", "resume(X)", "trolley")
 			
 			MsgUtil.sendMsg(job, myactor!!)
-			
+			MsgUtil.sendMsg(stop, myactor!!)
 			assertEquals(channelForObserver.receive(), "trolley WORKING")
-			MsgUtil.sendMsg(stopEvent, myactor!!)
+			assertEquals(channelForObserver.receive(), "trolley moveToPark(1)")
 			assertEquals(channelForObserver.receive(), "trolley STOPPED")
 			
 			delay(500)
 			
-			MsgUtil.sendMsg(resumeEvent, myactor!!)
+			MsgUtil.sendMsg(resume, myactor!!)
 			assertEquals(channelForObserver.receive(), "trolley WORKING")
 		}
 	}
@@ -173,16 +173,16 @@ class TrolleyUnitTest {
 			val channelForObserver = Channel<String>()
  			testingObserver!!.addObserver(channelForObserver)
 			
-			var stopEvent = MsgUtil.buildEvent("trolleyunittest", "stop", "stop(X)")
-			var resumeEvent = MsgUtil.buildEvent("trolleyunittest", "resume", "resume(X)")
+			var stop = MsgUtil.buildDispatch("trolleyunittest", "stop", "stop(X)", "trolley")
+			var resume = MsgUtil.buildDispatch("trolleyunittest", "resume", "resume(X)", "trolley")
 			
 			assertEquals(channelForObserver.receive(), "trolley IDLE")
-			MsgUtil.sendMsg(stopEvent, myactor!!)
+			MsgUtil.sendMsg(stop, myactor!!)
 			assertEquals(channelForObserver.receive(), "trolley STOPPED")
 			
 			delay(500)
 			
-			MsgUtil.sendMsg(resumeEvent, myactor!!)
+			MsgUtil.sendMsg(resume, myactor!!)
 			assertEquals(channelForObserver.receive(), "trolley WORKING")
 			assertEquals(channelForObserver.receive(), "trolley IDLE")
 		}
@@ -197,18 +197,18 @@ class TrolleyUnitTest {
 			val channelForObserver = Channel<String>()
 			testingObserver!!.addObserver(channelForObserver)
 			
-			var stopEvent = MsgUtil.buildEvent("trolleyunittest", "stop", "stop(X)")
+			var stop = MsgUtil.buildDispatch("trolleyunittest", "stop", "stop(X)", "trolley")
 			var job = MsgUtil.buildDispatch("trolleyunittest", "moveToPark", "moveToPark(1)", "trolley")
-			var resumeEvent = MsgUtil.buildEvent("trolleyunittest", "resume", "resume(X)")
+			var resume = MsgUtil.buildDispatch("trolleyunittest", "resume", "resume(X)", "trolley")
 			
-			MsgUtil.sendMsg(stopEvent, myactor!!)
+			MsgUtil.sendMsg(stop, myactor!!)
 			assertEquals(channelForObserver.receive(), "trolley STOPPED")
 			
 			MsgUtil.sendMsg(job, myactor!!)
 			delay(500)
 			assertEquals(channelForObserver.receive(), "trolley STOPPED")
 			
-			MsgUtil.sendMsg(resumeEvent, myactor!!)
+			MsgUtil.sendMsg(resume, myactor!!)
 			assertEquals(channelForObserver.receive(), "trolley WORKING")
 		}
 	}

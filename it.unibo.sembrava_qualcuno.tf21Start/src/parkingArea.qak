@@ -40,8 +40,8 @@ Dispatch moveToOut : moveToOut(SLOTNUM)
 Dispatch toggleState : toggleState(X)
 
 //PARK MANAGER SERVICE
-Event stop	 : stop(X)
-Event resume : resume(X)
+Dispatch stop	 : stop(X)
+Dispatch resume : resume(X)
 
 //TROLLEY
 Dispatch goToIdle : goToIdle(X)
@@ -49,7 +49,7 @@ Dispatch goToIdle : goToIdle(X)
 //TEST GUI MESSAGE
 Dispatch doAction : doAction(X)
 
-Context ctxcarparking ip[host="localhost" port=8023]
+Context ctxcarparking ip[host="localhost" port=8022]
 
 QActor indoorparkingservicegui context ctxcarparking {
 	[# var SLOTNUM = 0 #]
@@ -291,14 +291,14 @@ QActor parkmanagerservice context ctxcarparking {
 			
 			println("parkmanagerservice emit resume")
 			updateResource [# "parkmanagerservice emit resume" #]
-			emit resume : resume(X)
+			forward trolley -m  resume : resume(X)
 		}
 		else {
 			[# ParkingAreaKb.trolleyStopped = true #]
 			
 			println("parkmanagerservice emit stop")
 			updateResource [# "parkmanagerservice emit stop" #]
-			emit stop : stop(X)
+			forward trolley -m stop : stop(X)
 		}
 	}
 	Goto work
@@ -318,7 +318,7 @@ QActor trolley context  ctxcarparking{
 		//Moves the trolley to the home position if not there already
 	}
 	Transition t0
-		whenEvent stop -> stopped
+		whenMsg stop -> stopped
 		whenMsg moveToPark -> working
 		whenMsg moveToOut -> working
 	
@@ -354,14 +354,15 @@ QActor trolley context  ctxcarparking{
 		forward trolley -m goToIdle : goToIdle(X)
 	}
 	Transition t0
-		whenEvent stop -> stopped
+		whenMsg stop -> stopped
 		whenMsg goToIdle -> idle
+		
 	
 	State stopped {
 		println("trolley STOPPED")
 		updateResource [# "trolley STOPPED" #]
 	}
 	Transition t0
-		whenEvent resume -> working
+		whenMsg resume -> working
 }
  

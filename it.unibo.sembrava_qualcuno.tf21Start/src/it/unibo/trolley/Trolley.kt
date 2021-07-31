@@ -31,7 +31,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley IDLE"  
 						)
 					}
-					 transition(edgeName="t012",targetState="stopped",cond=whenEvent("stop"))
+					 transition(edgeName="t012",targetState="stopped",cond=whenDispatch("stop"))
 					transition(edgeName="t013",targetState="working",cond=whenDispatch("moveToPark"))
 					transition(edgeName="t014",targetState="working",cond=whenDispatch("moveToOut"))
 				}	 
@@ -59,7 +59,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						}
 						forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
 					}
-					 transition(edgeName="t015",targetState="stopped",cond=whenEvent("stop"))
+					 transition(edgeName="t015",targetState="stopped",cond=whenDispatch("stop"))
 					transition(edgeName="t016",targetState="idle",cond=whenDispatch("goToIdle"))
 				}	 
 				state("stopped") { //this:State
@@ -68,7 +68,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley STOPPED"  
 						)
 					}
-					 transition(edgeName="t017",targetState="working",cond=whenEvent("resume"))
+					 transition(edgeName="t017",targetState="working",cond=whenDispatch("resume"))
 				}	 
 			}
 		}
