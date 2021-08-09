@@ -265,26 +265,42 @@
 					Our motto:<br/>   
 					<k>there is no code without a project, no project without problem analysis and no problem without requirements</k>.
 				</div>
-			The sprint backlog for this specific sprint can be found at <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#sprint1">sembrava_qualcuno_tf21Start.html</a>
+			Hereafter we report a copy of the sprint backlog for this specific sprint:<br>
+			<h3 id="sprint1">Sprint1 backlog</h3>
+			This sprint is relative to the POR <em>informIN</em>, divided into F3, F4, F5, F6, F17, NF1, NF2, NF3, NF7 by the analysts.
+					<table class="sprint">
+						<thead>
+							<tr>
+								<th>Must Have</th>
+								<th>Should Have</th>
+								<th>Could Have</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									The client must be informed if no parking slots are available at the time of his request (<lr>F3</lr>)<br>
+									The ParkManagerService must successfully instruct the robot on how to move; in particular, the robot must be moved from the INDOOR AREA to one of the Parking Slots (<lr>F5</lr>)<br>
+									A unique token must be successfully generated and presented to the client (<lr>F6</lr>)<br>
+									The system must aknowledge from the client when the car is in the INDOOR area and double-check this fact through the weight sensor(<lr>F4</lr>-<lr>F17</lr>)
+								</td>
+								<td>
+									The map should be updated with the movements of the robot (<lr>NF2</lr>)<br>
+									The robot should not walk over the parking slots (<lr>NF3</lr>)<br>
+									The robot should correctly return to the home position if idle (<lr>NF7</lr>)
+								</td>
+								<td>The ParkServiceGUI is supposed to show a prompt for the client to interact with to notify to the system that the car has been placed in the INDOOR area (<lr>F4</lr>)
+									The token is supposed to be unique and unforgeable (<lr>NF1</lr>)</td>
+							</tr>
+						</tbody>
+					</table>
+					This sprint should be done in <k>one week</k>.
+			<div class="remark">
+				<center><em>In the following diagrams, the Green color is associated with "Controller" or "Buisness logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br> 
+			</div>
 			<h2>Project</h2>
 				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase, let's now "zoom-in" into 
 				the components we have to design for this sprint: ParkServiceGUI, ParkManagerService, Trolley, Map and WeightSensorController and simulator.
-				<div class="remark">
-					<center><em>In the following diagrams, the Green color is associated with "Controller" or "Buisness logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br> 
-				</div>
-				<div class="remark">
-					<center><k>This coming figure represents the communication pattern and architecture between the ClientService, the ClientGUI and the WeightSensor</k></center><br> 
-					<td style="width:50%">
-						<center><img id="ClientService-GUI" src="./img/ClientService-ClientGUICommPattern.png" width="70%"></center>
-					</td>
-				</div>
-				<hr>
-				<div class="remark">
-					<center><k>This figure represents the communication pattern and architecture between the ClientService and the Trolley</k></center><br>
-					<td style="width:50%">
-						<center><img id="ClientService-GUI" src="./img/ClientService-TrolleyCommPattern.png" width="70%"></center>
-					</td>
-				</div>
 				<h3>ParkServiceGUI</h3>
 					Good programming practice is the single responsibility principle, which advises us to design components with one logical purpose. To fulfill this principle, we need separation from application and presentation layers. We also need separation from
 					the buisness logic, the presenting view and the code that prepares these views.
@@ -327,11 +343,24 @@
 						</td></tr>
 					</table>
 					<br>
-				The ParkClientService will communicate with the SpringController using a request/response pattern, over TCP sessions, with the help of the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class.<br>
-				Instead, the service will communicate with the Trolley using dispatches, a fire-and-forget pattern and once again over TCP sessions and exploiting the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class.
-				Dispatches and fire-and-forget pattern are preferred over a request/response one because, in this case, the ClientService doesn't need an answer from the Trolley on how the moves of the actual robot ended, as the Trolley itself will take care of possible complications on that side. Moreover, there is no need to
-				require the Trolley to stop his tasks or let other queued tasks wait to respond to the service as it will be implemented as a CoAP-observable resource, thus these information could be presented to the service in a non-blocking manner.
-				The high-level messages exchanged between these three components are the same as the one identified in the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#execModel">First Executable Model</a> of the system.
+					<h4>Interaction</h4>
+						The ParkClientService will communicate with the SpringController using a request/response pattern, over TCP sessions, using the <a href=https://github.com/anatali/issLab2021/tree/main/it.unibo.qak21.basicrobot/usage/connQak/connQakTcp.kt>connQakTcp.kt</a>
+						class with the help of the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class to build qak-understandable requests.<br>
+						Instead, the service will communicate with the Trolley using dispatches, a fire-and-forget pattern and once again over TCP sessions and exploiting the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class.
+						Dispatches and fire-and-forget pattern are preferred over a request/response one because, in this case, the ClientService doesn't need an answer from the Trolley on how the moves of the actual robot ended, as the Trolley itself will take care of possible complications on that side. Moreover, there is no need to
+						require the Trolley to stop his tasks or let other queued tasks wait to respond to the service as it will be implemented as a CoAP-observable resource, thus these information could be presented to the service in a non-blocking manner.
+						The high-level messages exchanged between these three components are the same as the one identified in the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#execModel">First Executable Model</a> of the system.
+					<h4>State representation</h4>
+						As pointed out during the analysis phase, some sort of internal state must be mainteined by the service: we decided to save the parking slots state (free/engaged) internally, in a map, whose key represents the SLOTNUM of the parking slot, and empty value in case the slot is free or the TOKENID associated to the parked car if engaged.
+						We also decided to save this information in a binary file, to be read at the system startup, to reintegrate the system state in case of a service failure.<br>
+						The TOKENID has been modeled in this way (as suggested in the analysis phase):
+<pre>
+<tt>/*
+ * This solution presents the SLOTNUM as first argument to be easily parsed and 
+ * attaches to it the date and time of the car enter request to make it unique
+ */</tt>
+ &ltSLOTNUM&gt-dd/MM/yyyy-hh:mm:ss
+</pre>
 				<h3>WeightSensor</h3>
 					<table style="width:98%">
 						<tbody>
@@ -382,16 +411,72 @@
 							The attached figure shows our solution to the problem: the introduction of a Planner (modelled after the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/itunibo/planner/plannerUtil.kt">PlannerUtil.kt</a> class)
 							and of a Room Map (modelled after the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/mapRoomKotlin/RoomMap.kt">RoomMap.kt</a> class).<br>
 							The Planner component will use the <a href="http://aima.cs.berkeley.edu/java/doc/javadoc/aima/search/framework/package-summary.html">aima framework</a> to search for a path in the Room Map, 
-							after the Trolley actor specifies a goal as a couple of integers (identifying a cell of the map), and will return the path as a sequence of moves which both the BasicRobot and virtual WEnv robot can understand (see the <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.boundaryWalk/userDocs/BoundaryWalk.html#aril">aril language</a>)
+							after the Trolley actor specifies a goal as a couple of integers (identifying a cell of the map), and will return the path as a sequence of moves which both the BasicRobot and virtual WEnv robot can understand (see the <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.boundaryWalk/userDocs/BoundaryWalk.html#aril">aril language</a>).
+							In case of failure, the trolley should be led to the home position to restart the service, as the planner would reinitialize the AI used for the path search using the (0,0) position for the robot.
 						</td><td>  
 							<center><img src="./img/TrolleyClassDiagram.png" width="100%"></center>
 						</td></tr>
 						</tbody>
 					</table>
 					<br>
-				
 			<h2>Testing</h2>
+			For all the tests we assumed these starting conditions:
+				<ul>
+					<li>The trolley is not stopped by the manager</li>
+					<li>The INDOOR is not engaged</li>
+					<li>The OUTDOOR is not engaged</li>
+					<li>There is one free parking slot</li>
+					<li><k>TODO</k></li>
+				</ul>
+				These conditions were individually changed by the single tests if they needed some other context, as described below.<br>
+				We decided to implement the tests relative to this sprint under two test classes: one that holds tests concerning the WeightSensor, the ParkClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1ParkingAreaTests.kt">Sprint1ParkingAreaTests.kt</a>)
+				and one that holds tests concerning the Trolley, BasicRobot, ParkClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1TrolleyTests.kt">Sprint1TrolleyTests.kt</a>), in order to fire tests without having to start up every qak context if not needed for the current test.
+				<br>Hereafter is a description of the functional tests for this <a href="#sprint1"> sprint requirements</a>:
+			<ul>
+				<li>Test if there are no parking slots available, a proper response is returned by the SpringController (e.g. {slotnum:0}), as per <k>F3</k></li>
+				<li>Test if the service can handle a <k>carenter</k> request from a client (e.g. notifies the robot to pick up the car in the INDOOR area), as per <k>F4</k> and after the client sends a <k>carenter</k> request (e.g. when he notifies the system to have parked the car in the INDOOR area) test 
+				 if the service can double check this information with the weight sensor, as per <k>F17</k></li>
+				<li>Test if the service correctly instruct the trolley on where to go (e.g. sends the <k>moveToIndoor</k> to pickup a car from the INDOOR area and then the <k>moveToPark</k> to move it to the right parking slot) and that the trolley actually sends the right commands to the BasicRobot after obtaining the path from the PlannerUtil, by checking the robot position on the map at the end of each trip, as per <k>F5</k></li>
+				<li>Test if the service correctly generates the TOKENID when a <k>carenter</k> request is completed and that it correctly sends it back to the controller, as per <k>F6</k></li>
+			</ul>
 			<h2>Deployment</h2>
+			<h2>Sprint Summary</h2>
+			
+			The coming figure represents the final outline resulting from the Sprint1. The dashed lines that group components together gives a glance of the physical deployment organization<br> 			<div>
+				<td style="width:50%">
+					<center><img id="Final outline" src="./img/FullSprint1Outline.png" width="70%"></center>
+				</td>
+			</div>
+			<hr>
+			<div class="remark">
+						<center><k>This sprint is considered done, even though the "could have" goals set in the <a href="#sprint1">sprint backlog</a> are not met and therefore delegated in the third Sprint</k></center><br> 
+			</div>
+			<h3>Summary table</h3>
+				<table class="sprint" id="summary">
+						<thead>
+							<tr>
+								<th>Final Sprint Architecture</th>
+								<th>Executable Model</th>
+								<th>Tests</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<center><a href="./img/FullSprint1Outline.png">FullSprint1Outline.png</center>
+								</td>
+								<td>
+									<center><a target="code" href="../src/parkingArea.qak">parkingArea.qak</a></center>
+								</td>
+								<td>
+								<center>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1ParkingAreaTests.kt">Sprint1ParkingAreaTests.kt</a><br>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1TrolleyTests.kt">Sprint1TrolleyTests.kt</a>
+								</center>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				
 		</div>
 		<div class="footer">

@@ -422,7 +422,7 @@
 					<h4>Functional requirements</h4>
 						<ol class="fr">
 							<li>The client should be made able to notify his/her interest to park his car on a free parking spot throught the ParkServiceGUI interface.</li>
-							<li>Our system can accept a new client request only when the robot is in home position or is working. Conversely the system should notify the client to wait.</li>
+							<li>Our system can accept a new client request only when the robot is in home position or is working and if the INDOOR area is free at the time of the request. Conversely the system should notify the client to wait.</li>
 							<li>The client should be notified if no parking spot is free. Conversely he should receive the number of the chosen parking slot if available.</li>
 							<li>The client should be made able to notify the system when he has left his/her car in the indoor area.</li>
 							<li>Our system should instruct the trolley to escort a car from the indoor area to the specified parking slot.</li>
@@ -848,6 +848,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 							<tr>
 								<td>
 									The client must successfully submit a parking request (<lr>F1</lr>)<br>
+									The service must accept a request if the INDOOR area is free (<lr>F2</lr>) <br>
 									The robot must accept a client request if it is available (<lr>F2</lr>-<lr>NF5</lr>)<br>
 								</td>
 								<td></td>
