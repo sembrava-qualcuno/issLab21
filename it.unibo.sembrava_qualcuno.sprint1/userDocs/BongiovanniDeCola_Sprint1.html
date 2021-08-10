@@ -299,7 +299,7 @@
 				<center><em>In the following diagrams, the Green color is associated with "Controller" or "Buisness logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br> 
 			</div>
 			<h2>Project</h2>
-				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase, let's now "zoom-in" into 
+				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase, let's now "zoom-in" into 
 				the components we have to design for this sprint: ParkServiceGUI, ParkManagerService, Trolley, Map and WeightSensorController and simulator.
 				<h3>ParkServiceGUI</h3>
 					Good programming practice is the single responsibility principle, which advises us to design components with one logical purpose. To fulfill this principle, we need separation from application and presentation layers. We also need separation from
@@ -341,15 +341,21 @@
 						<td>  
 							<center><img src="./img/ParkClientServiceFSM.png" width="100%"></center>
 						</td></tr>
+						<tr><td style="width:60%">
+							<h4>Interaction</h4>
+								The ParkClientService will communicate with the SpringController using a request/response pattern, over TCP sessions, using the <a href="../src/it/unibo/connQak/connQakTcp.kt">connQakTcp.kt</a>
+								class with the help of the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class to build qak-understandable requests.<br>
+								Instead, the service will communicate with the Trolley using dispatches, a fire-and-forget pattern and once again over TCP sessions and exploiting the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class.
+								Dispatches and fire-and-forget pattern are preferred over a request/response one because, in this case, the ClientService doesn't need an answer from the Trolley on how the moves of the actual robot ended, as the Trolley itself will take care of possible complications on that side. Moreover, there is no need to
+								require the Trolley to stop his tasks or let other queued tasks wait to respond to the service as it will be implemented as a CoAP-observable resource, thus these information could be presented to the service in a non-blocking manner.
+								The high-level messages exchanged between these three components are the same as the one identified in the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#execModel">First Executable Model</a> of the system.<br>
+								Another class, named <a href="../src/it/unibo/sembrava_qualcuno/model/Message.kt">Message.kt</a>, has been introduced for an internal representation of the response of the ClientService, adding to the message content an id that quickly represent the state of the request (much alike a http response status).
+						</td>
+						<td>  
+							<center><img src="./img/ParkClientServiceComms.png" width="100%"></center>
+						</td></tr>
 					</table>
-					<br>
-					<h4>Interaction</h4>
-						The ParkClientService will communicate with the SpringController using a request/response pattern, over TCP sessions, using the <a href=https://github.com/anatali/issLab2021/tree/main/it.unibo.qak21.basicrobot/usage/connQak/connQakTcp.kt>connQakTcp.kt</a>
-						class with the help of the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class to build qak-understandable requests.<br>
-						Instead, the service will communicate with the Trolley using dispatches, a fire-and-forget pattern and once again over TCP sessions and exploiting the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class.
-						Dispatches and fire-and-forget pattern are preferred over a request/response one because, in this case, the ClientService doesn't need an answer from the Trolley on how the moves of the actual robot ended, as the Trolley itself will take care of possible complications on that side. Moreover, there is no need to
-						require the Trolley to stop his tasks or let other queued tasks wait to respond to the service as it will be implemented as a CoAP-observable resource, thus these information could be presented to the service in a non-blocking manner.
-						The high-level messages exchanged between these three components are the same as the one identified in the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/sembrava_qualcuno_tf21Start.html#execModel">First Executable Model</a> of the system.
+					
 					<h4>State representation</h4>
 						As pointed out during the analysis phase, some sort of internal state must be mainteined by the service: we decided to save the parking slots state (free/engaged) internally, in a map, whose key represents the SLOTNUM of the parking slot, and empty value in case the slot is free or the TOKENID associated to the parked car if engaged.
 						We also decided to save this information in a binary file, to be read at the system startup, to reintegrate the system state in case of a service failure.<br>
@@ -366,7 +372,7 @@
 						<tbody>
 						<tr><td style="width:60%">
 							<h4>The need of a Sensor Interface</h4>
-								Differently from what identified in the analysis phase, we thought that the WeightSensorController could rather be replaced by a WeightSensorInterface. The goal of an object that implements
+								Differently from what identified in the analysis phase, we thought that the WeightSensorController could rather be replaced by a <a href="../src/it/unibo/sembrava_qualcuno/weightsensor/WeightSensorInterface.kt">WeightSensorInterface</a>. The goal of an object that implements
 								this interface will be to communicate with a weight sensor (or a mock). The need for an interface derives from our will to introduce abstraction as much as possible, so that if the physical sensor (or mock) changes, a new object 
 								that implements the interface could be introduced, whose implementation corresponds to the one needed by the sensor.<br>
 						</td>
@@ -375,7 +381,7 @@
 						</td></tr>
 					</table>
 					<br>
-					In our case, the CoapWeightSensor is a plain object that communicates with a WeightSensorMock. As a sensor is a constraint device, we 
+					In our case, the <a href="../src/it/unibo/sembrava_qualcuno/weightsensor/CoapWeightSensor.kt">CoapWeightSensor</a> is a plain object that communicates with a <a href="../src/it/unibo/sembrava_qualcuno/weightsensor/WeightSensorMock.kt">WeightSensorMock</a>. As a sensor is a constraint device, we 
 					thought that the CoAP protocol could be the best fit for our requirements. Moreover, the communication will be based on a request/response pattern, using a polling strategy.
 					This can be done without problems as our requirements say that we should check the weight sensor data only after the client states that a car has been placed in the INDOOR area.
 					This defines a specific moment when a request should be fired to the weight sensor, for which a polling strategy is the best option.
@@ -386,7 +392,7 @@
 						<tbody>
 						<tr><td style="width:60%">
 							<h4>Trolley buisness logic and Trolley instructor</h4>
-								The TROLLEY component identified during the analysis phase has been actually split into a "Trolley" component, that helds the buisness logic for the trolley (the states and the rules on how to switch between them as well as preparing a path for the robot to perform) and a "BasicRobot" that instructs the robot on how to move. 
+								The <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#TROLLEY">TROLLEY component</a> identified during the analysis phase has been actually split into a "Trolley" actor, that helds the buisness logic for the trolley (the states and the rules on how to switch between them as well as preparing a path for the robot to perform) and a "BasicRobot" that instructs the robot on how to move. 
 								Once again we want to exploit the qak metamodel and architecture to develop the Trolley and for the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/src/basicrobot.qak">BasicRobot</a>, which is already developed and ready to use. This last component will grant the technology indipendece we wanted:
 								as described in the "configuration file" section of <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html#basicrobot">basicrobot2021.html</a>, this component 
 								can be easily configured (via a json configuration file) to work with the WEnv virtual robot as well as a variety of real robots deployed on different systems (such as Raspberry Pis or Arduinos).<br>
@@ -411,7 +417,8 @@
 							The attached figure shows our solution to the problem: the introduction of a Planner (modelled after the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/itunibo/planner/plannerUtil.kt">PlannerUtil.kt</a> class)
 							and of a Room Map (modelled after the <a href="https://github.com/anatali/issLab2021/blob/main/it.unibo.kotlinSupports/app/src/main/kotlin/mapRoomKotlin/RoomMap.kt">RoomMap.kt</a> class).<br>
 							The Planner component will use the <a href="http://aima.cs.berkeley.edu/java/doc/javadoc/aima/search/framework/package-summary.html">aima framework</a> to search for a path in the Room Map, 
-							after the Trolley actor specifies a goal as a couple of integers (identifying a cell of the map), and will return the path as a sequence of moves which both the BasicRobot and virtual WEnv robot can understand (see the <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.boundaryWalk/userDocs/BoundaryWalk.html#aril">aril language</a>).
+							after the Trolley actor specifies a goal as a couple of integers (identifying a cell of the map), and will return the path as a sequence of moves which both the BasicRobot and virtual WEnv robot can understand (see the <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.boundaryWalk/userDocs/BoundaryWalk.html#aril">aril language</a>).<br>
+							By considering the parking slots as "obstacles" in the RoomMap, the PlannerUtil class insures us that no path will be computed where the trolley goes on top of the parking slots, as per <k>NF3</k>. Moreover the plannerUtil class already offers a method to update the RoomMap with the position of the robot after every move has been completed (<k>NF2</k>)<br>
 							In case of failure, the trolley should be led to the home position to restart the service, as the planner would reinitialize the AI used for the path search using the (0,0) position for the robot.
 						</td><td>  
 							<center><img src="./img/TrolleyClassDiagram.png" width="100%"></center>
@@ -420,13 +427,13 @@
 					</table>
 					<br>
 			<h2>Testing</h2>
+			To exploit the qak CoAP observable resources for testing purposes, as already done during the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#tests">first test plans</a> of the analysis phase<br>, the <a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a> has been reintroduced in this sprint tests.
 			For all the tests we assumed these starting conditions:
 				<ul>
-					<li>The trolley is not stopped by the manager</li>
+					<li>The trolley cannot be stopped by the manager in this sprint</li>
 					<li>The INDOOR is not engaged</li>
-					<li>The OUTDOOR is not engaged</li>
-					<li>There is one free parking slot</li>
-					<li><k>TODO</k></li>
+					<li>The OUTDOOR is not relevant for this sprint</li>
+					<li>All the parking slots are free</li>
 				</ul>
 				These conditions were individually changed by the single tests if they needed some other context, as described below.<br>
 				We decided to implement the tests relative to this sprint under two test classes: one that holds tests concerning the WeightSensor, the ParkClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1ParkingAreaTests.kt">Sprint1ParkingAreaTests.kt</a>)
@@ -439,7 +446,6 @@
 				<li>Test if the service correctly instruct the trolley on where to go (e.g. sends the <k>moveToIndoor</k> to pickup a car from the INDOOR area and then the <k>moveToPark</k> to move it to the right parking slot) and that the trolley actually sends the right commands to the BasicRobot after obtaining the path from the PlannerUtil, by checking the robot position on the map at the end of each trip, as per <k>F5</k></li>
 				<li>Test if the service correctly generates the TOKENID when a <k>carenter</k> request is completed and that it correctly sends it back to the controller, as per <k>F6</k></li>
 			</ul>
-			<h2>Deployment</h2>
 			<h2>Sprint Summary</h2>
 			
 			The coming figure represents the final outline resulting from the Sprint1. The dashed lines that group components together gives a glance of the physical deployment organization<br> 			<div>

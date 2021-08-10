@@ -670,7 +670,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 						<tr><td>  
 							<center><img src="./img/Trolley.png" width="60%"></center>
 						</td><td style="width:80%">
-							<h4>Trolley</h4>
+							<h4 id="TROLLEY">Trolley</h4>
 							<ul>
 								<li>Actor observable by the ParkManagerService</li>
 								<li>Holds the buisness logic to implement the trolley states</li>
@@ -900,7 +900,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 				<div class="remark">
 					<k>Carefully note</k> that this new model of the system is not very far from the logic architecture we introduced earlier: the logic architecture better seizes the true nature of the components (as per the analysis we conducted), but this first executable model can be of use to begin designing and developing sprint1.
 				</div>
-			<h2>Test Plan</h2>
+			<h2 id="tests">Test Plan</h2>
 			Before beginning the test plan we realized that, for the qak system to be fully working and testable, we needed some way to synchronize the tests and the actors of the qak model. This is because, once a qak context is run, every actor inside it starts at the same time and there are no way to implement unit test or to test one functionality at the time. To achieve this goal we introduced a "listening" state on every actor we intended to test: this state is empty and it consists in waiting for a proper message to trigger a specific state change; 
 			in this way, we can systematically and sequentially trigger states to test by sending messages both from the testing class and other actors, to perform integration tests. This "listening" state should be engaged at an actor startup and every time it ends a task. <br>
 			Since qakactor are natively a CoAP-observable resources, we also thought to utilize a CoapObserver for each qakactor we wanted to observe for testing purposes. Its code is available at <a href="../test/it.sembrava_qualcuno.unibo.tf21Start/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a><br>
