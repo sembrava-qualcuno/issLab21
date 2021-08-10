@@ -36,7 +36,7 @@ class Sprint1TrolleyTests {
         var testingObserver : CoapObserverForTesting ? = null
         var systemStarted = false
         val channelSyncStart = Channel<String>()
-        val actors : Array<String> = arrayOf("parkclientservice", "trolley")
+        val actors : Array<String> = arrayOf("clientservice", "trolley")
         var myactor : ActorBasic? = null
         var counter = 1
         val weightSensor = WeightSensorMock(8025, 1000)

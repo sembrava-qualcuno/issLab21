@@ -39,7 +39,7 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 						println("indoorparkingservicegui requestToenter")
 						updateResourceRep( "indoorparkingservicegui requestToenter"  
 						)
-						request("reqenter", "reqenter(bob)" ,"parkclientservice" )  
+						request("reqenter", "reqenter(bob)" ,"clientservice" )  
 						stateTimer = TimerActor("timer_requestToenter", 
 							scope, context!!, "local_tout_indoorparkingservicegui_requestToenter", 1000.toLong() )
 					}
@@ -66,7 +66,7 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 						println("indoorparkingservicegui moving the car in the INDOOR and press CARENTER")
 						updateResourceRep( "indoorparkingservicegui oving the car in the INDOOR and press CARENTER"  
 						)
-						request("carenter", "carenter($SLOTNUM)" ,"parkclientservice" )  
+						request("carenter", "carenter($SLOTNUM)" ,"clientservice" )  
 					}
 					 transition(edgeName="t03",targetState="afterreceipt",cond=whenReply("receipt"))
 				}	 
@@ -82,7 +82,7 @@ class Indoorparkingservicegui ( name: String, scope: CoroutineScope  ) : ActorBa
 						println("indoorparkingservicegui will retry later")
 						updateResourceRep( "indoorparkingservicegui will retry later"  
 						)
-						forward("goToWork", "goToWork(bob)" ,"parkclientservice" ) 
+						forward("goToWork", "goToWork(bob)" ,"clientservice" ) 
 					}
 				}	 
 			}

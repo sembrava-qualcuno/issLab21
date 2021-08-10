@@ -30,12 +30,12 @@ Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 
 ExternalQActor basicrobot context ctxbasicrobot 
  
-QActor parkclientservice context ctxparkmanagerservice {
+QActor clientservice context ctxparkmanagerservice {
 	[#	val weightSensor : it.unibo.sembrava_qualcuno.weightsensor.WeightSensorInterface = it.unibo.sembrava_qualcuno.weightsensor.CoapWeightSensor("coap://localhost:8025/weightSensor")	#]
 	
 	State s0 initial {
-		println("parkclientservice STARTS")
-		updateResource [# "parkclientservice STARTS" #]
+		println("clientservice STARTS")
+		updateResource [# "clientservice STARTS" #]
 		
 		//Read state from file
 		[#  
@@ -46,8 +46,8 @@ QActor parkclientservice context ctxparkmanagerservice {
 	Goto work
 	
 	State work {
-		println("parkclientservice waiting ...")
-		updateResource [# "parkclientservice waiting ..." #]
+		println("clientservice waiting ...")
+		updateResource [# "clientservice waiting ..." #]
 	}
 	Transition t0 
 		whenRequest reqenter -> handleEnterRequest
@@ -55,8 +55,8 @@ QActor parkclientservice context ctxparkmanagerservice {
 	
 	State handleEnterRequest {
         printCurrentMessage
-        println("parkclientservice reply to reqenter")
-        updateResource [# "parkclientservice reply to reqenter" #]
+        println("clientservice reply to reqenter")
+        updateResource [# "clientservice reply to reqenter" #]
         [# 
             lateinit var message : Message
             var SLOTNUM = 0 #
@@ -75,20 +75,20 @@ QActor parkclientservice context ctxparkmanagerservice {
             #]
 
             if [# SLOTNUM == 0 #] {
-                forward parkclientservice -m goToWork : goToWork(enter($SLOTNUM))
+                forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
             }
 
             [# message = Message(0, "$SLOTNUM") #]
         }
         else {
-            forward parkclientservice -m goToWork : goToWork(enter($SLOTNUM))
+            forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
 
             [# message = Message(1, "The indoor area or trolley are engaged") #]
         }
 
         //informIN
         //ReplyTo reqenter
-        println("parkclientservice reply enter($SLOTNUM)")
+        println("clientservice reply enter($SLOTNUM)")
         updateResource [# "$SLOTNUM" #]
         [# val RESPONSE = Json.encodeToString(message) #]
         replyTo reqenter with enter : $RESPONSE
@@ -99,7 +99,7 @@ QActor parkclientservice context ctxparkmanagerservice {
 	
 	State enterthecar {
 		printCurrentMessage		
-		println("parkclientservice reply to carenter")
+		println("clientservice reply to carenter")
 		updateResource [# "parkingclientservice reply to carenter" #]
 		
  		onMsg(carenter : carenter(SLOTNUM)) {
@@ -121,7 +121,7 @@ QActor parkclientservice context ctxparkmanagerservice {
 					// Send the trolley to the INDOOR area
 					forward trolley -m moveToIndoor : moveToIndoor(indoor)
 					delay 2000
-					println("parkclientservice moves the car to SLOTNUM = $SLOTNUM")
+					println("clientservice moves the car to SLOTNUM = $SLOTNUM")
 					updateResource [# "parkingclientservice moves the car to SLOTNUM = $SLOTNUM" #]
 					forward trolley -m moveToPark : moveToPark($SLOTNUM)
 						
@@ -146,15 +146,15 @@ QActor parkclientservice context ctxparkmanagerservice {
 			}
 			
 			//ReplyTo carenter
-	        println("parkclientservice reply")
-	        updateResource [# "parkclientservice reply" #]
+	        println("clientservice reply")
+	        updateResource [# "clientservice reply" #]
 		}
 	}
 	Goto work
 	
 	State handleOutRequest {
 		printCurrentMessage
-		println("parkclientservice reply to reqexit")
+		println("clientservice reply to reqexit")
 		updateResource [# "parkingclientservice reply to reqexit" #]
 		
 		onMsg(reqexit : reqexit(TOKENID)) {
@@ -180,8 +180,8 @@ QActor parkclientservice context ctxparkmanagerservice {
 					// Send the trolley to the parking slot
 					forward trolley -m moveToPark : moveToPark($SLOTNUM)
 					delay 2000
-					println("parkclientservice moves the car from SLOTNUM = $SLOTNUM")
-					updateResource [# "parkclientservice moves the car from SLOTNUM = $SLOTNUM" #]
+					println("clientservice moves the car from SLOTNUM = $SLOTNUM")
+					updateResource [# "clientservice moves the car from SLOTNUM = $SLOTNUM" #]
 					forward trolley -m moveToOutdoor : moveToOutdoor(outdoor)
 						
 					//Set the slot free
@@ -205,8 +205,8 @@ QActor parkclientservice context ctxparkmanagerservice {
 			}
 				
 			//ReplyTo reqexit
-			println("parkclientservice reply")
-	        updateResource [# "parkclientservice reply" #]
+			println("clientservice reply")
+	        updateResource [# "clientservice reply" #]
 		}
 	}
 	Goto work

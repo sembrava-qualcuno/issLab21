@@ -4,7 +4,7 @@
 context(ctxcarparking, "localhost",  "TCP", "8022").
  qactor( indoorparkingservicegui, ctxcarparking, "it.unibo.indoorparkingservicegui.Indoorparkingservicegui").
   qactor( outdoorparkingservicegui, ctxcarparking, "it.unibo.outdoorparkingservicegui.Outdoorparkingservicegui").
-  qactor( parkclientservice, ctxcarparking, "it.unibo.parkclientservice.Parkclientservice").
+  qactor( clientservice, ctxcarparking, "it.unibo.clientservice.Clientservice").
   qactor( parkservicestatusgui, ctxcarparking, "it.unibo.parkservicestatusgui.Parkservicestatusgui").
-  qactor( parkmanagerservice, ctxcarparking, "it.unibo.parkmanagerservice.Parkmanagerservice").
+  qactor( managerservice, ctxcarparking, "it.unibo.managerservice.Managerservice").
   qactor( trolley, ctxcarparking, "it.unibo.trolley.Trolley").

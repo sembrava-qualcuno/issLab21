@@ -40,12 +40,12 @@ class ManagerServiceUnitTest {
 				it.unibo.ctxcarparking.main() //keep the control
 			}
 			GlobalScope.launch {
-				myactor = QakContext.getActor("parkmanagerservice")
+				myactor = QakContext.getActor("managerservice")
 				
  				while(myactor == null) {
 					println("waiting for system startup ...")
 					delay(500)
-					myactor = QakContext.getActor("parkmanagerservice")
+					myactor = QakContext.getActor("managerservice")
 				}				
 				delay(2000)
 				channelSyncStart.send("starttesting")
@@ -70,7 +70,7 @@ class ManagerServiceUnitTest {
 			    println("+++++++++ checkSystemStarted resumed ")
 			}			
 		} 
-		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "parkmanagerservice", "8022")
+		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "managerservice", "8022")
 		
 		// Reset the knowledge base to assumption state 
 		ParkingAreaKb.indoorfree = true
@@ -100,15 +100,15 @@ class ManagerServiceUnitTest {
 			val channelForObserver = Channel<String>()
  			testingObserver!!.addObserver(channelForObserver)
 			
-			var toggleState = MsgUtil.buildDispatch("managerserviceunittest", "toggleState", "toggleState(X)", "parkmanagerservice")
+			var toggleState = MsgUtil.buildDispatch("managerserviceunittest", "toggleState", "toggleState(X)", "managerservice")
 			
 			MsgUtil.sendMsg(toggleState, myactor!!)
-			assertEquals(channelForObserver.receive(), "parkmanagerservice emit stop")
+			assertEquals(channelForObserver.receive(), "managerservice emit stop")
 			
 			delay(500)
 			
 			MsgUtil.sendMsg(toggleState, myactor!!)
-			assertEquals(channelForObserver.receive(), "parkmanagerservice emit resume")
+			assertEquals(channelForObserver.receive(), "managerservice emit resume")
 		}
 	}
 }

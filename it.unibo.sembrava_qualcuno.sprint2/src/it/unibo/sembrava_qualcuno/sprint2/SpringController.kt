@@ -26,7 +26,7 @@ class SpringController {
     @GetMapping("/client/reqenter")
     @ResponseBody
     fun reqenter(): ResponseEntity<ParkingSlot> {
-        var request = MsgUtil.buildRequest("springcontroller", "reqenter", "reqenter(X)", "parkclientservice")
+        var request = MsgUtil.buildRequest("springcontroller", "reqenter", "reqenter(X)", "clientservice")
         val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
 
         val message: Message = Json.decodeFromString(reply.msgContent)
@@ -41,7 +41,7 @@ class SpringController {
     @GetMapping("/client/carenter")
     @ResponseBody
     fun carenter(@RequestParam slotnum: Int): ResponseEntity<TokenId> {
-        var request = MsgUtil.buildRequest("springcontroller", "carenter", "carenter($slotnum)", "parkclientservice")
+        var request = MsgUtil.buildRequest("springcontroller", "carenter", "carenter($slotnum)", "clientservice")
         val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
         val message: Message = Json.decodeFromString(reply.msgContent)
         //Error

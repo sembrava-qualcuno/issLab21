@@ -924,7 +924,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 					<li>Test if the trolley immediately goes to stopped state in case he is in idle state and a stop event arrives. Test also if, once a resume event arrives, it returns to the idle state</li>
 					<li>Test if once the trolley is in stopped state, whatever request arrives it continues to stay in the stopped state, unless a resume event arrives</li>
 				</ul>
-				<h4>ParkClientService</h4>
+				<h4>ClientService</h4>
 					Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/ClientServiceUnitTest.kt">ClientServiceUnitTest.kt</a>
 					<ul>
 						<li>Test that a client request to park a car (<k>requenter</k>) doesn't continue if the INDOOR area is not free (<k>enter</k> reply give back SLOTNUM=0, no subsequent <k>carenter</k> request, instead I expect a goToWork dispatch)</li>
@@ -935,20 +935,20 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 						<li>Test if the service correctly sends moveToPark/moveToOut messages to the trolley (via its CoAP-observable state)</li>
 						<li>Test if the service doesn't instruct the trolley to moveToOut if the inserted token is invalid (e.g. that a exit(0) reply is sent)
 					</ul>
-				<h4>ParkManagerService</h4>
+				<h4>ManagerService</h4>
 					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/ManagerServiceUnitTest.kt">ManagerServiceUnitTest.kt</a>
 					<ul>
 						<li>Test if the service, basing on the trolley state, emits the right events after a toggle dispatch arrives (both from the CoAP-observable state and the Kwnoledge base)</li>
 					</ul>
 			<h3>Integration tests / Functional tests</h3>
 				<h4>Test Plan 1</h4>
-					This test plan will work as an integration test for the ParkServiceStatusGUI, ParkManagerService and Trolley components; it will also work as a functional test for the Parking Manager use cases (POR <em>manage</em>). <br>
+					This test plan will work as an integration test for the ParkServiceStatusGUI, ManagerService and Trolley components; it will also work as a functional test for the Parking Manager use cases (POR <em>manage</em>). <br>
 					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan1.kt">TestPlan1.kt</a>
 				<h4>Test Plan 2</h4>
-					This test plan will work as an integration test for the IndoorParkingServiceGUI, ParkClientService and Trolley components; it will also work as a functional test for client "Parking Phase" use case (PORs <em>acceptIN</em>, <em>informIN</em>, <em>moveToIn</em>, <em>moveToSlotIn and <em>receipt</em></em>). <br>
+					This test plan will work as an integration test for the IndoorParkingServiceGUI, ClientService and Trolley components; it will also work as a functional test for client "Parking Phase" use case (PORs <em>acceptIN</em>, <em>informIN</em>, <em>moveToIn</em>, <em>moveToSlotIn and <em>receipt</em></em>). <br>
 					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan2.kt">TestPlan2.kt</a>
 				<h4>Test Plan 3</h4>
-					This test plan will work as an integration test for the OutdoorParkingServiceGUI, ParkClientService and Trolley components; it will also work as a functional test for client "Car Pickup" use case (PORs <em>acceptOUT</em> and <em>moveToSlotOut</em>). <br>
+					This test plan will work as an integration test for the OutdoorParkingServiceGUI, ClientService and Trolley components; it will also work as a functional test for client "Car Pickup" use case (PORs <em>acceptOUT</em> and <em>moveToSlotOut</em>). <br>
 					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan3.kt">TestPlan3.kt</a><br>
 		</div>
 		<h2>Summary of the Analysis phase</h2>

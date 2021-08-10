@@ -30,7 +30,7 @@ class TestPlan1 {
 		var testingObserver : CoapObserverForTesting ? = null
 		var systemStarted = false
 		val channelSyncStart = Channel<String>()
-		val actors : Array<String> = arrayOf("parkservicestatusgui", "parkmanagerservice", "trolley")
+		val actors : Array<String> = arrayOf("parkservicestatusgui", "managerservice", "trolley")
 		var myactor : ActorBasic ? = null
 		var counter = 1
 		

@@ -38,7 +38,7 @@ class Parkservicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasic
 						println("parkservicestatusgui toggle state")
 						updateResourceRep( "parkservicestatusgui toggle state"  
 						)
-						forward("toggleState", "toggleState(X)" ,"parkmanagerservice" ) 
+						forward("toggleState", "toggleState(X)" ,"managerservice" ) 
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 

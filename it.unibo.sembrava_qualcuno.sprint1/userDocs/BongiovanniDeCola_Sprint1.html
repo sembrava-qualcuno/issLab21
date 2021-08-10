@@ -299,8 +299,8 @@
 				<center><em>In the following diagrams, the Green color is associated with "Controller" or "Buisness logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br> 
 			</div>
 			<h2>Project</h2>
-				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase, let's now "zoom-in" into 
-				the components we have to design for this sprint: ParkServiceGUI, ParkManagerService, Trolley, Map and WeightSensorController and simulator.
+				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> and considering the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#execModel">First Executable Model</a> of the system derived during the analysis phase, let's now "zoom-in" into 
+				the components we have to design for this sprint: ParkServiceGUI, ClientService, Trolley, Map and WeightSensorController and simulator.
 				<h3>ParkServiceGUI</h3>
 					Good programming practice is the single responsibility principle, which advises us to design components with one logical purpose. To fulfill this principle, we need separation from application and presentation layers. We also need separation from
 					the buisness logic, the presenting view and the code that prepares these views.
@@ -312,7 +312,7 @@
 								The Spring Framework will be used for its ability to boost productivity with the use of annotations, Dependency Injection and easily configurable web services 
 								and for the need to focus on buisness code, leaving the generation and management of boilerplate code to the Framework.<br>
 								The new "ParkServiceGui", at this point, will be split in two components: a spring view (deployable on the client side, in the actual INDOOR area) and a sprint controller to generate the views basing on the client requests. This would also allow to delegate the 
-								real buisness logic to the ParkClientService component, which will be described later.
+								real buisness logic to the ClientService component, which will be described later.
 						</td>
 						<td>  
 							<center><img src="./img/ParkServiceGUI.png" width="65%"></center>
@@ -329,21 +329,22 @@
 							<center><img src="./img/APISequenceDiagram.png" width="75%"></center>
 						</td></tr>
 					</table>
-				<h3>ParkClientService</h3>
+				<h3>ClientService</h3>
+				As already done and explained in the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#execModel">First Executable Model</a> section of the analysis phase, the main service (ParkManagerService) is being split in two smaller services. In this sprint we will focus on the ClientService, as the ManagerService will be developed in Sprint4.<br>
 					<table style="width:98%">
 						<tbody>
 						<tr><td style="width:60%">
-							<h4>The ParkClientService as a Moore's Finite State Machine</h4>
-								The ParkClientService is the component that contains all the buisness logic in this system use case. It will be implemented as an actor, because we need a componenent capable of accepting and queuing different requests in a non-blocking manner and to 
+							<h4>The ClientService as a Moore's Finite State Machine</h4>
+								The ClientService is the component that contains all the buisness logic in this system use case. It will be implemented as an actor, because we need a componenent capable of accepting and queuing different requests in a non-blocking manner and to 
 								communicate and behave with a message-based strategy. In this way we can also exploit the qak infrastructure and language, implementing the service as a FSM, whose state changes are triggered by events and messages. <br>
-								The FSM Diagram attached describes the service states and the behaviour of the one which are of interest for this sprint. The diagram was designed basing on the ParkClientService designed and developed for the First Executable Model (<a target="code" href="../../it.unibo.sembrava_qualcuno.tf21Start/src/parkingArea.qak">parkingArea.qak</a>) of the system.
+								The FSM Diagram attached describes the service states and the behaviour of the one which are of interest for this sprint. The diagram was designed basing on the ClientService designed and developed for the First Executable Model (<a target="code" href="../../it.unibo.sembrava_qualcuno.tf21Start/src/parkingArea.qak">parkingArea.qak</a>) of the system.
 						</td>
 						<td>  
 							<center><img src="./img/ParkClientServiceFSM.png" width="100%"></center>
 						</td></tr>
 						<tr><td style="width:60%">
 							<h4>Interaction</h4>
-								The ParkClientService will communicate with the SpringController using a request/response pattern, over TCP sessions, using the <a href="../src/it/unibo/connQak/connQakTcp.kt">connQakTcp.kt</a>
+								The ClientService will communicate with the SpringController using a request/response pattern, over TCP sessions, using the <a href="../src/it/unibo/connQak/connQakTcp.kt">connQakTcp.kt</a>
 								class with the help of the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class to build qak-understandable requests.<br>
 								Instead, the service will communicate with the Trolley using dispatches, a fire-and-forget pattern and once again over TCP sessions and exploiting the <a target="code" href="https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/src/main/kotlin/MsgUtil.kt">MsgUtil.kt</a> utility class.
 								Dispatches and fire-and-forget pattern are preferred over a request/response one because, in this case, the ClientService doesn't need an answer from the Trolley on how the moves of the actual robot ended, as the Trolley itself will take care of possible complications on that side. Moreover, there is no need to
@@ -436,8 +437,8 @@
 					<li>All the parking slots are free</li>
 				</ul>
 				These conditions were individually changed by the single tests if they needed some other context, as described below.<br>
-				We decided to implement the tests relative to this sprint under two test classes: one that holds tests concerning the WeightSensor, the ParkClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1ParkingAreaTests.kt">Sprint1ParkingAreaTests.kt</a>)
-				and one that holds tests concerning the Trolley, BasicRobot, ParkClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1TrolleyTests.kt">Sprint1TrolleyTests.kt</a>), in order to fire tests without having to start up every qak context if not needed for the current test.
+				We decided to implement the tests relative to this sprint under two test classes: one that holds tests concerning the WeightSensor, the ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1ParkingAreaTests.kt">Sprint1ParkingAreaTests.kt</a>)
+				and one that holds tests concerning the Trolley, BasicRobot, ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1TrolleyTests.kt">Sprint1TrolleyTests.kt</a>), in order to fire tests without having to start up every qak context if not needed for the current test.
 				<br>Hereafter is a description of the functional tests for this <a href="#sprint1"> sprint requirements</a>:
 			<ul>
 				<li>Test if there are no parking slots available, a proper response is returned by the SpringController (e.g. {slotnum:0}), as per <k>F3</k></li>

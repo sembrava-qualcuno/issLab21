@@ -71,7 +71,7 @@ QActor indoorparkingservicegui context ctxcarparking {
 		println("indoorparkingservicegui requestToenter")
 		updateResource [# "indoorparkingservicegui requestToenter" #]
 		
-		request parkclientservice -m reqenter : reqenter(bob)
+		request clientservice -m reqenter : reqenter(bob)
 	}
 	Transition t0
 		whenTime 1000 -> retrylater		//The client does not wait forever...
@@ -91,7 +91,7 @@ QActor indoorparkingservicegui context ctxcarparking {
 		println("indoorparkingservicegui moving the car in the INDOOR and press CARENTER")
 		updateResource [# "indoorparkingservicegui oving the car in the INDOOR and press CARENTER" #]
 		
-		request parkclientservice -m carenter : carenter($SLOTNUM)		
+		request clientservice -m carenter : carenter($SLOTNUM)		
 	}
 	Transition t0 
 		whenReply receipt -> afterreceipt
@@ -102,12 +102,12 @@ QActor indoorparkingservicegui context ctxcarparking {
 		updateResource [# "indoorparkingservicegui leaves" #]
 	}
 	
-	//The client leaves, notify it to the parkclientservice
+	//The client leaves, notify it to the clientservice
 	State retrylater {
 		println("indoorparkingservicegui will retry later")
 		updateResource [# "indoorparkingservicegui will retry later" #]
 		
-		forward parkclientservice -m goToWork : goToWork(bob)
+		forward clientservice -m goToWork : goToWork(bob)
 	}
 }
 
@@ -131,7 +131,7 @@ QActor outdoorparkingservicegui context ctxcarparking {
 			println("outdoorparkingservicegui requestToExit($TOKENID)")
 			updateResource [# "outdoorparkingservicegui requestToExit($TOKENID)" #]
 		
-			request parkclientservice -m reqexit : reqexit($TOKENID)	
+			request clientservice -m reqexit : reqexit($TOKENID)	
 		}
 	}
 	Transition t0
@@ -144,16 +144,16 @@ QActor outdoorparkingservicegui context ctxcarparking {
 	}
 }
  
-QActor parkclientservice context ctxcarparking {
+QActor clientservice context ctxcarparking {
 	State s0 initial {
-		println("parkclientservice STARTS")
-		updateResource [# "parkclientservice STARTS" #]
+		println("clientservice STARTS")
+		updateResource [# "clientservice STARTS" #]
 	}
 	Goto work
 	
 	State work {
-		println("parkclientservice waiting ...")
-		updateResource [# "parkclientservice waiting ..." #]
+		println("clientservice waiting ...")
+		updateResource [# "clientservice waiting ..." #]
 	}
 	Transition t0 
 		whenRequest reqenter -> handleEnterRequest
@@ -161,8 +161,8 @@ QActor parkclientservice context ctxcarparking {
 	
 	State handleEnterRequest {
 		printCurrentMessage
-		println("parkclientservice reply to reqenter")
-		updateResource [# "parkclientservice reply to reqenter" #]
+		println("clientservice reply to reqenter")
+		updateResource [# "clientservice reply to reqenter" #]
 		
 		[# var SLOTNUM = 0 #]
 		
@@ -180,18 +180,18 @@ QActor parkclientservice context ctxcarparking {
 			#]
 			
 			if [# SLOTNUM == 0 #] {
-				forward parkclientservice -m goToWork : goToWork(enter($SLOTNUM))
+				forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
 				//backToHome requirement has been incorporated in trolley's idle state
 			}
 		}
 		else {
 			//Reply with slotnum=0 to indicates both indoor area and trolley are occupied
-			forward parkclientservice -m goToWork : goToWork(enter($SLOTNUM))
+			forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
 		}
 		
 		//informIN
-		println("parkclientservice reply enter($SLOTNUM)")
-		updateResource [# "parkclientservice reply enter($SLOTNUM)" #]
+		println("clientservice reply enter($SLOTNUM)")
+		updateResource [# "clientservice reply enter($SLOTNUM)" #]
 			
 		replyTo reqenter with enter : enter($SLOTNUM)
 	}
@@ -266,21 +266,21 @@ QActor parkservicestatusgui context ctxcarparking {
 		println("parkservicestatusgui toggle state")
 		updateResource [# "parkservicestatusgui toggle state" #]
 		
-		forward parkmanagerservice -m toggleState : toggleState(X)
+		forward managerservice -m toggleState : toggleState(X)
 	}
 	Goto work
 }
 
-QActor parkmanagerservice context ctxcarparking {
+QActor managerservice context ctxcarparking {
 	State s0 initial {
-		println("parkmanagerservice STARTS")
-		updateResource [# "parkmanagerservice STARTS" #]
+		println("managerservice STARTS")
+		updateResource [# "managerservice STARTS" #]
 	}
 	Goto work
 	
 	State work {
-		println("parkmanagerservice waiting ...")
-		updateResource [# "parkmanagerservice waiting ..." #]
+		println("managerservice waiting ...")
+		updateResource [# "managerservice waiting ..." #]
 	}
 	Transition t0
 		whenMsg toggleState -> toggleTrolleyState
@@ -289,15 +289,15 @@ QActor parkmanagerservice context ctxcarparking {
 		if [# ParkingAreaKb.trolleyStopped #] {
 			[# ParkingAreaKb.trolleyStopped = false #]
 			
-			println("parkmanagerservice emit resume")
-			updateResource [# "parkmanagerservice emit resume" #]
+			println("managerservice emit resume")
+			updateResource [# "managerservice emit resume" #]
 			forward trolley -m  resume : resume(X)
 		}
 		else {
 			[# ParkingAreaKb.trolleyStopped = true #]
 			
-			println("parkmanagerservice emit stop")
-			updateResource [# "parkmanagerservice emit stop" #]
+			println("managerservice emit stop")
+			updateResource [# "managerservice emit stop" #]
 			forward trolley -m stop : stop(X)
 		}
 	}

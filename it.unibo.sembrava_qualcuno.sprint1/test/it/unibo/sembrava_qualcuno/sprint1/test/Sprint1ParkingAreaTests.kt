@@ -37,7 +37,7 @@ class Sprint1ParkingAreaTests {
     companion object {
         var systemStarted = false
         val channelSyncStart = Channel<String>()
-        val actors: Array<String> = arrayOf("parkclientservice")
+        val actors: Array<String> = arrayOf("clientservice")
         val weightSensor = WeightSensorMock(8025, 1000)
 
         @JvmStatic

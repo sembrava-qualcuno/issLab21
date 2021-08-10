@@ -40,12 +40,12 @@ class ClientServiceUnitTest {
 				it.unibo.ctxcarparking.main() //keep the control
 			}
 			GlobalScope.launch {
-				myactor = QakContext.getActor("parkclientservice")
+				myactor = QakContext.getActor("clientservice")
 				
  				while(myactor == null) {
 					println("waiting for system startup ...")
 					delay(500)
-					myactor = QakContext.getActor("parkclientservice")
+					myactor = QakContext.getActor("clientservice")
 				}				
 				delay(2000)
 				channelSyncStart.send("starttesting")
@@ -70,7 +70,7 @@ class ClientServiceUnitTest {
 			    println("+++++++++ checkSystemStarted resumed ")
 			}			
 		} 
-		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "parkclientservice", "8023")
+		if(testingObserver == null) testingObserver = CoapObserverForTesting("obstesting${counter++}", "ctxcarparking", "clientservice", "8023")
 		
 		// Reset the knowledge base to assumption state 
 		ParkingAreaKb.indoorfree = true
@@ -105,30 +105,30 @@ class ClientServiceUnitTest {
  			testingObserver!!.addObserver(channelForObserver)	 
 			
 			//Test if the actor is ready to accept requests
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			
 			//Occupy the INDOOR area 
 			ParkingAreaKb.indoorfree = false
 			
 			//Build and send reqenter request
-			var msg = MsgUtil.buildRequest("testIndoorNotFree", "reqenter", "requenter(test)", "parkclientservice")
+			var msg = MsgUtil.buildRequest("testIndoorNotFree", "reqenter", "requenter(test)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			//Test the expected behaviour
-			assertEquals(channelForObserver.receive(), "parkclientservice reply to reqenter")
-			assertEquals(channelForObserver.receive(), "parkclientservice reply enter(0)")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice reply to reqenter")
+			assertEquals(channelForObserver.receive(), "clientservice reply enter(0)")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			
 			//Occupy the OUTDOOR area 
 			ParkingAreaKb.outdoorfree = false
 			
 			//Build and send requexit request
-			msg = MsgUtil.buildRequest("testOutdoorNotFree", "reqexit", "reqexit(3)", "parkclientservice")
+			msg = MsgUtil.buildRequest("testOutdoorNotFree", "reqexit", "reqexit(3)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			assertEquals(channelForObserver.receive(), "parkingclientservice reply to reqexit")
 			assertEquals(channelForObserver.receive(), "parkingclientservice moves the car to SLOTNUM = 0")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 		}
 	}
 	
@@ -147,19 +147,19 @@ class ClientServiceUnitTest {
  			testingObserver!!.addObserver(channelForObserver)	 
 			
 			//Test if the actor is ready to accept requests
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			
 			//Occupy all the parking slots
 			ParkingAreaKb.slotStateFree[4] = false
 			
 			//Build and send reqenter request
-			var msg = MsgUtil.buildRequest("testNoFreeSlots", "reqenter", "requenter(test)", "parkclientservice")
+			var msg = MsgUtil.buildRequest("testNoFreeSlots", "reqenter", "requenter(test)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			//Test the expected behaviour
-			assertEquals(channelForObserver.receive(), "parkclientservice reply to reqenter")
-			assertEquals(channelForObserver.receive(), "parkclientservice reply enter(0)")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice reply to reqenter")
+			assertEquals(channelForObserver.receive(), "clientservice reply enter(0)")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 		}
 	}
 	
@@ -178,27 +178,27 @@ class ClientServiceUnitTest {
  			testingObserver!!.addObserver(channelForObserver)	 
 			
 			//Test if the actor is ready to accept requests
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			
 			//Occupy all the parking slots
 			ParkingAreaKb.trolleyStopped = true
 			
 			//Build and send reqenter request
-			var msg = MsgUtil.buildRequest("testTrolleyStopped", "reqenter", "requenter(test)", "parkclientservice")
+			var msg = MsgUtil.buildRequest("testTrolleyStopped", "reqenter", "requenter(test)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			//Test the expected behaviour
-			assertEquals(channelForObserver.receive(), "parkclientservice reply to reqenter")
-			assertEquals(channelForObserver.receive(), "parkclientservice reply enter(0)")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice reply to reqenter")
+			assertEquals(channelForObserver.receive(), "clientservice reply enter(0)")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			
 			//Build and send requexit request
-			msg = MsgUtil.buildRequest("testOutdoorNotFree", "reqexit", "reqexit(3)", "parkclientservice")
+			msg = MsgUtil.buildRequest("testOutdoorNotFree", "reqexit", "reqexit(3)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			assertEquals(channelForObserver.receive(), "parkingclientservice reply to reqexit")
 			assertEquals(channelForObserver.receive(), "parkingclientservice moves the car to SLOTNUM = 0")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 		}
 	}
 	
@@ -216,23 +216,23 @@ class ClientServiceUnitTest {
  			testingObserver!!.addObserver(channelForObserver)	 
 			
 			//Test if the actor is ready to accept requests
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			
 			//Build and send reqenter request
-			var msg = MsgUtil.buildRequest("testMoveToPark", "reqenter", "requenter(test)", "parkclientservice")
+			var msg = MsgUtil.buildRequest("testMoveToPark", "reqenter", "requenter(test)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
-			assertEquals(channelForObserver.receive(), "parkclientservice reply to reqenter")
-			assertEquals(channelForObserver.receive(), "parkclientservice reply enter(5)")
+			assertEquals(channelForObserver.receive(), "clientservice reply to reqenter")
+			assertEquals(channelForObserver.receive(), "clientservice reply enter(5)")
 			
 			//Build and send carenter request
-			msg = MsgUtil.buildRequest("testMoveToPark", "carenter", "carenter(5)", "parkclientservice")
+			msg = MsgUtil.buildRequest("testMoveToPark", "carenter", "carenter(5)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			//Test the expected behaviour
 			assertEquals(channelForObserver.receive(), "parkingclientservice reply to enterthecar")
 			assertEquals(channelForObserver.receive(), "parkingclientservice moves the car to SLOTNUM = 5")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			assertFalse(ParkingAreaKb.slotStateFree[4])
 		}
 	}
@@ -251,32 +251,32 @@ class ClientServiceUnitTest {
  			testingObserver!!.addObserver(channelForObserver)	 
 			
 			//Test if the actor is ready to accept requests
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			
 			//Build and send requexit request
-			var msg = MsgUtil.buildRequest("testMoveToOut", "reqexit", "reqexit(4)", "parkclientservice")
+			var msg = MsgUtil.buildRequest("testMoveToOut", "reqexit", "reqexit(4)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			assertEquals(channelForObserver.receive(), "parkingclientservice reply to reqexit")
 			assertEquals(channelForObserver.receive(), "parkingclientservice moves the car to SLOTNUM = 4")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			assertTrue(ParkingAreaKb.slotStateFree[3])
 			
 			//Build and send wrong requexit request
-			msg = MsgUtil.buildRequest("testMoveToOut", "reqexit", "reqexit(7)", "parkclientservice")
+			msg = MsgUtil.buildRequest("testMoveToOut", "reqexit", "reqexit(7)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			assertEquals(channelForObserver.receive(), "parkingclientservice reply to reqexit")
 			assertEquals(channelForObserver.receive(), "parkingclientservice moves the car to SLOTNUM = 0")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 			
 			//Build and send another wrong requexit request
-			msg = MsgUtil.buildRequest("testMoveToOut", "reqexit", "reqexit(5)", "parkclientservice")
+			msg = MsgUtil.buildRequest("testMoveToOut", "reqexit", "reqexit(5)", "clientservice")
 			MsgUtil.sendMsg(msg, myactor!!)
 			
 			assertEquals(channelForObserver.receive(), "parkingclientservice reply to reqexit")
 			assertEquals(channelForObserver.receive(), "parkingclientservice moves the car to SLOTNUM = 0")
-			assertEquals(channelForObserver.receive(), "parkclientservice waiting ...")
+			assertEquals(channelForObserver.receive(), "clientservice waiting ...")
 		}
 	}
 	
