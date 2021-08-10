@@ -54,4 +54,10 @@ class SpringController {
 
         return ResponseEntity.ok(TokenId(message.message))
     }
+
+    @GetMapping("/client/reqexit")
+    @ResponseBody
+    fun reqexit(@RequestParam tokenid: String) {
+
+    }
 }

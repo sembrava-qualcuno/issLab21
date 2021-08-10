@@ -11,8 +11,13 @@ Reply   receipt  : receipt(MESSAGE)
 
 Dispatch goToWork : goToWork(X)
 
+//OUTDOOR CLIENT SERVICE
+Request reqexit : reqexit(TOKENID)
+Reply 	exit 	: exit(X)
+
 Dispatch moveToIndoor : moveToIndoor(X)
 Dispatch moveToPark : moveToPark(SLOTNUM)
+Dispatch moveToOutdoor : moveToOutdoor(X)
 
 //TROLLEY
 Dispatch goToIdle : goToIdle(X)
@@ -46,6 +51,7 @@ QActor parkclientservice context ctxparkmanagerservice {
 	}
 	Transition t0 
 		whenRequest reqenter -> handleEnterRequest
+		whenRequest reqexit -> handleOutRequest
 	
 	State handleEnterRequest {
         printCurrentMessage
@@ -57,7 +63,7 @@ QActor parkclientservice context ctxparkmanagerservice {
         ]
 
         //acceptIN
-        if [# weightSensor.getWeight() == 0 #] { //In this sprint the trolley can not be stopped
+        if [# weightSensor.getWeight() == 0 #] { //TODO Add check if trolley is available
             //Get first free parking spot, or 0
             [#
                 for(i in 1..6) {
@@ -99,7 +105,7 @@ QActor parkclientservice context ctxparkmanagerservice {
  		onMsg(carenter : carenter(SLOTNUM)) {
  			[# var SLOTNUM = payloadArg(0).toInt() #]
 			
-			if [# SLOTNUM >= 1 && SLOTNUM <= 6 && ParkingAreaKb.slot.get(SLOTNUM).equals("") #] {
+			if [# SLOTNUM in 1..6 && ParkingAreaKb.slot.get(SLOTNUM).equals("") #] {
 				if [# weightSensor.getWeight() > 0 #] {
 					//Generate token
 					[#
@@ -141,6 +147,65 @@ QActor parkclientservice context ctxparkmanagerservice {
 			
 			//ReplyTo carenter
 	        println("parkclientservice reply")
+	        updateResource [# "parkclientservice reply" #]
+		}
+	}
+	Goto work
+	
+	State handleOutRequest {
+		printCurrentMessage
+		println("parkclientservice reply to reqexit")
+		updateResource [# "parkingclientservice reply to reqexit" #]
+		
+		onMsg(reqexit : reqexit(TOKENID)) {
+			[# var TOKENID = payloadArg(0) #]
+			
+			//Check if the outdoor area is engaged
+			if [# SonarController.isOutdoorFree() #] {
+				//TODO Check if the trolley is available
+				
+				//Retrieve parking slot from the tokenid
+				[# 
+					var SLOTNUM = 0
+					ParkingAreaKb.slot.forEach { (k, v) -> 
+						if(v == TOKENID)
+							SLOTNUM = k
+					}
+				#]
+				if [# SLOTNUM != 0 #] {
+					//Reply with success
+					[# val RESPONSE = Json.encodeToString(Message(0, "Success")) #]
+					replyTo reqenter with exit : $RESPONSE
+					
+					// Send the trolley to the parking slot
+					forward trolley -m moveToPark : moveToPark($SLOTNUM)
+					delay 2000
+					println("parkclientservice moves the car from SLOTNUM = $SLOTNUM")
+					updateResource [# "parkclientservice moves the car from SLOTNUM = $SLOTNUM" #]
+					forward trolley -m moveToOutdoor : moveToOutdoor(outdoor)
+						
+					//Set the slot free
+					[# ParkingAreaKb.slot.set(SLOTNUM, "") #]	
+						
+					//Save state to file
+					[#
+						val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
+						os.writeObject(ParkingAreaKb.slot)
+						os.flush()
+						os.close()
+					#]
+				}
+				else {
+					[# val RESPONSE = Json.encodeToString(Message(4, "Invalid tokenid")) #]
+					replyTo reqenter with exit : $RESPONSE
+				}
+			} else {
+				[# val RESPONSE = Json.encodeToString(Message(5, "The outdoor area is engaged")) #]
+				replyTo reqenter with exit : $RESPONSE
+			}
+				
+			//ReplyTo reqexit
+			println("parkclientservice reply")
 	        updateResource [# "parkclientservice reply" #]
 		}
 	}

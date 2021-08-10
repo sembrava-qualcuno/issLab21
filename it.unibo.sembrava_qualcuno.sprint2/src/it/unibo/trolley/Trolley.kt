@@ -73,8 +73,8 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley at HOME"  
 						)
 					}
-					 transition(edgeName="t03",targetState="working",cond=whenDispatch("moveToIndoor"))
-					transition(edgeName="t04",targetState="working",cond=whenDispatch("moveToPark"))
+					 transition(edgeName="t04",targetState="working",cond=whenDispatch("moveToIndoor"))
+					transition(edgeName="t05",targetState="working",cond=whenDispatch("moveToPark"))
 				}	 
 				state("working") { //this:State
 					action { //it:State
@@ -156,8 +156,8 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 								forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
 						}
 					}
-					 transition(edgeName="t05",targetState="working",cond=whenDispatch("moveToPark"))
-					transition(edgeName="t06",targetState="idle",cond=whenDispatch("goToIdle"))
+					 transition(edgeName="t06",targetState="working",cond=whenDispatch("moveToPark"))
+					transition(edgeName="t07",targetState="idle",cond=whenDispatch("goToIdle"))
 				}	 
 			}
 		}
