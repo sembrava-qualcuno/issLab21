@@ -1,10 +1,9 @@
 package it.unibo.utils.it.unibo.sembrava_qualcuno.sonar
 
-class SonarController {
+class SonarController(sonarInterface: SonarInterface) {
+    private val sonar: SonarInterface = sonarInterface
 
-    companion object {
-        fun isOutdoorFree() : Boolean {
-            return true
-        }
+    fun isOutdoorFree(): Boolean {
+        return !sonar.isEngaged()
     }
 }

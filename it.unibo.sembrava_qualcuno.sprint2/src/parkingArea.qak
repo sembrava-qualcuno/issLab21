@@ -31,7 +31,10 @@ Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 ExternalQActor basicrobot context ctxbasicrobot 
  
 QActor clientservice context ctxparkmanagerservice {
-	[#	val weightSensor : it.unibo.sembrava_qualcuno.weightsensor.WeightSensorInterface = it.unibo.sembrava_qualcuno.weightsensor.CoapWeightSensor("coap://localhost:8025/weightSensor")	#]
+	[#	
+		val weightSensor : it.unibo.sembrava_qualcuno.weightsensor.WeightSensorInterface = it.unibo.sembrava_qualcuno.weightsensor.CoapWeightSensor("coap://localhost:8025/weightSensor")	
+        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"))
+	#]
 	
 	State s0 initial {
 		println("clientservice STARTS")
@@ -161,7 +164,7 @@ QActor clientservice context ctxparkmanagerservice {
 			[# var TOKENID = payloadArg(0) #]
 			
 			//Check if the outdoor area is engaged
-			if [# SonarController.isOutdoorFree() #] {
+			if [# sonarController.isOutdoorFree() #] {
 				//TODO Check if the trolley is available
 				
 				//Retrieve parking slot from the tokenid

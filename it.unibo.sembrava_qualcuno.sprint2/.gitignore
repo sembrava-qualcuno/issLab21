@@ -18,9 +18,6 @@ package-lock.json
 
  # Ignore Gradle project-specific cache directory
 .gradle
-gradlew
-gradlew.bat
-
 
 /ReadMe.html
 .lck/ 

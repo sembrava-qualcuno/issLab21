@@ -3,14 +3,15 @@ package it.unibo.clientservice
 
 import it.unibo.kactor.*
 import alice.tuprolog.*
+import it.unibo.sembrava_qualcuno.model.Message
+import it.unibo.sembrava_qualcuno.sprint1.ParkingAreaKb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import it.unibo.sembrava_qualcuno.sprint1.ParkingAreaKb
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import it.unibo.sembrava_qualcuno.model.Message
-	
+
 class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
@@ -28,7 +29,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						)
 						  
 									val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
-									ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>	
+									ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
@@ -69,7 +70,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						println("clientservice reply enter($SLOTNUM)")
 						updateResourceRep( "$SLOTNUM"  
 						)
-						 val RESPONSE = Json.encodeToString(message)  
+						 val RESPONSE = Json.encodeToString(message)
 						answer("reqenter", "enter", "$RESPONSE"   )  
 					}
 					 transition(edgeName="t01",targetState="work",cond=whenDispatch("goToWork"))
