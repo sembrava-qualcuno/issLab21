@@ -300,10 +300,32 @@
 			</div>
 			<h2>Project</h2>
 				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase and considering the results of <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html#Final outline">Sprint1</a> let's now "zoom-in" or update 
-				the components we require for this sprint: ClientService, Trolley and SonarController and simulator.
+				the components we require for this sprint: SpringController/View, ClientService, Trolley and SonarController and simulator. Furthermore, we want to specify that all what we developed in Sprint1 stand also for this sprint and only changes and updates to it are hereby presented. 
 				
 				<h3>ClientService</h3>
-					
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							<h4>The ClientService as a Moore's Finite State Machine (cont.d)</h4>
+								The ClientService actor is here updated with the code to implement the handleOutRequest state as described in the attached image. To reuse the same high-level message type to instruct the trolley to go to the INDOOR and OUTDOOR area,
+								the moveToIndoor dispatch used during the Sprint1, is replaced by a moveToInOutdoor dispatch. The trolley will distinguish between the two cases using the payload of the message. <br>
+								The barred actions are not part of this sprint and will be developed in Sprint3.
+						</td>
+						<td>  
+							<center><img src="./img/ClientServiceFSM.png" width="100%"></center>
+						</td></tr>
+					</table>
+				<h3>SpringController/View</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							<h4>Using RESTful APIs for the M2M interaction (cont.d)</h4>
+								The REST-API documentation has been updated and can always be found at <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/REST-APIdocs.html">REST-APIdocs.html</a>.
+						</td>
+						<td>
+							<center><img src="./img/APISequenceDiagram.png" width="75%"></center>
+						</td></tr>
+					</table>
 			<h2>Testing</h2>
 			
 			<h2>Sprint Summary</h2>
