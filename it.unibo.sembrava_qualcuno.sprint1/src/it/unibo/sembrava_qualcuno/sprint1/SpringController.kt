@@ -17,42 +17,41 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 class SpringController {
-	final val connParkClientService : connQakBase = connQakTcp()
+    final val connParkClientService: connQakBase = connQakTcp()
 
-	init {
-		connParkClientService.createConnection("localhost", 8023)
-	}
+    init {
+        connParkClientService.createConnection("localhost", 8023)
+    }
 
-	@GetMapping("/client/reqenter")
-	@ResponseBody
-	fun reqenter() : ResponseEntity<ParkingSlot> {
-		var request = MsgUtil.buildRequest("springcontroller", "reqenter", "reqenter(X)", "parkclientservice")
-		val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
+    @GetMapping("/client/reqenter")
+    @ResponseBody
+    fun reqenter(): ResponseEntity<ParkingSlot> {
+        var request = MsgUtil.buildRequest("springcontroller", "reqenter", "reqenter(X)", "parkclientservice")
+        val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
 
-		val message : Message = Json.decodeFromString(reply.msgContent)
+        val message: Message = Json.decodeFromString(reply.msgContent)
 
-		//Error
-		if(message.code != 0)
-			throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
+        //Error
+        if (message.code != 0)
+            throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
 
-		//TODO Se non ci sono posti è un errore?
-		return ResponseEntity.ok(ParkingSlot(message.message.toInt()))
-	}
+        return ResponseEntity.ok(ParkingSlot(message.message.toInt()))
+    }
 
-	@GetMapping("/client/carenter")
-	@ResponseBody
-	fun carenter(@RequestParam slotnum : Int) : ResponseEntity<TokenId> {
-		var request = MsgUtil.buildRequest("springcontroller", "carenter", "carenter($slotnum)", "parkclientservice")
-		val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
-		val message : Message = Json.decodeFromString(reply.msgContent)
-		//Error
-		if(message.code != 0) {
-			if(message.code == 3)
-				throw ApiErrorException(HttpStatus.BAD_REQUEST, ApiError(message.code, message.message))
-			else
-				throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
-		}
+    @GetMapping("/client/carenter")
+    @ResponseBody
+    fun carenter(@RequestParam slotnum: Int): ResponseEntity<TokenId> {
+        var request = MsgUtil.buildRequest("springcontroller", "carenter", "carenter($slotnum)", "parkclientservice")
+        val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
+        val message: Message = Json.decodeFromString(reply.msgContent)
+        //Error
+        if (message.code != 0) {
+            if (message.code == 3)
+                throw ApiErrorException(HttpStatus.BAD_REQUEST, ApiError(message.code, message.message))
+            else
+                throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
+        }
 
-		return ResponseEntity.ok(TokenId(message.message))
-	}
+        return ResponseEntity.ok(TokenId(message.message))
+    }
 }

@@ -26,15 +26,17 @@ Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 ExternalQActor basicrobot context ctxbasicrobot 
  
 QActor parkclientservice context ctxparkmanagerservice {
-	[#	val weightSensor : WeightSensorInterface = CoapWeightSensor("coap:/localhost:8020/weightSensor")	#]
+	[#	val weightSensor : it.unibo.sembrava_qualcuno.weightsensor.WeightSensorInterface = it.unibo.sembrava_qualcuno.weightsensor.CoapWeightSensor("coap://localhost:8025/weightSensor")	#]
 	
 	State s0 initial {
 		println("parkclientservice STARTS")
 		updateResource [# "parkclientservice STARTS" #]
 		
-		//TODO: read state from file
-		[#  val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
-			ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>	#]
+		//Read state from file
+		[#  
+			val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
+			ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>	
+		#]
 	}
 	Goto work
 	
@@ -48,15 +50,14 @@ QActor parkclientservice context ctxparkmanagerservice {
 	State handleEnterRequest {
         printCurrentMessage
         println("parkclientservice reply to reqenter")
-        //updateResource [# "parkclientservice reply to reqenter" #]
-
+        updateResource [# "parkclientservice reply to reqenter" #]
         [# 
             lateinit var message : Message
             var SLOTNUM = 0 #
         ]
 
         //acceptIN
-        if [# weightSensor.getWeight() > 0 #] { //In this sprint the trolley can not be stopped
+        if [# weightSensor.getWeight() == 0 #] { //In this sprint the trolley can not be stopped
             //Get first free parking spot, or 0
             [#
                 for(i in 1..6) {
@@ -74,19 +75,16 @@ QActor parkclientservice context ctxparkmanagerservice {
             [# message = Message(0, "$SLOTNUM") #]
         }
         else {
-            //Reply with slotnum=0 to indicates both indoor area and trolley are occupied
             forward parkclientservice -m goToWork : goToWork(enter($SLOTNUM))
 
             [# message = Message(1, "The indoor area or trolley are engaged") #]
         }
 
         //informIN
+        //ReplyTo reqenter
         println("parkclientservice reply enter($SLOTNUM)")
         updateResource [# "$SLOTNUM" #]
-
         [# val RESPONSE = Json.encodeToString(message) #]
-
-        //replyTo reqenter with enter : enter($SLOTNUM)
         replyTo reqenter with enter : $RESPONSE
     }
     Transition t0
@@ -95,41 +93,55 @@ QActor parkclientservice context ctxparkmanagerservice {
 	
 	State enterthecar {
 		printCurrentMessage		
-		println("parkingclientservice reply to enterthecar")
-		updateResource [# "parkingclientservice reply to enterthecar" #]
+		println("parkclientservice reply to carenter")
+		updateResource [# "parkingclientservice reply to carenter" #]
 		
  		onMsg(carenter : carenter(SLOTNUM)) {
-			[# 
-				var SLOTNUM = payloadArg(0).toInt()
+ 			[# var SLOTNUM = payloadArg(0).toInt() #]
 			
-			if(SLOTNUM >= 1 && SLOTNUM <= 6 && ParkingAreaKb.slot.get(SLOTNUM).equals("") ){
-				//Generate token
-				val sdf = java.text.SimpleDateFormat("dd/MM/yyyy-hh:mm:ss")
-				val currentDate = sdf.format(java.util.Date())	
-				val TOKENID = "$SLOTNUM-$currentDate"
-			#]
-				// Send the trolley to the INDOOR area
-				forward trolley -m moveToIndoor : moveToIndoor(indoor)
-				delay 2000
-				println("parkingclientservice moves the car to SLOTNUM = $SLOTNUM")
-				updateResource [# "parkingclientservice moves the car to SLOTNUM = $SLOTNUM" #]
-				forward trolley -m moveToPark : moveToPark($SLOTNUM)
+			if [# SLOTNUM >= 1 && SLOTNUM <= 6 && ParkingAreaKb.slot.get(SLOTNUM).equals("") #] {
+				if [# weightSensor.getWeight() > 0 #] {
+					//Generate token
+					[#
+						val sdf = java.text.SimpleDateFormat("dd/MM/yyyy-hh:mm:ss")
+						val currentDate = sdf.format(java.util.Date())	
+						val TOKENID = "$SLOTNUM-$currentDate"
+					#]
+					
+					//Reply with the TOKENID
+					[# val RESPONSE = Json.encodeToString(Message(0, "$TOKENID")) #]
+					replyTo carenter with receipt : $RESPONSE
+					
+					// Send the trolley to the INDOOR area
+					forward trolley -m moveToIndoor : moveToIndoor(indoor)
+					delay 2000
+					println("parkclientservice moves the car to SLOTNUM = $SLOTNUM")
+					updateResource [# "parkingclientservice moves the car to SLOTNUM = $SLOTNUM" #]
+					forward trolley -m moveToPark : moveToPark($SLOTNUM)
+						
+					//Set the slot occupied
+					[# ParkingAreaKb.slot.set(SLOTNUM, "$TOKENID") #]
+						
+					//Save state to file
+					[#
+						val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
+						os.writeObject(ParkingAreaKb.slot)
+						os.flush()
+						os.close()
+					#]
+				}
+				else {
+					[# val RESPONSE = Json.encodeToString(Message(2, "The indoor area is free")) #]
+					replyTo carenter with receipt : $RESPONSE
+				}
+			} else {
+				[# val RESPONSE = Json.encodeToString(Message(3, "Invalid parking slot number")) #]
+				replyTo carenter with receipt : $RESPONSE
+			}
 			
-				updateResource [# "$TOKENID" #]
-				//Reply with the TOKENID
-				replyTo carenter with receipt : receipt($TOKENID)	
-			[#
-				ParkingAreaKb.slot.set(SLOTNUM, "$TOKENID") //Set the slot occupied
-				//TODO: save state to file
-				val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
-				os.writeObject(ParkingAreaKb.slot)
-				os.flush()
-				os.close()
-			} else{
-				 val RESPONSE = Json.encodeToString(Message(3, "Invalid parking slot number") )
-			#]
-				 replyTo carenter with receipt : $RESPONSE
-			[#}#]
+			//ReplyTo carenter
+	        println("parkclientservice reply")
+	        updateResource [# "parkclientservice reply" #]
 		}
 	}
 	Goto work
@@ -137,15 +149,15 @@ QActor parkclientservice context ctxparkmanagerservice {
 
 QActor trolley context  ctxtrolley{
 	[#
-			val HOME : Pair<String,String> = Pair("0", "0")
-			val INDOOR : Pair<String,String> = Pair("5", "0")
-			//val OUTDOOR : Pair<String,String> = Pair("5", "4")
-			val SLOT1 : Pair<String,String> = Pair("1", "1")
-			val SLOT2 : Pair<String,String> = Pair("1", "2")
-			val SLOT3 : Pair<String,String> = Pair("1", "3")
-			val SLOT4 : Pair<String,String> = Pair("4", "1")
-			val SLOT5 : Pair<String,String> = Pair("4", "2")
-			val SLOT6 : Pair<String,String> = Pair("4", "3")
+		val HOME : Pair<String,String> = Pair("0", "0")
+		val INDOOR : Pair<String,String> = Pair("6", "0")
+		val OUTDOOR : Pair<String,String> = Pair("6", "5")
+		val SLOT1 : Pair<String,String> = Pair("1", "1")
+		val SLOT2 : Pair<String,String> = Pair("1", "2")
+		val SLOT3 : Pair<String,String> = Pair("1", "3")
+		val SLOT4 : Pair<String,String> = Pair("4", "1")
+		val SLOT5 : Pair<String,String> = Pair("4", "2")
+		val SLOT6 : Pair<String,String> = Pair("4", "3")
 	#]
 	 
 	State s0 initial {
@@ -173,7 +185,7 @@ QActor trolley context  ctxtrolley{
 					when(mv){
 						"w" ->
 			#] 
-						request basicrobot -m step : step(330)
+						request basicrobot -m step : step(340)
 						[#
 							"s" ->
 						#]
@@ -190,33 +202,31 @@ QActor trolley context  ctxtrolley{
 							else -> {println("Command error")}
 						#]
 					[# } //end when
-						delay(330)
+						delay(340)
 						itunibo.planner.plannerUtil.updateMap(mv)
 						mv = itunibo.planner.plannerUtil.getNextPlannedMove()
 					#]//end when	
 				[#}#]//end while
 		[#}#] // end if
 		
-		run itunibo.planner.plannerUtil.saveRoomMap("parkingMap")
+		//run itunibo.planner.plannerUtil.saveRoomMap("parkingMap")
 		println("trolley at HOME")
-		/*
-		 * USE FOR TESTS
-		 * updateResource [# "trolley at HOME" #] 
-		*/
+		updateResource [# "trolley at HOME" #] 
+		
 	}
 	Transition t0
+		whenMsg moveToIndoor -> working
 		whenMsg moveToPark -> working
 	
 	State working {
 		printCurrentMessage
 		println("trolley WORKING")
-		updateResource [# "trolley WORKING" #]
+		//updateResource [# "trolley WORKING" #]
 		
 		onMsg(moveToIndoor : moveToIndoor(WHERE)) {
-			println("trolley moveToIndoor")
-			updateResource [# "trolley moveToIndoor" #]
 			//Move the trolley to the INDOOR area
 			println("trolley trip to INDOOR start")
+			updateResource [# "trolley trip to INDOOR start" #]
 			[#
 				itunibo.planner.plannerUtil.planForGoal(INDOOR.first,INDOOR.second)
 				var mv : String = itunibo.planner.plannerUtil.getNextPlannedMove()
@@ -224,7 +234,7 @@ QActor trolley context  ctxtrolley{
 					when(mv){
 						"w" ->
 			#] 
-						request basicrobot -m step : step(330)
+						request basicrobot -m step : step(340)
 						[#
 							"s" ->
 						#]
@@ -241,15 +251,19 @@ QActor trolley context  ctxtrolley{
 							else -> {println("Command error")}
 						#]
 					[# } //end when
-						delay(330)
+						delay(340)
 						itunibo.planner.plannerUtil.updateMap(mv)
 						mv = itunibo.planner.plannerUtil.getNextPlannedMove()
 					#]//end when	
 				[#}#]//end while 
-				run itunibo.planner.plannerUtil.saveRoomMap("parkingMap")
-			}
-			//Trolley could be stopped in between these trips -> SPRINT4
-			onMsg(moveToPark : moveToPark(SLOTNUM)) {
+				
+				//run itunibo.planner.plannerUtil.saveRoomMap("parkingMap")
+				println("trolley trip to INDOOR end")
+				updateResource [# "trolley trip to INDOOR end" #]
+		}
+		
+		//Trolley could be stopped in between these trips -> SPRINT4
+		onMsg(moveToPark : moveToPark(SLOTNUM)) {
 			[# var SLOTNUM = payloadArg(0).toInt() #]
 			println("trolley moveToPark($SLOTNUM)")
 			updateResource [# "trolley moveToPark($SLOTNUM)" #]
@@ -270,7 +284,7 @@ QActor trolley context  ctxtrolley{
 					when(mv){
 						"w" ->
 			#] 
-						request basicrobot -m step : step(330)
+						request basicrobot -m step : step(340)
 						[#
 							"s" ->
 						#]
@@ -287,23 +301,22 @@ QActor trolley context  ctxtrolley{
 							else -> {println("Command error")}
 						#]
 					[# } //end when
-						delay(330)
+						delay(340)
 						itunibo.planner.plannerUtil.updateMap(mv)
 						mv = itunibo.planner.plannerUtil.getNextPlannedMove()
+						
 					#]//end when	
 				[#}#]//end while 
-				/*
-		 	* USE FOR TESTS
-		 	* updateResource [# "trolley trip to park slot $SLOTNUM end" #] 
-			*/
+			
+		 	updateResource [# "trolley trip to park slot $SLOTNUM end" #] 
 			println("trolley trip to park slot $SLOTNUM end")
 			forward trolley -m goToIdle : goToIdle(X)
-			}
-			
-		run itunibo.planner.plannerUtil.saveRoomMap("parkingMap")
+		}
+		
+		//run itunibo.planner.plannerUtil.saveRoomMap("parkingMap")
 	}
 	Transition t0
-		whenMsg goToIdle -> idle
 		whenMsg moveToPark -> working
+		whenMsg goToIdle -> idle
+		
 }
- 

@@ -8,7 +8,8 @@ class MessageUtilTest {
 
     @Test
     fun messageFromStringTest() {
-        val messageString = "msg(enter,reply,parkclientservice,springcontroller,'{\"code\":1,\"message\":\"The indoor area or trolley are engaged\"}',16)"
+        val messageString =
+            "msg(enter,reply,parkclientservice,springcontroller,'{\"code\":1,\"message\":\"The indoor area or trolley are engaged\"}',16)"
         val message = ApplMessageUtil.messageFromString(messageString)
 
         Assert.assertEquals("enter", message.msgId)

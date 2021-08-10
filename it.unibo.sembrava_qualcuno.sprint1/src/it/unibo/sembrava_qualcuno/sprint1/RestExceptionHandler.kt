@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 class RestExceptionHandler : ResponseEntityExceptionHandler() {
-	
-	@ExceptionHandler(ApiErrorException::class)
-	fun handleApiErrorException(e : ApiErrorException) : ResponseEntity<Any> {
-		return ResponseEntity.status(e.status).body(e.apiError)
-   }
+
+    @ExceptionHandler(ApiErrorException::class)
+    fun handleApiErrorException(e: ApiErrorException): ResponseEntity<Any> {
+        return ResponseEntity.status(e.status).body(e.apiError)
+    }
 }

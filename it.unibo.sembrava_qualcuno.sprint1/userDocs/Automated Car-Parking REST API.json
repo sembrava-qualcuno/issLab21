@@ -90,7 +90,7 @@
             }
           },
           "403": {
-            "description": "The service can't perform this operation at the moment:\n- The indoor area is free\n - No reqenter request has been sent",
+            "description": "The service can't perform this operation at the moment:\n- The indoor area is free",
             "schema": {
               "$ref": "#/definitions/ApiError"
             }

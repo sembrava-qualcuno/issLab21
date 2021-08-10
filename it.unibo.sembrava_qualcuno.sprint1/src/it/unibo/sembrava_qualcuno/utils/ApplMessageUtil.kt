@@ -5,7 +5,7 @@ import java.util.*
 
 class ApplMessageUtil {
     companion object {
-        fun messageFromString(message : String) : ApplMessage  {
+        fun messageFromString(message: String): ApplMessage {
             val st = StringTokenizer(message.substringAfter("msg(").substringBefore(")"), ",")
             val msgId = st.nextToken()
             val msgType = st.nextToken()
