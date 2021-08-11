@@ -1,6 +1,7 @@
 System carparking
 
-//INDOOR CLIENT SERVICE
+//CLIENT SERVICE
+
 //acceptIN
 Request reqenter : reqenter(X)
 Reply   enter    : enter(MESSAGE)
@@ -11,16 +12,17 @@ Reply   receipt  : receipt(MESSAGE)
 
 Dispatch goToWork : goToWork(X)
 
-//OUTDOOR CLIENT SERVICE
+//acceptOut
 Request reqexit : reqexit(TOKENID)
 Reply 	exit 	: exit(X)
 
-Dispatch moveToIndoor : moveToIndoor(X)
+Dispatch moveToInOutdoor : moveToInOutdoor(WHERE)
 Dispatch moveToPark : moveToPark(SLOTNUM)
-Dispatch moveToOutdoor : moveToOutdoor(X)
 
 //TROLLEY
 Dispatch goToIdle : goToIdle(X)
+Dispatch stop	 : stop(X)
+Dispatch resume : resume(X)	
 Dispatch cmd       : cmd(MOVE)     
 Request step       : step( TIME )	
 
@@ -34,6 +36,7 @@ QActor clientservice context ctxparkmanagerservice {
 	[#	
 		val weightSensor : it.unibo.sembrava_qualcuno.weightsensor.WeightSensorInterface = it.unibo.sembrava_qualcuno.weightsensor.CoapWeightSensor("coap://localhost:8025/weightSensor")	
         val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"))
+        val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
 	#]
 	
 	State s0 initial {
@@ -66,7 +69,10 @@ QActor clientservice context ctxparkmanagerservice {
         ]
 
         //acceptIN
-        if [# weightSensor.getWeight() == 0 #] { //TODO Add check if trolley is available
+        if [# weightSensor.getWeight() == 0 /* && 
+        		trolleyRequest.get().getResponseText() != ("trolley STOPPED")*/
+        	#] { 
+        		
             //Get first free parking spot, or 0
             [#
                 for(i in 1..6) {
@@ -86,7 +92,7 @@ QActor clientservice context ctxparkmanagerservice {
         else {
             forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
 
-            [# message = Message(1, "The indoor area or trolley are engaged") #]
+            [# message = Message(1, "The indoor area is engaged or the trolley is stopped") #]
         }
 
         //informIN
@@ -122,7 +128,7 @@ QActor clientservice context ctxparkmanagerservice {
 					replyTo carenter with receipt : $RESPONSE
 					
 					// Send the trolley to the INDOOR area
-					forward trolley -m moveToIndoor : moveToIndoor(indoor)
+					forward trolley -m moveToInOutdoor : moveToInOutdoor(indoor)
 					delay 2000
 					println("clientservice moves the car to SLOTNUM = $SLOTNUM")
 					updateResource [# "parkingclientservice moves the car to SLOTNUM = $SLOTNUM" #]
@@ -165,41 +171,47 @@ QActor clientservice context ctxparkmanagerservice {
 			
 			//Check if the outdoor area is engaged
 			if [# sonarController.isOutdoorFree() #] {
-				//TODO Check if the trolley is available
+				if [# trolleyRequest.get().getResponseText() != ("trolley STOPPED") #]{
 				
-				//Retrieve parking slot from the tokenid
-				[# 
-					var SLOTNUM = 0
-					ParkingAreaKb.slot.forEach { (k, v) -> 
-						if(v == TOKENID)
-							SLOTNUM = k
-					}
-				#]
-				if [# SLOTNUM != 0 #] {
-					//Reply with success
-					[# val RESPONSE = Json.encodeToString(Message(0, "Success")) #]
-					replyTo reqenter with exit : $RESPONSE
-					
-					// Send the trolley to the parking slot
-					forward trolley -m moveToPark : moveToPark($SLOTNUM)
-					delay 2000
-					println("clientservice moves the car from SLOTNUM = $SLOTNUM")
-					updateResource [# "clientservice moves the car from SLOTNUM = $SLOTNUM" #]
-					forward trolley -m moveToOutdoor : moveToOutdoor(outdoor)
-						
-					//Set the slot free
-					[# ParkingAreaKb.slot.set(SLOTNUM, "") #]	
-						
-					//Save state to file
-					[#
-						val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
-						os.writeObject(ParkingAreaKb.slot)
-						os.flush()
-						os.close()
+					//Retrieve parking slot from the tokenid
+					[# 
+						var SLOTNUM = 0
+						ParkingAreaKb.slot.forEach { (k, v) -> 
+							if(v == TOKENID)
+								SLOTNUM = k
+						}
 					#]
+					
+					if [# SLOTNUM != 0 #] {
+						//Reply with success
+						[# val RESPONSE = Json.encodeToString(Message(0, "Success")) #]
+						replyTo reqenter with exit : $RESPONSE
+					
+						// Send the trolley to the parking slot
+						forward trolley -m moveToPark : moveToPark($SLOTNUM)
+						delay 2000
+						println("clientservice moves the car from SLOTNUM = $SLOTNUM")
+						updateResource [# "clientservice moves the car from SLOTNUM = $SLOTNUM" #]
+						forward trolley -m moveToInOutdoor : moveToInOutdoor(outdoor)
+						
+						//Set the slot free
+						[# ParkingAreaKb.slot.set(SLOTNUM, "") #]	
+						
+						//Save state to file
+						[#
+							val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
+							os.writeObject(ParkingAreaKb.slot)
+							os.flush()
+							os.close()
+						#]
+					}
+					else {
+						[# val RESPONSE = Json.encodeToString(Message(4, "Invalid tokenid")) #]
+						replyTo reqenter with exit : $RESPONSE
+					}					
 				}
-				else {
-					[# val RESPONSE = Json.encodeToString(Message(4, "Invalid tokenid")) #]
+				else{
+					[# val RESPONSE = Json.encodeToString(Message(6, "The trolley is stopped")) #]
 					replyTo reqenter with exit : $RESPONSE
 				}
 			} else {
@@ -226,6 +238,7 @@ QActor trolley context  ctxtrolley{
 		val SLOT4 : Pair<String,String> = Pair("4", "1")
 		val SLOT5 : Pair<String,String> = Pair("4", "2")
 		val SLOT6 : Pair<String,String> = Pair("4", "3")
+		var currState : String = "INIT"
 	#]
 	 
 	State s0 initial {
@@ -244,7 +257,7 @@ QActor trolley context  ctxtrolley{
 	State idle {
 		println("trolley IDLE")
 		updateResource [# "trolley IDLE" #]
-		
+		[# currState = "IDLE" #]
 		//Moves the trolley to the home position if not there already
 		[# if(!itunibo.planner.plannerUtil.atHome()){
 				itunibo.planner.plannerUtil.planForGoal(HOME.first, HOME.second)
@@ -283,20 +296,41 @@ QActor trolley context  ctxtrolley{
 		
 	}
 	Transition t0
-		whenMsg moveToIndoor -> working
+		whenMsg moveToInOutdoor -> working
 		whenMsg moveToPark -> working
+		whenMsg stop -> stopped
+		whenMsg goToIdle -> idle
 	
 	State working {
 		printCurrentMessage
 		println("trolley WORKING")
 		//updateResource [# "trolley WORKING" #]
 		
-		onMsg(moveToIndoor : moveToIndoor(WHERE)) {
-			//Move the trolley to the INDOOR area
-			println("trolley trip to INDOOR start")
-			updateResource [# "trolley trip to INDOOR start" #]
+		onMsg(moveToInOutdoor : moveToInOutdoor(WHERE)) {
+			
+			[# var WHERE = payloadArg(0) #]
+			
+			if [# $WHERE.equals("indoor") #]{
+				//Move the trolley to the INDOOR area
+				println("trolley trip to INDOOR start")
+				updateResource [# "trolley trip to INDOOR start" #]
+				[# 
+					itunibo.planner.plannerUtil.planForGoal(INDOOR.first,INDOOR.second) 
+					currState = "INDOOR"
+				#]
+			}
+			
+			if [# $WHERE.equals("outdoor") #]{
+				//Move the trolley to the OUTDOOR area
+				println("trolley trip to OUTDOOR start")
+				updateResource [# "trolley trip to OUTDOOR start" #]
+				[# 
+					itunibo.planner.plannerUtil.planForGoal(OUTDOOR.first,OUTDOOR.second) 
+					currState = "OUTDOOR"
+				#]
+			} 
+			
 			[#
-				itunibo.planner.plannerUtil.planForGoal(INDOOR.first,INDOOR.second)
 				var mv : String = itunibo.planner.plannerUtil.getNextPlannedMove()
 				while(! mv.equals("")){
 					when(mv){
@@ -326,13 +360,27 @@ QActor trolley context  ctxtrolley{
 				[#}#]//end while 
 				
 				//run itunibo.planner.plannerUtil.saveRoomMap("parkingMap")
-				println("trolley trip to INDOOR end")
-				updateResource [# "trolley trip to INDOOR end" #]
+				if [# $WHERE.equals("outdoor") #]{
+					println("trolley trip to OUTDOOR end")
+					updateResource [# "trolley trip to OUTDOOR end" #]
+					forward trolley -m goToIdle : goToIdle(X)
+				
+				}
+				if [# $WHERE.equals("indoor") #]{
+					println("trolley trip to INDOOR end")
+					updateResource [# "trolley trip to INDOOR end" #]
+				}
 		}
 		
 		//Trolley could be stopped in between these trips -> SPRINT4
 		onMsg(moveToPark : moveToPark(SLOTNUM)) {
-			[# var SLOTNUM = payloadArg(0).toInt() #]
+			[# 
+				var SLOTNUM = payloadArg(0).toInt()
+				if( currState.equals("INDOOR"))
+					currState = "PARKIN"
+				else
+					currState = "PARKOUT"
+			#]
 			println("trolley moveToPark($SLOTNUM)")
 			updateResource [# "trolley moveToPark($SLOTNUM)" #]
 			
@@ -378,13 +426,28 @@ QActor trolley context  ctxtrolley{
 			
 		 	updateResource [# "trolley trip to park slot $SLOTNUM end" #] 
 			println("trolley trip to park slot $SLOTNUM end")
-			forward trolley -m goToIdle : goToIdle(X)
+			if [# currState.equals("PARKIN") #]{
+				forward trolley -m goToIdle : goToIdle(X)
+			}
 		}
 		
 		//run itunibo.planner.plannerUtil.saveRoomMap("parkingMap")
 	}
 	Transition t0
 		whenMsg moveToPark -> working
+		whenMsg moveToInOutdoor -> working
 		whenMsg goToIdle -> idle
+		whenMsg stop -> stopped
+	
+	State stopped {
+		println("trolley STOPPED")
+		updateResource [# "trolley STOPPED" #]
+	}
+	Transition t0
+		whenMsg resume and [# currState.equals("INDOOR") #] -> working
+		whenMsg resume and [# currState.equals("PARKOUT") #] -> working
+		whenMsg resume and [# currState.equals("PARKIN") #] -> idle
+		whenMsg resume and [# currState.equals("OUTDOOR") #] -> idle
+		whenMsg resume and [# currState.equals("IDLE") #] -> idle
 		
 }

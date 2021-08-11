@@ -3,17 +3,11 @@ package it.unibo.clientservice
 
 import it.unibo.kactor.*
 import alice.tuprolog.*
-import it.unibo.sembrava_qualcuno.model.Message
-import it.unibo.sembrava_qualcuno.sprint2.ParkingAreaKb
-import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.CoapSonar
-import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.SonarController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-
+	
 class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
@@ -25,6 +19,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 			
 				val weightSensor : it.unibo.sembrava_qualcuno.weightsensor.WeightSensorInterface = it.unibo.sembrava_qualcuno.weightsensor.CoapWeightSensor("coap://localhost:8025/weightSensor")	
 		        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"))
+		        val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -33,7 +28,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						)
 						  
 									val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
-									ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>
+									ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>	
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
@@ -55,7 +50,8 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						 
 						            lateinit var message : Message
 						            var SLOTNUM = 0  
-						if(  weightSensor.getWeight() == 0  
+						if(  weightSensor.getWeight() == 0 /* && 
+						        		trolleyRequest.get().getResponseText() != ("trolley STOPPED")*/
 						 ){
 						                for(i in 1..6) {
 						                    if(ParkingAreaKb.slot.get(i).equals("")) {
@@ -70,12 +66,12 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						}
 						else
 						 {forward("goToWork", "goToWork(enter($SLOTNUM))" ,"clientservice" ) 
-						  message = Message(1, "The indoor area or trolley are engaged")  
+						  message = Message(1, "The indoor area is engaged or the trolley is stopped")  
 						 }
 						println("clientservice reply enter($SLOTNUM)")
 						updateResourceRep( "$SLOTNUM"  
 						)
-						 val RESPONSE = Json.encodeToString(message)
+						 val RESPONSE = Json.encodeToString(message)  
 						answer("reqenter", "enter", "$RESPONSE"   )  
 					}
 					 transition(edgeName="t02",targetState="work",cond=whenDispatch("goToWork"))
@@ -98,7 +94,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 														val TOKENID = "$SLOTNUM-$currentDate"
 								 val RESPONSE = Json.encodeToString(Message(0, "$TOKENID"))  
 								answer("carenter", "receipt", "$RESPONSE"   )  
-								forward("moveToIndoor", "moveToIndoor(indoor)" ,"trolley" ) 
+								forward("moveToInOutdoor", "moveToInOutdoor(indoor)" ,"trolley" ) 
 								delay(2000) 
 								println("clientservice moves the car to SLOTNUM = $SLOTNUM")
 								updateResourceRep( "parkingclientservice moves the car to SLOTNUM = $SLOTNUM"  
@@ -137,12 +133,13 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var TOKENID = payloadArg(0)  
 								if(  sonarController.isOutdoorFree()  
+								 ){if(  trolleyRequest.get().getResponseText() != ("trolley STOPPED")  
 								 ){ 
-													var SLOTNUM = 0
-													ParkingAreaKb.slot.forEach { (k, v) -> 
-														if(v == TOKENID)
-															SLOTNUM = k
-													}
+														var SLOTNUM = 0
+														ParkingAreaKb.slot.forEach { (k, v) -> 
+															if(v == TOKENID)
+																SLOTNUM = k
+														}
 								if(  SLOTNUM != 0  
 								 ){ val RESPONSE = Json.encodeToString(Message(0, "Success"))  
 								answer("reqenter", "exit", "$RESPONSE"   )  
@@ -151,16 +148,21 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								println("clientservice moves the car from SLOTNUM = $SLOTNUM")
 								updateResourceRep( "clientservice moves the car from SLOTNUM = $SLOTNUM"  
 								)
-								forward("moveToOutdoor", "moveToOutdoor(outdoor)" ,"trolley" ) 
+								forward("moveToInOutdoor", "moveToInOutdoor(outdoor)" ,"trolley" ) 
 								 ParkingAreaKb.slot.set(SLOTNUM, "")  
 								
-														val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
-														os.writeObject(ParkingAreaKb.slot)
-														os.flush()
-														os.close()
+															val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
+															os.writeObject(ParkingAreaKb.slot)
+															os.flush()
+															os.close()
 								}
 								else
 								 { val RESPONSE = Json.encodeToString(Message(4, "Invalid tokenid"))  
+								 answer("reqenter", "exit", "$RESPONSE"   )  
+								 }
+								}
+								else
+								 { val RESPONSE = Json.encodeToString(Message(6, "The trolley is stopped"))  
 								 answer("reqenter", "exit", "$RESPONSE"   )  
 								 }
 								}

@@ -26,6 +26,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 				val SLOT4 : Pair<String,String> = Pair("4", "1")
 				val SLOT5 : Pair<String,String> = Pair("4", "2")
 				val SLOT6 : Pair<String,String> = Pair("4", "3")
+				var currState : String = "INIT"
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -45,6 +46,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						println("trolley IDLE")
 						updateResourceRep( "trolley IDLE"  
 						)
+						 currState = "IDLE"  
 						 if(!itunibo.planner.plannerUtil.atHome()){
 										itunibo.planner.plannerUtil.planForGoal(HOME.first, HOME.second)
 										var mv : String = itunibo.planner.plannerUtil.getNextPlannedMove()
@@ -73,20 +75,35 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley at HOME"  
 						)
 					}
-					 transition(edgeName="t04",targetState="working",cond=whenDispatch("moveToIndoor"))
+					 transition(edgeName="t04",targetState="working",cond=whenDispatch("moveToInOutdoor"))
 					transition(edgeName="t05",targetState="working",cond=whenDispatch("moveToPark"))
+					transition(edgeName="t06",targetState="stopped",cond=whenDispatch("stop"))
+					transition(edgeName="t07",targetState="idle",cond=whenDispatch("goToIdle"))
 				}	 
 				state("working") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						println("trolley WORKING")
-						if( checkMsgContent( Term.createTerm("moveToIndoor(X)"), Term.createTerm("moveToIndoor(WHERE)"), 
+						if( checkMsgContent( Term.createTerm("moveToInOutdoor(WHERE)"), Term.createTerm("moveToInOutdoor(WHERE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								println("trolley trip to INDOOR start")
+								 var WHERE = payloadArg(0)  
+								if(  $WHERE.equals("indoor")  
+								 ){println("trolley trip to INDOOR start")
 								updateResourceRep( "trolley trip to INDOOR start"  
 								)
+								 
+													itunibo.planner.plannerUtil.planForGoal(INDOOR.first,INDOOR.second) 
+													currState = "INDOOR"
+								}
+								if(  $WHERE.equals("outdoor")  
+								 ){println("trolley trip to OUTDOOR start")
+								updateResourceRep( "trolley trip to OUTDOOR start"  
+								)
+								 
+													itunibo.planner.plannerUtil.planForGoal(OUTDOOR.first,OUTDOOR.second) 
+													currState = "OUTDOOR"
+								}
 								
-												itunibo.planner.plannerUtil.planForGoal(INDOOR.first,INDOOR.second)
 												var mv : String = itunibo.planner.plannerUtil.getNextPlannedMove()
 												while(! mv.equals("")){
 													when(mv){
@@ -108,13 +125,26 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 														itunibo.planner.plannerUtil.updateMap(mv)
 														mv = itunibo.planner.plannerUtil.getNextPlannedMove()
 								} 
-								println("trolley trip to INDOOR end")
+								if(  $WHERE.equals("outdoor")  
+								 ){println("trolley trip to OUTDOOR end")
+								updateResourceRep( "trolley trip to OUTDOOR end"  
+								)
+								forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
+								}
+								if(  $WHERE.equals("indoor")  
+								 ){println("trolley trip to INDOOR end")
 								updateResourceRep( "trolley trip to INDOOR end"  
 								)
+								}
 						}
 						if( checkMsgContent( Term.createTerm("moveToPark(SLOTNUM)"), Term.createTerm("moveToPark(SLOTNUM)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 var SLOTNUM = payloadArg(0).toInt()  
+								 
+												var SLOTNUM = payloadArg(0).toInt()
+												if( currState.equals("INDOOR"))
+													currState = "PARKIN"
+												else
+													currState = "PARKOUT"
 								println("trolley moveToPark($SLOTNUM)")
 								updateResourceRep( "trolley moveToPark($SLOTNUM)"  
 								)
@@ -153,11 +183,32 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 								updateResourceRep( "trolley trip to park slot $SLOTNUM end"  
 								)
 								println("trolley trip to park slot $SLOTNUM end")
-								forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
+								if(  currState.equals("PARKIN")  
+								 ){forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
+								}
 						}
 					}
-					 transition(edgeName="t06",targetState="working",cond=whenDispatch("moveToPark"))
-					transition(edgeName="t07",targetState="idle",cond=whenDispatch("goToIdle"))
+					 transition(edgeName="t08",targetState="working",cond=whenDispatch("moveToPark"))
+					transition(edgeName="t09",targetState="working",cond=whenDispatch("moveToInOutdoor"))
+					transition(edgeName="t010",targetState="idle",cond=whenDispatch("goToIdle"))
+					transition(edgeName="t011",targetState="stopped",cond=whenDispatch("stop"))
+				}	 
+				state("stopped") { //this:State
+					action { //it:State
+						println("trolley STOPPED")
+						updateResourceRep( "trolley STOPPED"  
+						)
+					}
+					 transition(edgeName="t012",targetState="working",cond=whenDispatchGuarded("resume",{ currState.equals("INDOOR")  
+					}))
+					transition(edgeName="t013",targetState="working",cond=whenDispatchGuarded("resume",{ currState.equals("PARKOUT")  
+					}))
+					transition(edgeName="t014",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("PARKIN")  
+					}))
+					transition(edgeName="t015",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("OUTDOOR")  
+					}))
+					transition(edgeName="t016",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("IDLE")  
+					}))
 				}	 
 			}
 		}
