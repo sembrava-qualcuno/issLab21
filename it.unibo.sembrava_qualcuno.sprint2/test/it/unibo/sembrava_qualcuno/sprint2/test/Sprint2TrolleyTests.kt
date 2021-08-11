@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class Sprint1TrolleyTests {
+class Sprint2TrolleyTests {
 
     @Autowired
     lateinit var mockMvc : MockMvc

@@ -58,6 +58,17 @@ class SpringController {
     @GetMapping("/client/reqexit")
     @ResponseBody
     fun reqexit(@RequestParam tokenid: String) {
+        var request = MsgUtil.buildRequest("springcontroller", "reqexit", "reqexit($tokenid)", "clientservice")
+        val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
+        val message: Message = Json.decodeFromString(reply.msgContent)
+        //Error
+        if (message.code != 0) {
+            if (message.code == 4)
+                throw ApiErrorException(HttpStatus.BAD_REQUEST, ApiError(message.code, message.message))
+            else
+                throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
+        }
 
+        return
     }
 }

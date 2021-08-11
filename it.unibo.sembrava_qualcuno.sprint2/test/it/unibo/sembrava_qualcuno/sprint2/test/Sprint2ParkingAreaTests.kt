@@ -6,6 +6,7 @@ import it.unibo.sembrava_qualcuno.model.ParkingSlot
 import it.unibo.sembrava_qualcuno.model.TokenId
 import it.unibo.sembrava_qualcuno.sprint2.ParkingAreaKb
 import it.unibo.sembrava_qualcuno.weightsensor.WeightSensorMock
+import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.SonarMock
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -28,7 +29,7 @@ import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class Sprint1ParkingAreaTests {
+class Sprint2ParkingAreaTests {
 
     @Autowired
     lateinit var mockMvc: MockMvc
@@ -38,6 +39,7 @@ class Sprint1ParkingAreaTests {
         val channelSyncStart = Channel<String>()
         val actors: Array<String> = arrayOf("clientservice")
         val weightSensor = WeightSensorMock(8025, 1000)
+        val sonarMock = SonarMock(8026, false)
 
         @JvmStatic
         @BeforeAll
@@ -87,6 +89,8 @@ class Sprint1ParkingAreaTests {
         ParkingAreaKb.slot = mutableMapOf(1 to "", 2 to "", 3 to "", 4 to "", 5 to "", 6 to "")
         // Reset the weight sensor
         weightSensor.updateResource(0)
+        // Reset the sonar
+        sonarMock.updateResource(false)
     }
 
     @AfterEach
@@ -200,5 +204,32 @@ class Sprint1ParkingAreaTests {
         )
 
         assertTrue(tokenId1 != tokenId2)
+    }
+
+    @Test
+    fun testExitRequest() {
+        ParkingAreaKb.slot.set(1, "TOKENID")
+
+        //Send reqexit
+        mockMvc.perform(get("/client/reqexit?tokenid=TOKENID")).andDo(print()).andExpect(status().isOk)
+    }
+
+    @Test
+    fun testInvalidTokenid() {
+        ParkingAreaKb.slot.set(1, "TOKENID")
+
+        //Send reqexit
+        mockMvc.perform(get("/client/reqexit?tokenid=BADTOKENID")).andDo(print()).andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun testOutdoorAreaEngaged() {
+        ParkingAreaKb.slot.set(1, "TOKENID")
+
+        //Set the outdoor area engaged
+        sonarMock.updateResource(true)
+
+        //Send reqexit
+        mockMvc.perform(get("/client/reqexit?tokenid=TOKENID")).andDo(print()).andExpect(status().isForbidden)
     }
 }
