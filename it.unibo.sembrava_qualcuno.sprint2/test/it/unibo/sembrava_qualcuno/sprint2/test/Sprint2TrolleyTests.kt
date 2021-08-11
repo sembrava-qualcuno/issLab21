@@ -1,11 +1,16 @@
 package it.unibo.sembrava_qualcuno.sprint2.test
 
+import it.unibo.connQak.connQakBase
+import it.unibo.connQak.connQakTcp
 import it.unibo.kactor.ActorBasic
+import it.unibo.kactor.MsgUtil
 import it.unibo.kactor.QakContext
 import it.unibo.sembrava_qualcuno.model.ParkingSlot
 import it.unibo.sembrava_qualcuno.model.TokenId
 import it.unibo.sembrava_qualcuno.sprint2.ParkingAreaKb
+import it.unibo.sembrava_qualcuno.utils.ApplMessageUtil
 import it.unibo.sembrava_qualcuno.weightsensor.WeightSensorMock
+import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.SonarMock
 import itunibo.planner.plannerUtil
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
@@ -23,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @SpringBootTest
@@ -40,6 +46,8 @@ class Sprint2TrolleyTests {
         var myactor : ActorBasic? = null
         var counter = 1
         val weightSensor = WeightSensorMock(8025, 1000)
+        val sonarMock = SonarMock(8026, false)
+        val connParkClientService: connQakBase = connQakTcp()
 
         @JvmStatic
         @BeforeAll
@@ -90,14 +98,18 @@ class Sprint2TrolleyTests {
         ParkingAreaKb.slot = mutableMapOf(1 to "", 2 to "", 3 to "", 4 to "", 5 to "", 6 to "")
         // Reset the weight sensor
         weightSensor.updateResource(0)
+        // Reset the sonar
+        sonarMock.updateResource(false)
     }
 
     @AfterEach
-    fun removeObs(){
+    fun removeObs(testInfo: TestInfo){
         println("+++++++++ AFTERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR  ${testingObserver!!.name}")
 
-        testingObserver!!.terminate()
-        testingObserver = null
+        if(!testInfo.tags.contains("NoObserve")) {
+            testingObserver!!.terminate()
+            testingObserver = null
+        }
 
         runBlocking{
             delay(1000)
@@ -139,6 +151,129 @@ class Sprint2TrolleyTests {
             assertEquals("trolley at HOME", channelForObserver.receive())
 
             assertTrue(plannerUtil.atPos(0, 0))
+        }
+    }
+
+    @Test
+    fun testTrolleyMovedToOutdoorArea() {
+        ParkingAreaKb.slot.set(1, "TOKENID")
+
+        //Send reqexit
+        mockMvc.perform(MockMvcRequestBuilders.get("/client/reqexit?tokenid=TOKENID")).andDo(MockMvcResultHandlers.print()).andExpect(
+            MockMvcResultMatchers.status().isOk)
+
+        runBlocking {
+            val channelForObserver = Channel<String>()
+            testingObserver!!.addObserver(channelForObserver)
+
+            assertEquals("trolley moveToPark(1)", channelForObserver.receive())
+            assertEquals("trolley trip to park slot 1 end", channelForObserver.receive())
+
+            assertTrue(plannerUtil.atPos(1, 1))
+
+            assertEquals("trolley trip to OUTDOOR start", channelForObserver.receive())
+            assertEquals("trolley trip to OUTDOOR end", channelForObserver.receive())
+
+            assertTrue(plannerUtil.atPos(6, 4))
+
+            assertEquals("trolley IDLE", channelForObserver.receive())
+            assertEquals("trolley at HOME", channelForObserver.receive())
+
+            assertTrue(plannerUtil.atPos(0, 0))
+        }
+    }
+
+    @Test
+    //@Tag("NoObserve")
+    fun testAcceptOutdoorRequestOnAvailable() {
+        connParkClientService.createConnection("localhost", 8024)
+
+        ParkingAreaKb.slot.set(1, "TOKENID")
+
+        //Send stop
+        val stopDispatch = MsgUtil.buildDispatch("springcontroller", "stop", "stop()", "trolley")
+        connParkClientService.forward(stopDispatch)
+
+        runBlocking {
+            val channelForObserver = Channel<String>()
+            testingObserver!!.addObserver(channelForObserver)
+
+            assertEquals("trolley at HOME", channelForObserver.receive())
+            assertEquals("trolley STOPPED", channelForObserver.receive())
+        }
+
+        //Send reqexit
+        mockMvc.perform(MockMvcRequestBuilders.get("/client/reqexit?tokenid=TOKENID")).andDo(MockMvcResultHandlers.print()).andExpect(
+            MockMvcResultMatchers.status().isForbidden)
+    }
+
+    @Test
+    fun testNoAcceptAfterResume() {
+        connParkClientService.createConnection("localhost", 8024)
+
+        ParkingAreaKb.slot.set(1, "TOKENID")
+
+        //Send stop
+        val stopDispatch = MsgUtil.buildDispatch("springcontroller", "stop", "stop()", "trolley")
+        connParkClientService.forward(stopDispatch)
+
+        val channelForObserver = Channel<String>()
+        testingObserver!!.addObserver(channelForObserver)
+
+        runBlocking {
+            assertEquals("trolley STOPPED", channelForObserver.receive())
+        }
+
+        //Send reqexit
+        mockMvc.perform(MockMvcRequestBuilders.get("/client/reqexit?tokenid=TOKENID")).andDo(MockMvcResultHandlers.print()).andExpect(
+            MockMvcResultMatchers.status().isForbidden)
+
+        //Send resume
+        val resumeDispatch = MsgUtil.buildDispatch("springcontroller", "resume", "resume()", "trolley")
+        connParkClientService.forward(resumeDispatch)
+
+        runBlocking {
+            assertEquals("trolley IDLE", channelForObserver.receive())
+        }
+    }
+
+    @Test
+    fun testStopAndResumeWorking() {
+        connParkClientService.createConnection("localhost", 8024)
+        val channelForObserver = Channel<String>()
+
+        ParkingAreaKb.slot.set(1, "TOKENID")
+
+        //Send reqexit
+        mockMvc.perform(MockMvcRequestBuilders.get("/client/reqexit?tokenid=TOKENID")).andDo(MockMvcResultHandlers.print()).andExpect(
+            MockMvcResultMatchers.status().isOk)
+
+        testingObserver!!.addObserver(channelForObserver)
+        runBlocking {
+            assertEquals("trolley moveToPark(1)", channelForObserver.receive())
+        }
+
+        //Send stop
+        val stopDispatch = MsgUtil.buildDispatch("springcontroller", "stop", "stop()", "trolley")
+        connParkClientService.forward(stopDispatch)
+
+        runBlocking {
+            assertEquals("trolley trip to park slot 1 end", channelForObserver.receive())
+            assertEquals("trolley STOPPED", channelForObserver.receive())
+
+            delay(2000)
+        }
+
+        //Send resume
+        val resumeDispatch = MsgUtil.buildDispatch("springcontroller", "resume", "resume()", "trolley")
+        connParkClientService.forward(resumeDispatch)
+
+        runBlocking {
+            assertEquals("trolley trip to OUTDOOR start", channelForObserver.receive())
+            assertEquals("trolley trip to OUTDOOR end", channelForObserver.receive())
+
+            assertEquals("trolley IDLE", channelForObserver.receive())
+            assertEquals("trolley at HOME", channelForObserver.receive())
         }
     }
 }

@@ -19,7 +19,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 		
 				val HOME : Pair<String,String> = Pair("0", "0")
 				val INDOOR : Pair<String,String> = Pair("6", "0")
-				val OUTDOOR : Pair<String,String> = Pair("6", "5")
+				val OUTDOOR : Pair<String,String> = Pair("6", "4")
 				val SLOT1 : Pair<String,String> = Pair("1", "1")
 				val SLOT2 : Pair<String,String> = Pair("1", "2")
 				val SLOT3 : Pair<String,String> = Pair("1", "3")
@@ -87,7 +87,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						if( checkMsgContent( Term.createTerm("moveToInOutdoor(WHERE)"), Term.createTerm("moveToInOutdoor(WHERE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var WHERE = payloadArg(0)  
-								if(  $WHERE.equals("indoor")  
+								if(  WHERE.equals("indoor")  
 								 ){println("trolley trip to INDOOR start")
 								updateResourceRep( "trolley trip to INDOOR start"  
 								)
@@ -95,7 +95,7 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 													itunibo.planner.plannerUtil.planForGoal(INDOOR.first,INDOOR.second) 
 													currState = "INDOOR"
 								}
-								if(  $WHERE.equals("outdoor")  
+								if(  WHERE.equals("outdoor")  
 								 ){println("trolley trip to OUTDOOR start")
 								updateResourceRep( "trolley trip to OUTDOOR start"  
 								)
@@ -125,13 +125,13 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 														itunibo.planner.plannerUtil.updateMap(mv)
 														mv = itunibo.planner.plannerUtil.getNextPlannedMove()
 								} 
-								if(  $WHERE.equals("outdoor")  
+								if(  WHERE.equals("outdoor")  
 								 ){println("trolley trip to OUTDOOR end")
 								updateResourceRep( "trolley trip to OUTDOOR end"  
 								)
 								forward("goToIdle", "goToIdle(X)" ,"trolley" ) 
 								}
-								if(  $WHERE.equals("indoor")  
+								if(  WHERE.equals("indoor")  
 								 ){println("trolley trip to INDOOR end")
 								updateResourceRep( "trolley trip to INDOOR end"  
 								)

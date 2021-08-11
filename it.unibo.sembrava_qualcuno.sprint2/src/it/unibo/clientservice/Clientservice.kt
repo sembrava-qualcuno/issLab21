@@ -3,11 +3,18 @@ package it.unibo.clientservice
 
 import it.unibo.kactor.*
 import alice.tuprolog.*
+import it.unibo.sembrava_qualcuno.model.Message
+import it.unibo.sembrava_qualcuno.sprint2.ParkingAreaKb
+import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.CoapSonar
+import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.SonarController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-	
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.eclipse.californium.core.CoapClient
+
 class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
@@ -28,7 +35,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						)
 						  
 									val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
-									ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>	
+									ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
@@ -51,7 +58,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						            lateinit var message : Message
 						            var SLOTNUM = 0  
 						if(  weightSensor.getWeight() == 0 /* && 
-						        		trolleyRequest.get().getResponseText() != ("trolley STOPPED")*/
+						        		trolleyResource.get().getResponseText() != ("trolley STOPPED")*/
 						 ){
 						                for(i in 1..6) {
 						                    if(ParkingAreaKb.slot.get(i).equals("")) {
@@ -71,7 +78,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						println("clientservice reply enter($SLOTNUM)")
 						updateResourceRep( "$SLOTNUM"  
 						)
-						 val RESPONSE = Json.encodeToString(message)  
+						 val RESPONSE = Json.encodeToString(message)
 						answer("reqenter", "enter", "$RESPONSE"   )  
 					}
 					 transition(edgeName="t02",targetState="work",cond=whenDispatch("goToWork"))
@@ -133,7 +140,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 var TOKENID = payloadArg(0)  
 								if(  sonarController.isOutdoorFree()  
-								 ){if(  trolleyRequest.get().getResponseText() != ("trolley STOPPED")  
+								 ){if(  trolleyResource.get().getResponseText() != ("trolley STOPPED")  
 								 ){ 
 														var SLOTNUM = 0
 														ParkingAreaKb.slot.forEach { (k, v) -> 
@@ -142,7 +149,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 														}
 								if(  SLOTNUM != 0  
 								 ){ val RESPONSE = Json.encodeToString(Message(0, "Success"))  
-								answer("reqenter", "exit", "$RESPONSE"   )  
+								answer("reqexit", "exit", "$RESPONSE"   )  
 								forward("moveToPark", "moveToPark($SLOTNUM)" ,"trolley" ) 
 								delay(2000) 
 								println("clientservice moves the car from SLOTNUM = $SLOTNUM")
@@ -158,17 +165,17 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								}
 								else
 								 { val RESPONSE = Json.encodeToString(Message(4, "Invalid tokenid"))  
-								 answer("reqenter", "exit", "$RESPONSE"   )  
+								 answer("reqexit", "exit", "$RESPONSE"   )  
 								 }
 								}
 								else
 								 { val RESPONSE = Json.encodeToString(Message(6, "The trolley is stopped"))  
-								 answer("reqenter", "exit", "$RESPONSE"   )  
+								 answer("reqexit", "exit", "$RESPONSE"   )  
 								 }
 								}
 								else
 								 { val RESPONSE = Json.encodeToString(Message(5, "The outdoor area is engaged"))  
-								 answer("reqenter", "exit", "$RESPONSE"   )  
+								 answer("reqexit", "exit", "$RESPONSE"   )  
 								 }
 								println("clientservice reply")
 								updateResourceRep( "clientservice reply"  
