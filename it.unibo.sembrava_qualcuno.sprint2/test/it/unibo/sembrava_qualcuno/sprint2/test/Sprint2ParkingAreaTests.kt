@@ -101,7 +101,9 @@ class Sprint2ParkingAreaTests {
             delay(1000)
         }
     }
-
+	
+// Test INDOOR use cases
+	
     @Test
     fun testNoParkingSlotsAvailable() {
         //Set all parking slots as occupied
@@ -205,7 +207,9 @@ class Sprint2ParkingAreaTests {
 
         assertTrue(tokenId1 != tokenId2)
     }
-
+	
+// Test OUTDOOR use cases
+	
     @Test
     fun testExitRequest() {
         ParkingAreaKb.slot.set(1, "TOKENID")

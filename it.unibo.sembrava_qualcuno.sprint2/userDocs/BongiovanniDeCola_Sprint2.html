@@ -260,7 +260,7 @@
 		</div>   
 
 		<div class="body"> 
-			<h2>Introduction</h2>
+			<h2 id="sprint2">Introduction</h2>
 				<div class="remark">
 					Our motto:<br/>   
 					<k>there is no code without a project, no project without problem analysis and no problem without requirements</k>.
@@ -308,6 +308,8 @@
 						<tr><td style="width:60%">
 							<h4>Using RESTful APIs for the M2M interaction (cont.d)</h4>
 								The REST-API documentation has been updated and can always be found at <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/REST-APIdocs.html">REST-APIdocs.html</a>.
+							<h4>SpringController</h4>
+								The SpringController is updated from the one introduced in Sprint1, by adding the method to deal with the <k>/client/reqexit</k> REST-API. Its code is available <a target="code" href="../src/it/unibo/sembrava_qualcuno/sprint2/SpringController.kt">here</a>.
 						</td>
 						<td>
 							<center><img src="./img/APISequenceDiagram.png" width="75%"></center>
@@ -328,34 +330,88 @@
 						</td></tr>
 					</table>
 
-				<h3>SonarController</h3>
-					<table style="width:98%">
-						<tbody>
-						<tr><td style="width:60%">
-							<h4></h4>
-								As for the weight sensor in the first sprint we have added a SonarInterface 
-						</td>
-						<td>
-							<center><img src="./img/Sonar.png" width="100%"></center>
-						</td></tr>
-					</table>
-
 				<h3>Trolley</h3>
 					<table style="width:98%">
 						<tbody>
 						<tr><td style="width:60%">
 							<h4>A stoppable trolley</h4>
+								In this sprint, the problem of a stoppable trolley arises: even though we didn't already implement the manager sending the stop request (this will be done in Sprint4), <k>F2</k> tells us to accept a client request only if the trolley isn't in stopped state.<br>
+								As stated in the analysis phase, the trolley can be stopped only when it ends a task (e.g. goes to home, to the indoor/outdoor, or to a parking slot) and not when it is on trips. Moreover, it should be able to remember in what state to return, in case a <em>resume</em> dispatch arrives.
+								We decided to implement this feature by maintaining an internal state, in the form of a <em>currState</em> variable: it will be updated by the trolley every time it begins a trip, and its value will represent the end goal of a single trip. The possible values and their explaination are 
+								described in the attached table.
 								
 						</td>
 						<td>
-							<center><img src="" width="75%"></center>
+							<center><img src="./img/CurrStateMeaning.png" width="100%"></center>
+						</td></tr>
+						<tr><td style="width:60%">
+							<h4>The trolley as a FSM</h4>
+								Of course, having implemented the trolley actor as a qakactor, its behaviour is modeled after a Moore's Finite State Machine. This sprint, however, made a few changes from the FSM resulted from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#trolleyFSM">analysis phase</a>:
+								<ul>
+									<li>Conditional guards where included to the state switch after a resume dispatch arrives, to match about what previously said about the currState variable</li>
+									<li>The actual high-level message names where introduced as conditions for state transitions</li>
+									<li>Every implication of the manager where removed as they will be introduced in Sprint4</li>
+								</ul>
+								Every trip is planned by the PlannerUtil class on the RoomMap space as explained during <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html#planner">Sprint1</a>
+								
+						</td>
+						<td>
+							<center><img src="./img/TrolleyFSM.png" width="95%"></center>
+						</td></tr>
+					</table>
+				<h3>SonarController</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							<h4>The need of a Sensor Interface (cont.d)</h4>
+								As for the weight sensor in the first sprint we have added a <a target="code" href="../src/it/unibo/sembrava_qualcuno/sonar/SonarInterface.kt">SonarInterface</a> to abstract the concept of Sonar from the technology that it uses to communicate. As sonars are usually constrained devices, we decided to use the CoAP protocol once again for 
+								<a target="code" href="../src/it/unibo/sembrava_qualcuno/sonar/CoapSonar.kt">our implementation</a> of the interface, as for the <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html#weight">CoapWeightSensor</a> in Sprint1.
+							<h4>The SonarController and SonarMock</h4>
+								The <a target="code" href="../src/it/unibo/sembrava_qualcuno/sonar/SonarController.kt">SonarController</a> is the entity that will be queried by the ClientService to understand if the outdoor area is free before continuing with a reqexit request from the client. This is done quering a CoAP Resource, in the form of our <a target="code" href="../src/it/unibo/sembrava_qualcuno/sonar/SonarMock.kt">SonarMock</a>.<br>
+								The SonarController, however, should be completed in Sprint4, as it should also be responsible of firing an alarm when a car occupied the outdoor area for more than DTFREE seconds. For this reason, in this sprint it is not yet implemented as an object with internal thread as per the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a>, but rather as a simple object.
+						</td>
+						<td>
+							<center><img src="./img/Sonar.png" width="100%"></center>
 						</td></tr>
 					</table>
 				
 			<h2>Testing</h2>
+			To exploit the qak CoAP observable resources for testing purposes, as already done during the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#tests">first test plans</a> of the analysis phase<br> and the <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html#tests">tests of the sprint1</a>, the <a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a> has been reintroduced in this sprint tests.
+			For all the tests we assumed these starting conditions:
+				<ul>
+					<li>The trolley is not stopped by the manager</li>
+					<li>The INDOOR is not relevant for this sprint</li>
+					<li>The OUTDOOR is not engaged</li>
+					<li>All the parking slots are free</li>
+				</ul>
+				These conditions were individually changed by the single tests if they needed some other context, as described below.<br>
+				We decided to implement the tests relative to this sprint under three test classes: one that holds tests concerning the SonarController and mock, the ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2ParkingAreaTests.kt">Sprint1ParkingAreaTests.kt</a>),
+				one that holds tests concerning the Trolley, BasicRobot, ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2TrolleyTests.kt">Sprint1TrolleyTests.kt</a>) and one for the SonarController/Mock unit tests (<a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/SonarTests.kt">SonarTests.kt</a>), in order to fire tests without having to start up every qak context if not needed for the current test.
+				<br>Hereafter is a description of the functional tests for this <a href="#sprint2"> sprint requirements</a>:
+			<ul>
+				<li>Test that if the if there is at least one parked car, the trolley is not stopped and the OUTDOOR area is not engaged (<k>F6</k>), a reqexit client request is accepted by the ClientService, as per <k>F2</k>-<k>NF5</k>. If not, the SpringController should return a <tt>403 forbidden http error code</tt></li>
+				<li>Test that if a reqexit is accepted, it succeeds only if the TOKENID is valid and correctly corresponds to the parking slot, as per <k>F7</k>. If not, the SpringController should return a <tt>400 bad request http error code</tt>.</li>
+				<li>Test that if the ClientService can correctly infer the SLOTNUM from the TOKENIND, as per <k>F8</k></li>
+				<li>Test if the service correctly instruct the trolley on where to go (e.g. sends the moveToPark(SLOTNUM) to pickup a car from the correct parking slot and then the <k><k>moveToInOutdoor(outdoor)</k></k> to move it to the OUTDOOR area) and that the trolley actually sends the right commands to the BasicRobot after obtaining the path from the PlannerUtil, by checking the robot position on the map at the end of each trip, as per <k>F9</k></li>
+				<li>Test the correct behaviour of the stop/resume mechanism for the trolley (e.g. test if the stopped trolley queues requests instead of executing them, test if the resumed trolley switches to the right states, etc.)</li>
+			</ul>
+				And here a description of the unit tests of the Sonar:
+				<ul>
+					<li>Test that the SonarController has the ability to request the state of the sonar</li>
+					<li>Test that if the Sonar intercepts a car (the mock sets <tt>engaged=true</tt>), the SonarController successfully receives this information</li>
+				</ul>
 			
 			<h2>Sprint Summary</h2>
 			
+			The coming figure represents the final outline resulting from the Sprint2. The dashed lines that group components together gives a glance of the physical deployment organization<br> 			<div>
+				<td style="width:50%">
+					<center><img id="Final outline" src="./img/FullSprint2Outline.png" width="70%"></center>
+				</td>
+			</div>
+			<hr>
+			<div class="remark">
+						<center><k>This sprint is considered done, even though the GUI goals set in the "could have" section of the <a href="#sprint2">sprint backlog</a> are not met and therefore delegated in the third Sprint</k></center><br> 
+			</div>
 			
 			<h3>Summary table</h3>
 				<table class="sprint" id="summary">
@@ -366,9 +422,25 @@
 								<th>Tests</th>
 							</tr>
 						</thead>
-						
+						<tbody>
+							<tr>
+								<td>
+									<center><a href="./img/FullSprint2Outline.png">FullSprint2Outline.png</center>
+								</td>
+								<td>
+									<center><a target="code" href="../src/parkingArea.qak">parkingArea.qak</a></center>
+								</td>
+								<td>
+								<center>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2ParkingAreaTests.kt">Sprint2ParkingAreaTests.kt</a><br>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2TrolleyTests.kt">Sprint2TrolleyTests.kt</a><br>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/SonarTests.kt">SonarTests.kt</a>
+								</center>
+								</td>
+							</tr>
+						</tbody>
 					</table>
-				
+				<hr>
 		</div>
 		<div class="footer">
 			<center>			

@@ -361,6 +361,26 @@
 					<h4>State representation</h4>
 						As pointed out during the analysis phase, some sort of internal state must be mainteined by the service: we decided to save the parking slots state (free/engaged) internally, in a map, whose key represents the SLOTNUM of the parking slot, and empty value in case the slot is free or the TOKENID associated to the parked car if engaged.
 						We also decided to save this information in a binary file, to be read at the system startup, to reintegrate the system state in case of a service failure.<br>
+<pre>
+<tt>/*
+ * State in a map
+ */</tt>
+object ParkingAreaKb {
+    var slot: MutableMap<Int, String> = mutableMapOf(1 to "", 2 to "", 3 to "", 4 to "", 5 to "", 6 to "")
+}
+<tt>/*
+ * Write state to file
+ */</tt>
+ val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
+os.writeObject(ParkingAreaKb.slot)
+os.flush()
+os.close()
+ <tt>/*
+ * Read state from file at startup
+ */</tt>
+ val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
+ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>
+</pre>				
 						The TOKENID has been modeled in this way (as suggested in the analysis phase):
 <pre>
 <tt>/*
@@ -369,7 +389,7 @@
  */</tt>
  &ltSLOTNUM&gt-dd/MM/yyyy-hh:mm:ss
 </pre>
-				<h3>WeightSensor</h3>
+				<h3 id="weight">WeightSensor</h3>
 					<table style="width:98%">
 						<tbody>
 						<tr><td style="width:60%">
@@ -412,7 +432,7 @@
 							<center><img src="./img/TrolleyLayeredArchitecture.png" width="100%"></center>
 						</td></tr>
 						<tr><td>
-							<h4>Instruct the robot trough a Planner</h4>
+							<h4 id="planner">Instruct the robot trough a Planner</h4>
 							As correctly stated by the analysts, the BasicRobot component ability to move by "steps" is crucial to our needs in the sense that, in this way, we can monitor the robot's movement easily.
 							The only thing to consider, now, is how to make the BasicRobot work with a map of the area so that the virtual robot correctly follows the requirements (e.g. NF2, NF3, etc.) and how to 
 							send the correct sequence of moves from the Trolley actor to the BasicRobot.<br>
@@ -428,7 +448,7 @@
 						</tbody>
 					</table>
 					<br>
-			<h2>Testing</h2>
+			<h2 id="tests">Testing</h2>
 			To exploit the qak CoAP observable resources for testing purposes, as already done during the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#tests">first test plans</a> of the analysis phase<br>, the <a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a> has been reintroduced in this sprint tests.
 			For all the tests we assumed these starting conditions:
 				<ul>
@@ -447,6 +467,7 @@
 				 if the service can double check this information with the weight sensor, as per <k>F17</k></li>
 				<li>Test if the service correctly instruct the trolley on where to go (e.g. sends the <k>moveToIndoor</k> to pickup a car from the INDOOR area and then the <k>moveToPark</k> to move it to the right parking slot) and that the trolley actually sends the right commands to the BasicRobot after obtaining the path from the PlannerUtil, by checking the robot position on the map at the end of each trip, as per <k>F5</k></li>
 				<li>Test if the service correctly generates the TOKENID when a <k>carenter</k> request is completed and that it correctly sends it back to the controller, as per <k>F6</k></li>
+				<li>Test that the generated tokenid is really unique as per <k>NF1</k> (e.g. test if two requests generate two unique tokenids)</li>
 			</ul>
 			<h2>Sprint Summary</h2>
 			
