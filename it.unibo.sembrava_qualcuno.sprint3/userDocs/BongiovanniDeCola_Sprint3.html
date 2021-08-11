@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+		<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+		<script type="text/javascript" src="../css/issStyle.js"></script>
+	-->
+	<style type="text/css">
+		body {
+			margin-left:  30px;
+			margin-right: 30px;
+		}
+
+		P {
+			font-family: Tahoma;
+			font-size: 10pt;
+		}
+
+		a, a:visited, a:active, a:link, a:hover {
+			text-decoration: underline;
+			color: #545454;
+			background-color: transparent;
+			font-size: 93%;
+		}
+
+		a:hover {
+			background-color: #cccccc;
+		}
+
+		hr {
+			clear: both;
+			height: 1px;
+			color: #242424;
+			background-color: transparent;
+		}
+
+		h1, h2, h3 {
+			color: #242424;
+			clear: left;
+			font: 100% Tahoma, Helvetica, Arial, sans-serif;
+			margin-bottom: 0.5em;
+			padding-top: 0.5em;
+			border-radius: 10px;
+			padding: 5px;
+		}
+
+		top {
+			width: 100%;
+		}
+
+		#i {
+			color: #ff1010;
+		}
+
+		tt {
+			font-family: "Arial";
+			font-size: 90%;
+			color: #006600;
+		}
+
+		em {
+			font-family: "Arial";
+			font-size: 80%;
+			font-weight: bold;
+			border-style:solid;
+			border-color: #abe876;
+			color: #1632cc;
+		}
+
+		bc {
+			font-family: "Arial";
+			font-size: 90%;
+			font-weight: bold;
+			color: #990000;
+			background-color: #fcf8c7;
+		}
+
+		ks {
+			font-family: "Arial";
+			font-weight: bold;
+			color: #0000CD	;
+			font-size: 90%;
+		}
+
+		kc {
+			font-family: "Arial";
+			font-weight: bold;
+			color: #008000	;
+			font-size: 90%;
+		}
+
+		pre {
+			font-family: "Consolas";
+			font-size: 85%;
+			background-color: #f5f5f5;
+			border: 1.5px solid silver;
+			padding: 5px;
+		}
+
+		m {
+			font-family: "Helvetica";
+			line-height: 100%;
+			font-size: 75%;
+		}
+
+		div.body {
+			font-size: 18px;
+		}
+
+		k, lr {
+			color: #990000;
+			font-weight: bold;
+			font-size: 90%;
+		}
+
+		h1 {
+			font-size: 150%;
+			background-color: #b2c0ff;
+			padding: 10px;
+		}
+
+		h2 {
+			background-color: #9ed8ff;
+			font-size: 130%;
+		}
+
+		h3 {
+			background-color: #e6ccff;
+			font-size: 100%;
+		}
+
+		h4 {
+			background-color: #ccffcc;
+			font-size: 100%;
+			width: 95%;
+			border-radius: 5px;
+			padding: 2px;
+		}
+
+		h5 {
+			background-color: #d5ffb0;
+			font-size: 100%;
+		}
+
+		div.req {
+			background-color: #d9ffb3;
+			font-size: 18px;
+			width: 700px;
+			border: 3px solid green;
+			padding: 15px;
+			margin: 10px;
+		}
+
+		div.remark {
+			background-color: #E3F2FD;
+			border: 1.5px solid #d5f2ed;
+			padding: 15px;
+			margin: 10px;
+			border-radius: 25px;
+		}
+
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+
+		ol, ul, li {
+			margin: 0;
+			margin-left: 10px;
+			padding: 0;
+			padding-bottom: 5px;
+		}
+
+		table, th, td {
+			border: 1px solid black;
+		}
+
+		img {
+			border: 1.5px solid #d5f2ed
+		}
+
+		a, a:visited, a:active, a:link, a:hover {
+			text-decoration: underline;
+			color: #545454;
+			background-color: transparent;
+		}
+
+		div.wrapdesc {
+			width: 90%;
+			margin: auto;
+		}
+
+		div.imagedesc {
+			width: 85%;
+			margin: auto;
+		}
+
+		.fr li::marker {
+			content: "F" counter(list-item) " ";
+			color: mediumslateblue;
+		}
+
+		.nfr li::marker {
+			content: "NF" counter(list-item) " ";
+			color: mediumslateblue;
+		}
+
+		.sprint td {
+			width: 33%;
+		}
+	</style>
+		
+	<head>
+		<title>Final Task 2021 Sprint 3</title>
+		<script type="text/javascript">
+			function onLoad() {
+				//setRequirementsId();
+				addLrLinks();
+				addAutoLinks();
+			}
+
+			function setRequirementsId() {
+				var fRequirements = document.getElementsByClassName("fr")[0].children;
+				var nfRequirements = document.getElementsByClassName("nfr")[0].children;
+				var i;
+				for(i = 0; i < fRequirements.length; i++)
+					fRequirements[i].id = "F" + (i + 1);
+				for(i = 0; i < nfRequirements.length; i++)
+					nfRequirements[i].id = "NF" + (i + 1);
+			}
+
+			function addLrLinks() {
+				var lrList = document.getElementsByTagName("lr");
+
+				for(var i = 0; i < lrList.length; i++) {
+					org_html = lrList[i].outerHTML;
+					new_html = "<a href=../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#" + lrList[i].textContent + ">" + org_html + "</a>";
+					lrList[i].outerHTML = new_html;		
+			lrList[i].outerHTML = new_html;		
+					lrList[i].outerHTML = new_html;		
+				}
+			}
+
+			function addAutoLinks() {
+				var elements = document.getElementsByClassName("al");
+
+				for(var i = 0; i < elements.length; i++) {
+					org_html = elements[i].outerHTML;
+					new_html = "<a href=#" + elements[i].textContent + ">" + org_html + "</a>";
+					elements[i].outerHTML = new_html;	
+			elements[i].outerHTML = new_html;	
+					elements[i].outerHTML = new_html;	
+				}
+			}
+		</script>
+	</head>
+		
+	<body onload="onLoad();">
+		<div id="top">
+			<h1>ISS | Final Task Sprint 3 <font size="5"></font></h1>
+		</div>   
+
+		<div class="body"> 
+			<h2 id="sprint3">Introduction</h2>
+				<div class="remark">
+					Our motto:<br/>   
+					<k>there is no code without a project, no project without problem analysis and no problem without requirements</k>.
+				</div>
+				Hereafter we updated the sprint backlog with the undone tasks from sprint1 and sprint2 and old tasks have been switched to "must have" as we want to deliver a full deployable service for client use cases<br>
+				<table class="sprint">
+					<thead>
+						<tr>
+							<th>Must Have</th>
+							<th>Should Have</th>
+							<th>Could Have</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								The client must successfully submit a parking request (<lr>F1</lr>)<br>
+								The service must accept a request if the INDOOR area is free (<lr>F2</lr>) <br>
+								The robot must accept a client request if it is available (<lr>F2</lr>-<lr>NF5</lr>)<br>
+								The token is supposed to be unique and unforgeable (<lr>NF1</lr>)<br>
+								The SpringViewIndoor is supposed to show a prompt for the client to interact with to notify to the system that the car has been placed in the INDOOR area (<lr>F4</lr>)<br>
+								The SpringViewIndoor is supposed to show a prompt for the client to interact with for his parking request (<lr>F1</lr>)<br>
+								The SpringViewOutdoor is supposed to show a prompt to the client for him to submit the token (<lr>F7</lr>)
+							</td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				This sprint could leverage and reuse some components created in the previous sprint so <k>two days</k> should be enough.
+			<div class="remark">
+				<center><em>In the following diagrams, the Green color is associated with "Controller" or "Buisness logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br> 
+			</div>
+			<h2>Project</h2>
+				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase and considering the results of <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html#Final outline">Sprint1</a> let's now "zoom-in" or update 
+				the components we require for this sprint: SpringController/View, ClientService, Trolley and SonarController and simulator. Furthermore, we want to specify that all what we developed in Sprint1 stand also for this sprint and only changes and updates to it are hereby presented. 
+				
+				<h3>SpringController/View</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							<h4>Using RESTful APIs for the M2M interaction (cont.d)</h4>
+								The REST-API documentation has been updated and can always be found at <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/REST-APIdocs.html">REST-APIdocs.html</a>.
+							<h4>SpringController</h4>
+						</td>
+						<td>
+							<center><img src="./img/APISequenceDiagram.png" width="75%"></center>
+						</td></tr>
+					</table>
+
+				<h3>ClientService</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							<h4>The ClientService as a Moore's Finite State Machine (cont.d)</h4>
+						</td>
+						<td>  
+							<center><img src="./img/ClientServiceFSM.png" width="100%"></center>
+						</td></tr>
+					</table>
+			<h2>Testing</h2>
+			
+			<h2>Sprint Summary</h2>
+			
+			The coming figure represents the final outline resulting from the Sprint2. The dashed lines that group components together gives a glance of the physical deployment organization<br> 			<div>
+				<td style="width:50%">
+					<center><img id="Final outline" src="./img/FullSprint2Outline.png" width="70%"></center>
+				</td>
+			</div>
+			<hr>
+			<div class="remark">
+						<center><k>This sprint is considered done, even though the GUI goals set in the "could have" section of the <a href="#sprint2">sprint backlog</a> are not met and therefore delegated in the third Sprint</k></center><br> 
+			</div>
+			
+			<h3>Summary table</h3>
+				<table class="sprint" id="summary">
+						<thead>
+							<tr>
+								<th>Final Sprint Architecture</th>
+								<th>Executable Model</th>
+								<th>Tests</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<center><a href="./img/FullSprint2Outline.png">FullSprint2Outline.png</center>
+								</td>
+								<td>
+									<center><a target="code" href="../src/parkingArea.qak">parkingArea.qak</a></center>
+								</td>
+								<td>
+								<center>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2ParkingAreaTests.kt">Sprint2ParkingAreaTests.kt</a><br>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2TrolleyTests.kt">Sprint2TrolleyTests.kt</a><br>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/SonarTests.kt">SonarTests.kt</a>
+								</center>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				<hr>
+		</div>
+		<div class="footer">
+			<center>			
+				<table style="background-color:rgba(30, 22, 255, 0.9); width:60%;text-align:center;color:white">	
+					<tr>
+						<td colspan="2">By</td>
+					</tr>
+					<tr>
+						<td style="width:50%">
+							<img src="./img/bongiovanni_luca.jpg" style="width:50%"> <br/>
+							Luca Bongiovanni <br/>
+							email: luca.bongiovanni@studio.unibo.it
+						</td>
+						<td style="width:50%">
+							<img src="./img/fototessera gmdc.jpg"  style="width:50%"><br/>
+							Gian Marco De Cola <br/>		 
+							email: gianmarco.decola@studio.unibo.it			 
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<b>PROJECT REPO</b>: <a style="color: white;" href="https://github.com/sembrava-qualcuno/issLab21/tree/master/it.sembrava_qualcuno.unibo.tf21Start">
+							https://github.com/sembrava-qualcuno/issLab21/tree/master/it.sembrava_qualcuno.unibo.tf21Start</a>
+						</td>
+					</tr>
+				</table>
+			</center>
+		</div>
+	</body>
+</html>
