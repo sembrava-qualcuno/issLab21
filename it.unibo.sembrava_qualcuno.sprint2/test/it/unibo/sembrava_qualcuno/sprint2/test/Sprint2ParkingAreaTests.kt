@@ -114,19 +114,9 @@ class Sprint2ParkingAreaTests {
     }
 
     @Test
-    fun testIndoorAreaEngaged() {
-        //The indoor area is engaged
-        weightSensor.updateResource(1000)
-
-        mockMvc.perform(get("/client/reqenter")).andDo(print()).andExpect(status().isForbidden)
-            .andExpect(content().json(Json.encodeToString(ApiError(1, "The indoor area or trolley are engaged"))))
-    }
-
-    @Test
     fun testGenerateTokenId() {
         //Send reqenter
         mockMvc.perform(get("/client/reqenter")).andDo(print()).andExpect(status().isOk)
-            .andExpect(content().json(Json.encodeToString(ParkingSlot(1))))
 
         //The client moves the car to the indoor area
         weightSensor.updateResource(1000)
@@ -144,7 +134,6 @@ class Sprint2ParkingAreaTests {
 
         //Test correct date format
         val sdf = java.text.SimpleDateFormat("dd/MM/yyyy-hh:mm:ss")
-        val currentDate = sdf.format(java.util.Date())
         sdf.parse(stringTokenizer.nextToken(""))
     }
 
@@ -152,32 +141,27 @@ class Sprint2ParkingAreaTests {
     fun testInvalidParkingSlot() {
         //Send reqenter
         mockMvc.perform(get("/client/reqenter")).andDo(print()).andExpect(status().isOk)
-            .andExpect(content().json(Json.encodeToString(ParkingSlot(1))))
 
         //The client moves the car to the indoor area
         weightSensor.updateResource(1000)
 
         //Send carenter
         mockMvc.perform(get("/client/carenter?slotnum=-1")).andDo(print()).andExpect(status().isBadRequest)
-            .andExpect(content().json(Json.encodeToString(ApiError(3, "Invalid parking slot number"))))
     }
 
     @Test
     fun testIndoorAreaFree() {
         //Send reqenter
         mockMvc.perform(get("/client/reqenter")).andDo(print()).andExpect(status().isOk)
-            .andExpect(content().json(Json.encodeToString(ParkingSlot(1))))
 
         //Send carenter
         mockMvc.perform(get("/client/carenter?slotnum=1")).andDo(print()).andExpect(status().isForbidden)
-            .andExpect(content().json(Json.encodeToString(ApiError(2, "The indoor area is free"))))
     }
 
     @Test
     fun testUniqueTokenId() {
         //Send reqenter
         mockMvc.perform(get("/client/reqenter")).andDo(print()).andExpect(status().isOk)
-            .andExpect(content().json(Json.encodeToString(ParkingSlot(1))))
 
         //The client moves the car to the indoor area
         weightSensor.updateResource(1000)
@@ -194,7 +178,6 @@ class Sprint2ParkingAreaTests {
 
         //Send reqenter
         mockMvc.perform(get("/client/reqenter")).andDo(print()).andExpect(status().isOk)
-            .andExpect(content().json(Json.encodeToString(ParkingSlot(2))))
 
         //The client moves the car to the indoor area
         weightSensor.updateResource(1000)
