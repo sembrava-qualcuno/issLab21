@@ -9,6 +9,8 @@ import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.CoapSonar
 import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.SonarController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.eclipse.californium.core.CoapClient
@@ -32,8 +34,10 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						updateResourceRep( "clientservice STARTS"  
 						)
 						  
-									val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
-									ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>
+									if(java.io.File("ServiceState.bin").exists()) {
+										val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
+										ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>
+									}
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
@@ -55,32 +59,40 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						 
 						            lateinit var message : Message
 						            var SLOTNUM = 0  
-						if(  weightSensor.getWeight() == 0 /* && 
-						        		trolleyResource.get().getResponseText() != ("trolley STOPPED")*/
+						if(  weightSensor.getWeight() == 0  
+						 ){if(  trolleyResource.get().getResponseText() != ("trolley STOPPED")  
 						 ){
-						                for(i in 1..6) {
-						                    if(ParkingAreaKb.slot.get(i).equals("")) {
-						                        SLOTNUM = i
-						                        break
-						                    }
-						                }
+							                for(i in 1..6) {
+							                    if(ParkingAreaKb.slot.get(i).equals("")) {
+							                        SLOTNUM = i
+							                        break
+							                    }
+							                }
 						if(  SLOTNUM == 0  
 						 ){forward("goToWork", "goToWork(enter($SLOTNUM))" ,"clientservice" ) 
 						}
-						 message = Message(0, "$SLOTNUM")  
+						 message = Message(0, "$SLOTNUM")
 						}
 						else
 						 {forward("goToWork", "goToWork(enter($SLOTNUM))" ,"clientservice" ) 
-						  message = Message(1, "The indoor area is engaged or the trolley is stopped")  
+						  message = Message(7, "The trolley is stopped")  
+						 }
+						}
+						else
+						 {forward("goToWork", "goToWork(enter($SLOTNUM))" ,"clientservice" ) 
+						  message = Message(1, "The indoor area is engaged")  
 						 }
 						println("clientservice reply enter($SLOTNUM)")
 						updateResourceRep( "$SLOTNUM"  
 						)
 						 val RESPONSE = Json.encodeToString(message)
 						answer("reqenter", "enter", "$RESPONSE"   )  
+						stateTimer = TimerActor("timer_handleEnterRequest", 
+							scope, context!!, "local_tout_clientservice_handleEnterRequest", 60000.toLong() )
 					}
-					 transition(edgeName="t02",targetState="work",cond=whenDispatch("goToWork"))
-					transition(edgeName="t03",targetState="enterthecar",cond=whenRequest("carenter"))
+					 transition(edgeName="t02",targetState="work",cond=whenTimeout("local_tout_clientservice_handleEnterRequest"))   
+					transition(edgeName="t03",targetState="work",cond=whenDispatch("goToWork"))
+					transition(edgeName="t04",targetState="enterthecar",cond=whenRequest("carenter"))
 				}	 
 				state("enterthecar") { //this:State
 					action { //it:State
@@ -94,9 +106,9 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								if(  SLOTNUM in 1..6 && ParkingAreaKb.slot.get(SLOTNUM).equals("")  
 								 ){if(  weightSensor.getWeight() > 0  
 								 ){
-														val sdf = java.text.SimpleDateFormat("dd/MM/yyyy-hh:mm:ss")
+														val sdf = java.text.SimpleDateFormat("ddMMyyyyhhmmss")
 														val currentDate = sdf.format(java.util.Date())	
-														val TOKENID = "$SLOTNUM-$currentDate"
+														val TOKENID = "$SLOTNUM$currentDate"
 								 val RESPONSE = Json.encodeToString(Message(0, "$TOKENID"))  
 								answer("carenter", "receipt", "$RESPONSE"   )  
 								forward("moveToInOutdoor", "moveToInOutdoor(indoor)" ,"trolley" ) 
@@ -111,6 +123,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 														os.writeObject(ParkingAreaKb.slot)
 														os.flush()
 														os.close()
+								forward("goToWork", "goToWork(enter($SLOTNUM))" ,"clientservice" ) 
 								}
 								else
 								 { val RESPONSE = Json.encodeToString(Message(2, "The indoor area is free"))  
@@ -125,8 +138,12 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								updateResourceRep( "clientservice reply"  
 								)
 						}
+						stateTimer = TimerActor("timer_enterthecar", 
+							scope, context!!, "local_tout_clientservice_enterthecar", 60000.toLong() )
 					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+					 transition(edgeName="t05",targetState="work",cond=whenTimeout("local_tout_clientservice_enterthecar"))   
+					transition(edgeName="t06",targetState="work",cond=whenDispatch("goToWork"))
+					transition(edgeName="t07",targetState="enterthecar",cond=whenRequest("carenter"))
 				}	 
 				state("handleOutRequest") { //this:State
 					action { //it:State

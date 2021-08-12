@@ -119,7 +119,6 @@ class Sprint3ParkingAreaTests {
         weightSensor.updateResource(1000)
 
         mockMvc.perform(get("/client/reqenter")).andDo(print()).andExpect(status().isForbidden)
-            .andExpect(content().json(Json.encodeToString(ApiError(1, "The indoor area or trolley are engaged"))))
     }
 
     @Test
@@ -135,16 +134,15 @@ class Sprint3ParkingAreaTests {
         val result =
             mockMvc.perform(get("/client/carenter?slotnum=1")).andDo(print()).andExpect(status().isOk).andReturn()
         val tokenId: TokenId = Json.decodeFromString(result.response.contentAsString)
-
+        //TODO Da cambiare
         //example of tokenid: SLOTNUM-dd/MM/yyyy-hh:mm:ss
-        val stringTokenizer = StringTokenizer(tokenId.tokenId, "-")
+        val stringTokenizer = StringTokenizer(tokenId.tokenId, ":")
 
         //Test correct slotnum
         assertTrue(stringTokenizer.nextToken().equals("1"))
 
         //Test correct date format
-        val sdf = java.text.SimpleDateFormat("dd/MM/yyyy-hh:mm:ss")
-        val currentDate = sdf.format(java.util.Date())
+        val sdf = java.text.SimpleDateFormat("ddMMyyyyhhmmss")
         sdf.parse(stringTokenizer.nextToken(""))
     }
 
@@ -159,7 +157,6 @@ class Sprint3ParkingAreaTests {
 
         //Send carenter
         mockMvc.perform(get("/client/carenter?slotnum=-1")).andDo(print()).andExpect(status().isBadRequest)
-            .andExpect(content().json(Json.encodeToString(ApiError(3, "Invalid parking slot number"))))
     }
 
     @Test
@@ -170,7 +167,6 @@ class Sprint3ParkingAreaTests {
 
         //Send carenter
         mockMvc.perform(get("/client/carenter?slotnum=1")).andDo(print()).andExpect(status().isForbidden)
-            .andExpect(content().json(Json.encodeToString(ApiError(2, "The indoor area is free"))))
     }
 
     @Test

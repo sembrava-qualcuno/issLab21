@@ -207,6 +207,27 @@ class Sprint3TrolleyTests {
     }
 
     @Test
+    fun testAcceptInRequestOnAvailable() {
+        connParkClientService.createConnection("localhost", 8024)
+
+        //Send stop
+        val stopDispatch = MsgUtil.buildDispatch("springcontroller", "stop", "stop()", "trolley")
+        connParkClientService.forward(stopDispatch)
+
+        runBlocking {
+            val channelForObserver = Channel<String>()
+            testingObserver!!.addObserver(channelForObserver)
+
+            assertEquals("trolley at HOME", channelForObserver.receive())
+            assertEquals("trolley STOPPED", channelForObserver.receive())
+        }
+
+        //Send reqenter
+        mockMvc.perform(MockMvcRequestBuilders.get("/client/reqenter")).andDo(MockMvcResultHandlers.print()).andExpect(
+            MockMvcResultMatchers.status().isForbidden)
+    }
+
+    @Test
     fun testNoAcceptAfterResume() {
         connParkClientService.createConnection("localhost", 8024)
 

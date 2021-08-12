@@ -75,10 +75,10 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley at HOME"  
 						)
 					}
-					 transition(edgeName="t04",targetState="working",cond=whenDispatch("moveToInOutdoor"))
-					transition(edgeName="t05",targetState="working",cond=whenDispatch("moveToPark"))
-					transition(edgeName="t06",targetState="stopped",cond=whenDispatch("stop"))
-					transition(edgeName="t07",targetState="idle",cond=whenDispatch("goToIdle"))
+					 transition(edgeName="t08",targetState="working",cond=whenDispatch("moveToInOutdoor"))
+					transition(edgeName="t09",targetState="working",cond=whenDispatch("moveToPark"))
+					transition(edgeName="t010",targetState="stopped",cond=whenDispatch("stop"))
+					transition(edgeName="t011",targetState="idle",cond=whenDispatch("goToIdle"))
 				}	 
 				state("working") { //this:State
 					action { //it:State
@@ -188,10 +188,10 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 								}
 						}
 					}
-					 transition(edgeName="t08",targetState="working",cond=whenDispatch("moveToPark"))
-					transition(edgeName="t09",targetState="working",cond=whenDispatch("moveToInOutdoor"))
-					transition(edgeName="t010",targetState="idle",cond=whenDispatch("goToIdle"))
-					transition(edgeName="t011",targetState="stopped",cond=whenDispatch("stop"))
+					 transition(edgeName="t012",targetState="working",cond=whenDispatch("moveToPark"))
+					transition(edgeName="t013",targetState="working",cond=whenDispatch("moveToInOutdoor"))
+					transition(edgeName="t014",targetState="idle",cond=whenDispatch("goToIdle"))
+					transition(edgeName="t015",targetState="stopped",cond=whenDispatch("stop"))
 				}	 
 				state("stopped") { //this:State
 					action { //it:State
@@ -199,15 +199,15 @@ class Trolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						updateResourceRep( "trolley STOPPED"  
 						)
 					}
-					 transition(edgeName="t012",targetState="working",cond=whenDispatchGuarded("resume",{ currState.equals("INDOOR")  
+					 transition(edgeName="t016",targetState="working",cond=whenDispatchGuarded("resume",{ currState.equals("INDOOR")  
 					}))
-					transition(edgeName="t013",targetState="working",cond=whenDispatchGuarded("resume",{ currState.equals("PARKOUT")  
+					transition(edgeName="t017",targetState="working",cond=whenDispatchGuarded("resume",{ currState.equals("PARKOUT")  
 					}))
-					transition(edgeName="t014",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("PARKIN")  
+					transition(edgeName="t018",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("PARKIN")  
 					}))
-					transition(edgeName="t015",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("OUTDOOR")  
+					transition(edgeName="t019",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("OUTDOOR")  
 					}))
-					transition(edgeName="t016",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("IDLE")  
+					transition(edgeName="t020",targetState="idle",cond=whenDispatchGuarded("resume",{ currState.equals("IDLE")  
 					}))
 				}	 
 			}

@@ -27,3 +27,4 @@ docker/
 .settings/
 .idea/
 out/
+ServiceState.bin

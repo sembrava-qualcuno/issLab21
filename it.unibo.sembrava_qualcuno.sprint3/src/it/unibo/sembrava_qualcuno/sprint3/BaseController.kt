@@ -21,8 +21,13 @@ class BaseController {
     }
 
     @GetMapping("/client")
-    fun clientHomepage(): String {
-        return "clientHomepage"
+    fun clientInHomepage(): String {
+        return "clientInHomepage"
+    }
+
+    @GetMapping("/clientOut")
+    fun clientOutHomepage(): String {
+        return "clientOutHomepage"
     }
 
     @ExceptionHandler

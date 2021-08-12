@@ -42,11 +42,12 @@ QActor clientservice context ctxparkmanagerservice {
 	State s0 initial {
 		println("clientservice STARTS")
 		updateResource [# "clientservice STARTS" #]
-		
 		//Read state from file
 		[#  
-			val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
-			ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>	
+			if(java.io.File("ServiceState.bin").exists()) {
+				val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
+				ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>		
+			}
 		#]
 	}
 	Goto work
@@ -69,30 +70,34 @@ QActor clientservice context ctxparkmanagerservice {
         ]
 
         //acceptIN
-        if [# weightSensor.getWeight() == 0 /* && 
-        		trolleyResource.get().getResponseText() != ("trolley STOPPED")*/
-        	#] { 
-        		
-            //Get first free parking spot, or 0
-            [#
-                for(i in 1..6) {
-                    if(ParkingAreaKb.slot.get(i).equals("")) {
-                        SLOTNUM = i
-                        break
-                    }
-                }
-            #]
+        if [# weightSensor.getWeight() == 0 #] { 
+        	if [# trolleyResource.get().getResponseText() != ("trolley STOPPED") #] {
+        		//Get first free parking spot, or 0
+	            [#
+	                for(i in 1..6) {
+	                    if(ParkingAreaKb.slot.get(i).equals("")) {
+	                        SLOTNUM = i
+	                        break
+	                    }
+	                }
+	            #]
+	
+	            if [# SLOTNUM == 0 #] {
+	                forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
+	            }
+	
+	            [# message = Message(0, "$SLOTNUM") #]
+        	}
+        	else {
+        		forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
 
-            if [# SLOTNUM == 0 #] {
-                forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
-            }
-
-            [# message = Message(0, "$SLOTNUM") #]
+            	[# message = Message(7, "The trolley is stopped") #]
+        	}
         }
         else {
             forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
 
-            [# message = Message(1, "The indoor area is engaged or the trolley is stopped") #]
+            [# message = Message(1, "The indoor area is engaged") #]
         }
 
         //informIN
@@ -103,6 +108,7 @@ QActor clientservice context ctxparkmanagerservice {
         replyTo reqenter with enter : $RESPONSE
     }
     Transition t0
+    	whenTime 60000 -> work
         whenMsg goToWork -> work
         whenRequest carenter -> enterthecar
 	
@@ -118,9 +124,9 @@ QActor clientservice context ctxparkmanagerservice {
 				if [# weightSensor.getWeight() > 0 #] {
 					//Generate token
 					[#
-						val sdf = java.text.SimpleDateFormat("dd/MM/yyyy-hh:mm:ss")
+						val sdf = java.text.SimpleDateFormat("ddMMyyyyhhmmss")
 						val currentDate = sdf.format(java.util.Date())	
-						val TOKENID = "$SLOTNUM-$currentDate"
+						val TOKENID = "$SLOTNUM$currentDate"
 					#]
 					
 					//Reply with the TOKENID
@@ -144,6 +150,8 @@ QActor clientservice context ctxparkmanagerservice {
 						os.flush()
 						os.close()
 					#]
+					
+					forward clientservice -m goToWork : goToWork(enter($SLOTNUM))
 				}
 				else {
 					[# val RESPONSE = Json.encodeToString(Message(2, "The indoor area is free")) #]
@@ -159,7 +167,11 @@ QActor clientservice context ctxparkmanagerservice {
 	        updateResource [# "clientservice reply" #]
 		}
 	}
-	Goto work
+	Transition t0
+		whenTime 60000 -> work
+		whenMsg goToWork -> work
+		whenRequest carenter -> enterthecar
+		 
 	
 	State handleOutRequest {
 		printCurrentMessage
@@ -168,11 +180,9 @@ QActor clientservice context ctxparkmanagerservice {
 		
 		onMsg(reqexit : reqexit(TOKENID)) {
 			[# var TOKENID = payloadArg(0) #]
-			
 			//Check if the outdoor area is engaged
 			if [# sonarController.isOutdoorFree() #] {
 				if [# trolleyResource.get().getResponseText() != ("trolley STOPPED") #]{
-				
 					//Retrieve parking slot from the tokenid
 					[# 
 						var SLOTNUM = 0
