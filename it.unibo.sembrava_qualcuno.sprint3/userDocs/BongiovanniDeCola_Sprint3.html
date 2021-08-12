@@ -434,11 +434,11 @@ class SpringController {
 								The ClientService has been completed by adding the last checks to perform before accepting a <k>reqenter</k> request: 
 								<ul>
 									<li>The indoor area must be free: check if the WeightSensor detects that a car is present</li>
-									<li>The trolley must be either in <tt>idle</tt> or <tt>stopped</tt> state: inspect the trolley CoAP resource to know about its state</li>
+									<li>The trolley must be either in <tt>idle</tt> or <tt>working</tt> state: inspect the trolley CoAP resource to know about its state</li>
 								</ul>
 								Moreover, if the client takes too much time to park his car to the INDOOR area and/or notify this to the service, a timeout will bring back the service to
 							    the <tt>work</tt> state, to reset the ClientService behaviour. This situation could occur either if the client has left without
-								notifying this or someone want to perform a <k>DoS attack</k>: in this way we prevent the ClientService of stalling in the <tt>handleEnterRequest</tt> state.<br>
+								notifying this or someone want to perform a <k>DoS attack</k>: in this way we prevent the ClientService of stalling in the <tt>handleEnterRequest</tt>/<tt>enterthecar</tt> states.<br>
 								To grant user-friendliness, we also thought that if a <tt>carenter</tt> request arrives at the end of a <tt>enterthecar</tt> state, it will trigger the <tt>enterthecar</tt>
 								state once again as it could be that a client hasn't parked the car well on the indoor area and we want to give him another chance without repeating the whole process from the start.<br>
 								Still to boost user-friendliness we decided to change the <tt>TOKENID</tt> format, without changing the information it retains:
@@ -451,8 +451,6 @@ class SpringController {
 						</td></tr>
 
 					</table>
-			<h2>Testing</h2>
-
 			<h2>Deployment</h2>
 			
 			<h2>Sprint Summary</h2>
@@ -479,16 +477,15 @@ class SpringController {
 						<tbody>
 							<tr>
 								<td>
-									<center><a href="./img/FullSprint3Outline.png">FullSprint2Outline.png</a></center>
+									<center><a href="./img/FullSprint3Outline.png">FullSprint3Outline.png</a></center>
 								</td>
 								<td>
 									<center><a target="code" href="../src/parkingArea.qak">parkingArea.qak</a></center>
 								</td>
 								<td>
 								<center>
-									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2ParkingAreaTests.kt">Sprint2ParkingAreaTests.kt</a><br>
-									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2TrolleyTests.kt">Sprint2TrolleyTests.kt</a><br>
-									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint2/test/SonarTests.kt">SonarTests.kt</a>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint3/test/Sprint3ParkingAreaTests.kt">Sprint3ParkingAreaTests.kt</a><br>
+									<a target="code" href="../test/it/unibo/sembrava_qualcuno/sprint3/test/Sprint3TrolleyTests.kt">Sprint3TrolleyTests.kt</a><br>
 								</center>
 								</td>
 							</tr>
