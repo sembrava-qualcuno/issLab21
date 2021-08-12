@@ -295,44 +295,161 @@
 				<center><em>In the following diagrams, the Green color is associated with "Controller" or "Buisness logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br> 
 			</div>
 			<h2>Project</h2>
-				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase and considering the results of <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html#Final outline">Sprint1</a> let's now "zoom-in" or update 
-				the components we require for this sprint: SpringController/View, ClientService, Trolley and SonarController and simulator. Furthermore, we want to specify that all what we developed in Sprint1 stand also for this sprint and only changes and updates to it are hereby presented. 
+				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase and considering the results of <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint2.html#Final outline">Sprint2</a> let's now update 
+				the components we require for this sprint: SpringController/View, ClientService. Furthermore, we want to specify that all what we developed in Sprint2 stand also for this sprint and only changes and updates to it are hereby presented. 
 				
-				<h3>SpringController/View</h3>
+				<h3>SpringIndoorView</h3>
+					<table>
+						<tr><td>
+							<h4>Client home page</h4>
+							<center><img src="./img/ClientInHomePage.png" width="70%"></center>
+						</td><td>
+							<h4>Client home page error: no parking slot available</h4>
+							<center><img src="./img/ClientInHomeNoParking.png" width="70%"></center>
+						</td></tr>
+						<tr><td>
+							<h4>Client home page error: trolley stopped</h4>
+							<center><img src="./img/ClientInHomeTrolleyStopped.png" width="70%"></center>
+						</td><td>
+							<h4>Client home page error: indoor area engaged</h4>
+							<center><img src="./img/ClientHomeIndoorEngaged.png" width="70%"></center>
+						</td></tr>
+						<tr><td>
+							<h4>Good reqenter: SLOTNUM notification and carenter view</h4>
+							<center><img src="./img/ClientCarenter.png" width="70%"></center>
+						</td><td>
+							<h4>Client carenter error: car not parked on indoor</h4>
+							<center><img src="./img/ClientCarenterIndoorFree.png" width="70%"></center>
+						</td></tr>
+					</table>
+					<center><table>
+						<tr><td>
+								<h4>Client receipt</h4>
+							<center><img src="./img/ClientReceipt.png" width="70%"></center>
+						</td></tr>
+					</table></center>
+
+				<h3>SpringOutdoorView</h3>
+					<table>
+						<tr><td>
+							<h4>Client home page</h4>
+							<center><img src="./img/ClientOutHomePage.png" width="70%"></center>
+						</td><td>
+							<h4>Client home page error: trolley stopped</h4>
+							<center><img src="./img/ClientOutHomeTrolleyStopped.png" width="70%"></center>
+						</td></tr>
+						<tr><td>
+							<h4>Client home page error: outdoor area engaged</h4>
+							<center><img src="./img/ClientHomeOutdoorEngaged.png" width="70%"></center>
+						</td><td>
+							<h4>Client home page error: invalid tokenid</h4>
+							<center><img src="./img/ClientHomeInvalidToken.png" width="70%"></center>
+						</td></tr>
+					</table>
+					<center><table>
+						<tr><td>
+							<h4>Client correct tokenid</h4>
+							<center><img src="./img/ClientReqexit.png" width="70%"></center>
+						</td></tr>
+					</table></center>
+
+				<h3>SpringController</h3>
 					<table style="width:98%">
 						<tbody>
 						<tr><td style="width:60%">
-							<h4>Using RESTful APIs for the M2M interaction (cont.d)</h4>
-								The REST-API documentation has been updated and can always be found at <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/REST-APIdocs.html">REST-APIdocs.html</a>.
-							<h4>SpringController</h4>
+							<h4>Using RESTful APIs for the M2M interaction (cont.d) and JS for H2M interaction</h4>
+							As already known, the M2M interaction has been developed using RESTful APIs (<a href=" ../../it.unibo.sembrava_qualcuno.sprint1/userDocs/REST-APIdocs.html">API docs</a>).
+							These are managed by the already known <a href="../src/it/unibo/sembrava_qualcuno/sprint3/SpringController.kt">SpringController</a>; the H2M interaction, however, is orchestrated by
+							a client-side <a href="../src/main/resources/static/app.js">app.js</a> file and a <a href="../src/it/unibo/sembrava_qualcuno/sprint3/BaseController.kt">BaseController</a>: the BaseController
+							accepts <tt>/client</tt> or <tt>/clientOut</tt> request to return to the home pages while the app.js changes the DOM elements of the page according to the responses of the SpringController (e.g. changes
+							buttons to let the client perform different actions).<br>
+							To implement some sort of "session timeout" (1 min), we exploited JS ability to fire up alarms when a certain time is reached: this alarms will trigger the return to the homepage as a countermeasure for the client leaving or <k>DoS attacks</k> to the service:
+<pre>
+Inserire codice timeout
+</pre>
+							<br>We exploited the Spring Framework once again to simplify our code by using the <tt>@Controller</tt> and <tt>@RestController</tt> to diversify these two controllers:
+							<ul>
+								<li>The  <tt>@RestController</tt> annotation was used for the SpringController as it is a combination of the  <tt>@Controller</tt> and <tt>@ResponseBody</tt> annotations:
+								the @Controller annotation specializes the annotated component to be a MVC controller, while the @ResponseBody one lets you include objects in the HTTPResponse an automatically encodes them
+								in json format, which is what we needed to implement our REST-APIs</li>
+								<li>The <tt>@Controller</tt> annotation has been used for the BaseController as we didn't need to send objects in its responses, rather html pages, so the @ResponseBody annotation was not required.</li>
+							</ul>
+							We also annotated the controllers' methods with <tt>@GetMapping</tt>, to automatically fire specific methods for specific requests. An example is provided by the code below:
 						</td>
-						<td>
-							<center><img src="./img/APISequenceDiagram.png" width="75%"></center>
-						</td></tr>
+							<td>
+								<center><img src="./img/APISequenceDiagram.png" width="80%"></center>
+							</td></tr>
+						</tbody>
 					</table>
+<pre>
+@Controller
+class BaseController {
+	...
+	@GetMapping("/client")
+    fun clientInHomepage(): String {
+        return "clientInHomepage"
+    }
+	...
+}
 
+@RestController
+class SpringController {
+	...
+	@GetMapping("/client/reqenter")
+	fun reqenter(): ResponseEntity&lt;ParkingSlot&gt; {
+        var request = MsgUtil.buildRequest("springcontroller", "reqenter", "reqenter(X)", "clientservice")
+        val reply = ApplMessageUtil.messageFromString(connParkClientService.request(request))
+
+        val message: Message = Json.decodeFromString(reply.msgContent)
+
+        //Error
+        if (message.code != 0)
+            throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
+
+        return ResponseEntity.ok(ParkingSlot(message.message.toInt()))
+    }
+	...
+}
+</pre>
 				<h3>ClientService</h3>
 					<table style="width:98%">
 						<tbody>
 						<tr><td style="width:60%">
 							<h4>The ClientService as a Moore's Finite State Machine (cont.d)</h4>
+								The ClientService has been completed by adding the last checks to perform before accepting a <k>reqenter</k> request: 
+								<ul>
+									<li>The indoor area must be free: check if the WeightSensor detects that a car is present</li>
+									<li>The trolley must be either in <tt>idle</tt> or <tt>stopped</tt> state: inspect the trolley CoAP resource to know about its state</li>
+								</ul>
+								Moreover, if the client takes too much time to park his car to the INDOOR area and/or notify this to the service, a timeout will bring back the service to
+							    the <tt>work</tt> state, to reset the ClientService behaviour. This situation could occur either if the client has left without
+								notifying this or someone want to perform a <k>DoS attack</k>: in this way we prevent the ClientService of stalling in the <tt>handleEnterRequest</tt> state.<br>
+								To grant user-friendliness, we also thought that if a <tt>carenter</tt> request arrives at the end of a <tt>enterthecar</tt> state, it will trigger the <tt>enterthecar</tt>
+								state once again as it could be that a client hasn't parked the car well on the indoor area and we want to give him another chance without repeating the whole process from the start.<br>
+								Still to boost user-friendliness we decided to change the <tt>TOKENID</tt> format, without changing the information it retains:
+<pre>
+ &lt;SLOTNUM&gt;ddMMyyyyhhmmss
+</pre>
 						</td>
 						<td>  
 							<center><img src="./img/ClientServiceFSM.png" width="100%"></center>
 						</td></tr>
+
 					</table>
 			<h2>Testing</h2>
+
+			<h2>Deployment</h2>
 			
 			<h2>Sprint Summary</h2>
 			
-			The coming figure represents the final outline resulting from the Sprint2. The dashed lines that group components together gives a glance of the physical deployment organization<br> 			<div>
+			The coming figure represents the final outline resulting from the Sprint3. The dashed lines that group components together gives a glance of the physical deployment organization<br> 			<div>
 				<td style="width:50%">
-					<center><img id="Final outline" src="./img/FullSprint2Outline.png" width="70%"></center>
+					<center><img id="Final outline" src="./img/FullSprint3Outline.png" width="70%"></center>
 				</td>
 			</div>
 			<hr>
 			<div class="remark">
-						<center><k>This sprint is considered done, even though the GUI goals set in the "could have" section of the <a href="#sprint2">sprint backlog</a> are not met and therefore delegated in the third Sprint</k></center><br> 
+						<center><k>This sprint is considered done and, with this sprint we consider the "client" side of this project done and deployable. The next sprint will focus on the manager side, to end the project</center><br>
 			</div>
 			
 			<h3>Summary table</h3>
@@ -347,7 +464,7 @@
 						<tbody>
 							<tr>
 								<td>
-									<center><a href="./img/FullSprint2Outline.png">FullSprint2Outline.png</center>
+									<center><a href="./img/FullSprint3Outline.png">FullSprint2Outline.png</a></center>
 								</td>
 								<td>
 									<center><a target="code" href="../src/parkingArea.qak">parkingArea.qak</a></center>
