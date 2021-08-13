@@ -1,1 +1,4 @@
 rootProject.name = "it.unibo.carparking"
+include 'parkmanagerservice'
+include 'weightsensor'
+include 'sonar'
