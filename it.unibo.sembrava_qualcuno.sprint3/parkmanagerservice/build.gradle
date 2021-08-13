@@ -85,8 +85,12 @@ dependencies {
 	implementation 'com.andreapivetta.kolor:kolor:1.0.0'
 
 	//Subprojects dependencies
-	implementation project(':weightsensor')
-	implementation project(':sonar')
+	compile(project(':indoorarea')) {
+		exclude module: "slf4j-log4j12"
+	}
+	compile(project(':outdoorarea')) {
+		exclude module: "slf4j-log4j12"
+	}
 }
 
 application {
@@ -107,9 +111,9 @@ compileTestKotlin {
 }
 
 sourceSets {
-	main.kotlin.srcDirs += 'src'
-    main.kotlin.srcDirs += 'resources'
-    test.kotlin.srcDirs += 'test'
+	main.kotlin.srcDirs += 'src/main/kotlin'
+	test.kotlin.srcDirs += 'src/test/kotlin'
+	main.kotlin.srcDirs += 'src/main/resources'
 }
 
 springBoot {
