@@ -1,0 +1,43 @@
+version: '3'
+services:
+  wenv:
+    image: docker.io/natbodocker/virtualrobotdisi:2.0
+    ## image: virtualrobotdisi:1.0
+    ports:
+      - 8090:8090
+      - 8091:8091
+  robot:
+    image: docker.io/natbodocker/basicrobot21virtual:1.0
+    ##image: basicrobot21virtual:1.0
+    ports:
+      - 8020:8020/tcp
+      - 8020:8020/udp
+    depends_on:
+      - wenv
+  indoorarea:
+    image: indoorarea
+    stdin_open: true
+    ports:
+      - 8025:8025/udp
+  outdoorarea:
+    image: outdoorarea
+    stdin_open: true
+    ports:
+      - 8026:8026/udp
+  parkmanagerservice:
+    image: parkmanagerservice
+    ports:
+      - 8080:8080/tcp
+      - 8080:8080/udp
+    depends_on:
+      - robot
+      - indoorarea
+      - outdoorarea
+## -------------------------------------------------------------
+## TODO See https://docs.docker.com/compose/startup-order/
+## Compose does not wait until a container is â€œreadyâ€� (whatever that means for your particular application)
+## - only until itâ€™s running. Thereâ€™s a good reason for this.
+## The best solution is to perform this check in your application code,
+## -------------------------------------------------------------
+## docker-compose run --service-ports wenv
+## docker-compose run --service-ports vrobotclient  ATTIVA ANCHE wenv

@@ -1,6 +1,6 @@
 package parkmanagerservice.controller
 
-import it.unibo.parkmanagerservice.exception.ApiErrorException
+import parkmanagerservice.exception.ApiErrorException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.core.annotation.Order

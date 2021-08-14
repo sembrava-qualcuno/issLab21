@@ -3,30 +3,35 @@ package clientservice
 
 import it.unibo.kactor.*
 import alice.tuprolog.*
-import it.unibo.parkmanagerservice.model.Message
-import it.unibo.parkmanagerservice.model.ParkingAreaKb
 import sonar.CoapSonar
 import sonar.SonarController
 import weightsensor.CoapWeightSensor
 import weightsensor.WeightSensorInterface
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.eclipse.californium.core.CoapClient
+import parkmanagerservice.model.Message
+import parkmanagerservice.model.ParkingAreaKb
+import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
 		return "s0"
 	}
-	@kotlinx.coroutines.ObsoleteCoroutinesApi
-	@kotlinx.coroutines.ExperimentalCoroutinesApi			
+	@ObsoleteCoroutinesApi
+	@ExperimentalCoroutinesApi
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 			
 				val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://localhost:8025/weightSensor")
 		        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"))
-		        val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
+		        val trolleyResource : CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -34,8 +39,8 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						updateResourceRep( "clientservice STARTS"  
 						)
 						  
-									if(java.io.File("ServiceState.bin").exists()) {
-										val inps = java.io.ObjectInputStream(java.io.FileInputStream("ServiceState.bin"))
+									if(File("ServiceState.bin").exists()) {
+										val inps = ObjectInputStream(FileInputStream("ServiceState.bin"))
 										ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>
 									}
 					}
@@ -106,8 +111,8 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								if(  SLOTNUM in 1..6 && ParkingAreaKb.slot.get(SLOTNUM).equals("")
 								 ){if(  weightSensor.getWeight() > 0  
 								 ){
-														val sdf = java.text.SimpleDateFormat("ddMMyyyyhhmmss")
-														val currentDate = sdf.format(java.util.Date())	
+														val sdf = SimpleDateFormat("ddMMyyyyhhmmss")
+														val currentDate = sdf.format(Date())
 														val TOKENID = "$SLOTNUM$currentDate"
 								 val RESPONSE = Json.encodeToString(Message(0, "$TOKENID"))
 								answer("carenter", "receipt", "$RESPONSE"   )  
@@ -119,7 +124,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								forward("moveToPark", "moveToPark($SLOTNUM)" ,"trolley" ) 
 								 ParkingAreaKb.slot.set(SLOTNUM, "$TOKENID")
 								
-														val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
+														val os = ObjectOutputStream( FileOutputStream("ServiceState.bin") )
 														os.writeObject(ParkingAreaKb.slot)
 														os.flush()
 														os.close()
@@ -173,7 +178,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								forward("moveToInOutdoor", "moveToInOutdoor(outdoor)" ,"trolley" ) 
 								 ParkingAreaKb.slot.set(SLOTNUM, "")
 								
-															val os = java.io.ObjectOutputStream( java.io.FileOutputStream("ServiceState.bin") )
+															val os = ObjectOutputStream( FileOutputStream("ServiceState.bin") )
 															os.writeObject(ParkingAreaKb.slot)
 															os.flush()
 															os.close()

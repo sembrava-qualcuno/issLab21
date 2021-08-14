@@ -1,6 +1,6 @@
 package parkmanagerservice.exception
 
-import it.unibo.parkmanagerservice.model.ApiError
+import parkmanagerservice.model.ApiError
 import org.springframework.http.HttpStatus
 import java.lang.RuntimeException
 

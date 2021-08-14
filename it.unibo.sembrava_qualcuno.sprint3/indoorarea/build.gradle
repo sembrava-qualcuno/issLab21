@@ -6,8 +6,9 @@ plugins {
 }
 
 group = 'it.unibo.sembrava_qualcuno'
-version = '0.0.1-SNAPSHOT'
+version = '1.0'
 sourceCompatibility = 1.8
+mainClassName = 'weightsensor.WeightSensorMockKt'
 
 repositories {
 	mavenCentral()
@@ -51,5 +52,15 @@ compileTestKotlin {
 sourceSets {
 	main.kotlin.srcDirs += 'src/main/kotlin'
     test.kotlin.srcDirs += 'src/test/kotlin'
-	main.kotlin.srcDirs += 'src/main/resources'
+}
+
+jar.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+jar {
+	println("executing jar")
+	from sourceSets.main.allSource
+	manifest.attributes 'Main-Class': "$mainClassName"
+	into 'resources', {
+		from 'resources'
+	}
 }
