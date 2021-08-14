@@ -30,7 +30,7 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 			
 				val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://localhost:8025/weightSensor")
-		        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"))
+		        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"), 60)
 		        val trolleyResource : CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
