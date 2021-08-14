@@ -38,4 +38,13 @@ class BaseController {
             responseHeaders, HttpStatus.CREATED
         )
     }
+    companion object {
+        fun notifyHighTemperature(highTemperature: Boolean){
+
+        }
+
+        fun notifyOutdoorEngaged(){
+
+        }
+    }
 }

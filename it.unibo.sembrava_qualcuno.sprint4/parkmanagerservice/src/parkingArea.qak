@@ -6,18 +6,26 @@ System carparking
 Request reqenter : reqenter(X)
 Reply   enter    : enter(MESSAGE)
 
-//informIN
+//informIN 
 Request carenter : carenter(SLOTNUM)
 Reply   receipt  : receipt(MESSAGE)
-
+ 
 Dispatch goToWork : goToWork(X)
-
+  
 //acceptOut
 Request reqexit : reqexit(TOKENID)
 Reply 	exit 	: exit(X)
 
 Dispatch moveToInOutdoor : moveToInOutdoor(WHERE)
 Dispatch moveToPark : moveToPark(SLOTNUM)
+
+//MANAGER SERVICE
+//monitor
+Request getParkingArea : getParkingArea(X) 
+Reply parkingAreaState : parkingAreaState(STATE)
+//manage 
+Request updateTrolley : updateTrolley(ACTION)
+Reply updateResult : updateResult(STATE)
 
 //TROLLEY
 Dispatch goToIdle : goToIdle(X)
@@ -35,7 +43,7 @@ ExternalQActor basicrobot context ctxbasicrobot
 QActor clientservice context ctxparkmanagerservice {
 	[#	
 		val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://localhost:8025/weightSensor")
-        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"))
+        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"), 60)
         val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
 	#]
 	
@@ -51,9 +59,9 @@ QActor clientservice context ctxparkmanagerservice {
 		#]
 	}
 	Goto work
-	
+	 
 	State work {
-		println("clientservice waiting ...")
+		println("clientservice waiting...")
 		updateResource [# "clientservice waiting ..." #]
 	}
 	Transition t0 
@@ -233,6 +241,92 @@ QActor clientservice context ctxparkmanagerservice {
 			println("clientservice reply")
 	        updateResource [# "clientservice reply" #]
 		}
+	}
+	Goto work
+}
+
+QActor managerservice context ctxparkmanagerservice {
+	[#	
+		val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://localhost:8025/weightSensor")
+        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"), 60)
+        val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
+        val thermometerController = ThermometerController(CoapThermometer("coap://localhost:8027/parkingarea/thermometer"), 30)
+        val fanResource : FanInterface = CoapFan("coap://localhost:8027/parkingarea/fan") 
+	#]
+	
+	State s0 initial{
+		println("managerservice STARTS")
+		updateResource [# "managerservice STARTS" #]
+		[#
+			managerservice.CoapManagerObserver("SonarController").start()
+			managerservice.CoapManagerObserver("ThermometerController").start()
+		#]
+	}
+	Goto work
+	
+	State work{
+		println("managerservice WAITING for requests")
+		updateResource [# "managerservice WAITING for requests" #]
+	}
+	Transition t0
+		whenRequest getParkingArea -> monitor
+		whenRequest updateTrolley -> manage
+	
+	State manage{
+		onMsg(updateTrolley: updateTrolley(ACTION)){
+			[# var ACTION = payloadArg(0) 
+			   lateinit var message : Message
+			   lateinit var RESPONSE : String
+			#]
+			println("managerservice $ACTION the trolley")
+			updateResource [# "managerservice $ACTION the trolley" #]
+			
+			if [# ParkingAreaKb.highTemperature #]{
+				[#
+					when(ACTION){
+						"stop" -> { 
+							message = Message(0, "Success")
+							RESPONSE = Json.encodeToString(message)
+							
+				#]
+						forward trolley -m stop: stop(X) 
+					[#}
+						"resume" -> {
+							message = Message(0, "Success")
+							RESPONSE = Json.encodeToString(message)
+					#]
+						forward trolley -m resume: resume(X)
+					[#}
+						else -> {
+							println("action error")
+							message = Message(8, "Bad Request")
+							RESPONSE = Json.encodeToString(message)
+						}
+					#]
+					
+				[#}//end when#]				
+			}
+			else{
+				[# message = Message(8, "Bad Request")
+				RESPONSE = Json.encodeToString(message) #]
+			}
+			replyTo updateTrolley with updateResult : $RESPONSE
+		}
+		
+	}
+	Goto work
+	
+	State monitor{
+		println("managerservice GETTING parking area state")
+		updateResource [# "managerservice GETTING parking area state" #]
+			
+		[#
+			var fanState = fanResource.getState()
+			var thermometerState = thermometerController.getTemperature()
+			var trolleyState = trolleyResource.get().getResponseText()
+			val RESPONSE = Json.encodeToString(ParkingArea(fanState, thermometerState, trolleyState))
+		#]
+			replyTo getParkingArea with parkingAreaState : $RESPONSE	
 	}
 	Goto work
 }
