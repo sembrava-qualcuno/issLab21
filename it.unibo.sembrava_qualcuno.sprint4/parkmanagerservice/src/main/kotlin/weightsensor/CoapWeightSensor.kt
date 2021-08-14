@@ -3,9 +3,9 @@ package weightsensor
 import org.eclipse.californium.core.CoapClient
 
 class CoapWeightSensor(url: String) : WeightSensorInterface {
-    val client: CoapClient = CoapClient(url)
+    private val client: CoapClient = CoapClient(url)
 
     override fun getWeight(): Int {
-        return client.get().getResponseText().toInt()
+        return client.get().responseText.toInt()
     }
 }

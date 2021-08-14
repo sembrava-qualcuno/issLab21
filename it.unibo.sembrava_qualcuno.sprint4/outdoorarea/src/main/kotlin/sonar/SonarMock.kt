@@ -19,6 +19,7 @@ class SonarMock(port: Int) : CoapResource("sonar") {
 
     fun updateResource(value: Boolean) {
         engaged = value
+        changed()
     }
 
     override fun handleGET(exchange: CoapExchange) {

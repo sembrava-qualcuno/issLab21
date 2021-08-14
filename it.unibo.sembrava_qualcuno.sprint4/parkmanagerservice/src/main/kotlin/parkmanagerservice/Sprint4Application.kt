@@ -1,4 +1,4 @@
-package it.unibo.parkmanagerservice
+package parkmanagerservice
 
 import it.unibo.kactor.QakContext
 import kotlinx.coroutines.runBlocking

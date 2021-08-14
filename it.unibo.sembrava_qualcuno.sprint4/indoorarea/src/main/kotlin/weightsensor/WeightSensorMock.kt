@@ -20,6 +20,7 @@ class WeightSensorMock(port: Int) : CoapResource("weightSensor") {
 
     fun updateResource(value: Int) {
         weight = value
+        changed()
     }
 
     override fun handleGET(exchange: CoapExchange) {
