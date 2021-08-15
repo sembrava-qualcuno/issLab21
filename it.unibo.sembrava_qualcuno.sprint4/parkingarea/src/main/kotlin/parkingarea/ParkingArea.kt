@@ -11,9 +11,8 @@ fun main() {
 
     val server = CoapServer(8027)
     server.add(CoapResource("parkingarea").add(thermometerMock, fanMock))
-
     server.start()
-    //TODO Update also the fan from cmdline?
+
     while(true) {
         try {
             val temperature = readLine()!!.toInt()

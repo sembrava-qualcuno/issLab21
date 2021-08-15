@@ -82,8 +82,10 @@ class SpringController {
         val message: Message = Json.decodeFromString(reply.msgContent)
 
         //Error
-        if(message.code != 0)
+        if(message.code == 8)
             throw ApiErrorException(HttpStatus.BAD_REQUEST, ApiError(message.code, message.message))
+        else if(message.code != 0)
+            throw ApiErrorException(HttpStatus.FORBIDDEN, ApiError(message.code, message.message))
 
         return
     }

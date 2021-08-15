@@ -42,7 +42,7 @@ dependencies {
     compile group: 'org.eclipse.paho', name: 'org.eclipse.paho.client.mqttv3', version: '1.2.1'
 	//JSON
     // https://mvnrepository.com/artifact/org.json/json
-    compile group: 'org.json', name: 'json', version: '20160810'
+    //compile group: 'org.json', name: 'json', version: '20160810'
 	//COAP
 	// https://mvnrepository.com/artifact/org.eclipse.californium/californium-core
 	compile group: 'org.eclipse.californium', name: 'californium-core', version: '2.0.0-M12'

@@ -1,5 +1,7 @@
 package managerservice
 
+import fan.CoapFan
+import fan.FanInterface
 import parkmanagerservice.controller.BaseController
 import parkmanagerservice.model.ParkingAreaKb
 import sonar.CoapSonar
@@ -12,13 +14,15 @@ class CoapManagerObserver(val controller: String) {
         println("%%%%%% CoapManagerObserver | START FOR: $controller")
         when(controller){
             "SonarController" -> {
-                SonarController(CoapSonar("coap://localhost:8026/sonar"), 60).addObserver {
+                SonarController(CoapSonar("coap://localhost:8026/sonar"), 3).addObserver {
                     BaseController.notifyOutdoorEngaged()
                 }
             }
             "ThermometerController" -> {
                 ThermometerController(CoapThermometer("coap://localhost:8027/parkingarea/thermometer"), 30).addObserver{
                     ParkingAreaKb.highTemperature = !ParkingAreaKb.highTemperature
+                    val fanResource : FanInterface = CoapFan("coap://localhost:8027/parkingarea/fan")
+                    fanResource.updateResource(if(ParkingAreaKb.highTemperature) "start" else "stop")
                     BaseController.notifyHighTemperature(ParkingAreaKb.highTemperature)
                 }
             }

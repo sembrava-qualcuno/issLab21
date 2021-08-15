@@ -4,6 +4,7 @@ import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.CoapHandler
 import org.eclipse.californium.core.CoapResponse
 import org.eclipse.californium.core.coap.CoAP
+import kotlin.concurrent.thread
 
 class CoapSonar(url: String) : SonarInterface, CoapHandler {
     var client: CoapClient = CoapClient(url)
@@ -22,7 +23,7 @@ class CoapSonar(url: String) : SonarInterface, CoapHandler {
         if (response.code == CoAP.ResponseCode.NOT_FOUND)
             return
 
-        handler(response.responseText.toBoolean())
+        thread { handler(response.responseText.toBoolean()) }
     }
 
     override fun onError() {

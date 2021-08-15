@@ -19,8 +19,6 @@ class ThermometerController(private val thermometer: ThermometerInterface, priva
     }
 
     private fun checkHighTemperature(temperature: Int) {
-        println("Acutal temperature: $temperature")
-        println("Last temperature: $lastTemperature")
         if(temperatureThreshold in lastTemperature until temperature) {
             observer()
             lastTemperature = temperature

@@ -1,9 +1,11 @@
 package thermometer
 
+import kotlinx.coroutines.runBlocking
 import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.CoapHandler
 import org.eclipse.californium.core.CoapResponse
 import org.eclipse.californium.core.coap.CoAP
+import kotlin.concurrent.thread
 
 class CoapThermometer(url: String) : ThermometerInterface, CoapHandler {
     private val client: CoapClient = CoapClient(url)
@@ -22,7 +24,7 @@ class CoapThermometer(url: String) : ThermometerInterface, CoapHandler {
         if (response.code == CoAP.ResponseCode.NOT_FOUND)
             return
 
-        handler(response.responseText.toInt())
+        thread { handler(response.responseText.toInt()) }
     }
 
     override fun onError() {

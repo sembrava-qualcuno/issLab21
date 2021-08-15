@@ -33,7 +33,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class Sprint3TrolleyTests {
+class Sprint4TrolleyTests {
 
     @Autowired
     lateinit var mockMvc : MockMvc
