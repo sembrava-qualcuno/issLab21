@@ -8,6 +8,8 @@ class ThermometerMock() : CoapResource("thermometer") {
 
     constructor(defaultValue: Int) : this() {
         temperature = defaultValue
+        this.isObservable = true
+        this.setObserveType(null)
     }
 
     fun updateResource(value: Int) {

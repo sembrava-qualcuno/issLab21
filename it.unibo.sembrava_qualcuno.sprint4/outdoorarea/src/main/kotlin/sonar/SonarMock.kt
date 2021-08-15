@@ -9,6 +9,8 @@ class SonarMock(port: Int) : CoapResource("sonar") {
 
     constructor(port: Int, defaultValue: Boolean) : this(port) {
         engaged = defaultValue
+        this.isObservable = true
+        this.setObserveType(null)
     }
 
     init {

@@ -94,6 +94,9 @@ dependencies {
 	compile(project(':outdoorarea')) {
 		exclude module: "slf4j-log4j12"
 	}
+	compile(project(':parkingarea')) {
+		exclude module: "slf4j-log4j12"
+	}
 }
 
 application {

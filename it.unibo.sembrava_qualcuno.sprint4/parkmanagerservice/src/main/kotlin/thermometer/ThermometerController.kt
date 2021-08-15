@@ -13,11 +13,14 @@ class ThermometerController(private val thermometer: ThermometerInterface, priva
     }
 
     fun addObserver(lmbd: () -> Unit) {
+        lastTemperature = getTemperature()
         observer = lmbd
         thermometer.addObserver(::checkHighTemperature)
     }
 
-    fun checkHighTemperature(temperature: Int) {
+    private fun checkHighTemperature(temperature: Int) {
+        println("Acutal temperature: $temperature")
+        println("Last temperature: $lastTemperature")
         if(temperatureThreshold in lastTemperature until temperature) {
             observer()
             lastTemperature = temperature

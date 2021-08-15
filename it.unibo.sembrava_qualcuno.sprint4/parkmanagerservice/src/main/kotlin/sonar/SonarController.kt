@@ -2,7 +2,7 @@ package sonar
 
 import java.util.*
 
-class SonarController(sonarInterface: SonarInterface, val timerThreshold: Int) : TimerTask() {
+class SonarController(sonarInterface: SonarInterface, private val timerThreshold: Int) : TimerTask() {
     private val sonar: SonarInterface = sonarInterface
     lateinit var observer: () -> Unit
     private val timer = Timer()
