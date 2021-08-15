@@ -3,7 +3,7 @@ package thermometer
 import org.eclipse.californium.core.CoapResource
 import org.eclipse.californium.core.server.resources.CoapExchange
 
-class ThermometerMock() : CoapResource("parkingarea/thermometer") {
+class ThermometerMock() : CoapResource("thermometer") {
     var temperature: Int = 25
 
     constructor(defaultValue: Int) : this() {

@@ -1,6 +1,7 @@
 package parkingarea
 
 import fan.FanMock
+import org.eclipse.californium.core.CoapResource
 import org.eclipse.californium.core.CoapServer
 import thermometer.ThermometerMock
 
@@ -9,11 +10,10 @@ fun main() {
     val fanMock = FanMock(false)
 
     val server = CoapServer(8027)
-    server.add(thermometerMock)
-    server.add(fanMock)
+    server.add(CoapResource("parkingarea").add(thermometerMock, fanMock))
 
     server.start()
-    //TODO Aggiornare anche la fan da cmdline?
+    //TODO Update also the fan from cmdline?
     while(true) {
         try {
             val temperature = readLine()!!.toInt()
