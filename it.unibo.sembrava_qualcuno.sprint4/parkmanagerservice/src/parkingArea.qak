@@ -274,7 +274,7 @@ QActor managerservice context ctxparkmanagerservice {
 	
 	State manage{
 		onMsg(updateTrolley: updateTrolley(ACTION)){
-			[# var ACTION = payloadArg(0) 
+			[# val ACTION = payloadArg(0)
 			   lateinit var message : Message
 			   lateinit var RESPONSE : String
 			#]
@@ -321,9 +321,18 @@ QActor managerservice context ctxparkmanagerservice {
 		updateResource [# "managerservice GETTING parking area state" #]
 			
 		[#
-			var fanState = fanResource.getState()
-			var thermometerState = thermometerController.getTemperature()
-			var trolleyState = trolleyResource.get().getResponseText()
+			val fanState = fanResource.getState()
+            val thermometerState = thermometerController.getTemperature()
+            val trolleyResourceString = trolleyResource.get().getResponseText()
+            val trolleyState : String = if(trolleyResourceString == "trolley IDLE" ||
+            					trolleyResourceString == "trolley at HOME"
+            ){
+            	"idle"
+            } else if(trolleyResourceString == "trolley STOPPED"){
+            	"stopped"
+            } else{
+            	"working"
+            }
 			val RESPONSE = Json.encodeToString(ParkingArea(fanState, thermometerState, trolleyState))
 		#]
 			replyTo getParkingArea with parkingAreaState : $RESPONSE	

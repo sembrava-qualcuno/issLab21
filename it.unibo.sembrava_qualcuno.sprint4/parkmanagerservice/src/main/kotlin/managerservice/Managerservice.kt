@@ -61,14 +61,13 @@ class Managerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("updateTrolley(ACTION)"), Term.createTerm("updateTrolley(ACTION)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 var ACTION = payloadArg(0) 
+								 val ACTION = payloadArg(0)
 											   lateinit var message : Message
 											   lateinit var RESPONSE : String
 								println("managerservice $ACTION the trolley")
 								updateResourceRep( "managerservice $ACTION the trolley"  
 								)
-								if(
-										ParkingAreaKb.highTemperature
+								if(  ParkingAreaKb.highTemperature
 								 ){
 													when(ACTION){
 														"stop" -> { 
@@ -104,10 +103,19 @@ class Managerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 						updateResourceRep( "managerservice GETTING parking area state"  
 						)
 						
-									var fanState = fanResource.getState()
-									var thermometerState = thermometerController.getTemperature()
-									var trolleyState = trolleyResource.get().getResponseText()
-									val RESPONSE = Json.encodeToString(	ParkingArea(fanState, thermometerState, trolleyState))
+									val fanState = fanResource.getState()
+									val thermometerState = thermometerController.getTemperature()
+									val trolleyResourceString = trolleyResource.get().getResponseText()
+						val trolleyState : String = if(trolleyResourceString == "trolley IDLE" ||
+					trolleyResourceString == "trolley at HOME"
+			){
+				"idle"
+			} else if(trolleyResourceString == "trolley STOPPED"){
+				"stopped"
+			} else{
+				"working"
+			}
+									val RESPONSE = Json.encodeToString(ParkingArea(fanState, thermometerState, trolleyState))
 						answer("getParkingArea", "parkingAreaState", "$RESPONSE"   )  
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
