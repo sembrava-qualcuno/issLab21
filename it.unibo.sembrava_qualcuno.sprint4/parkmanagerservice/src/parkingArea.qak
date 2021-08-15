@@ -274,12 +274,10 @@ QActor managerservice context ctxparkmanagerservice {
 	
 	State manage{
 		onMsg(updateTrolley: updateTrolley(ACTION)){
-			[# val ACTION = payloadArg(0)
+			[# val ACTION = payloadArg(0) 
 			   lateinit var message : Message
 			   lateinit var RESPONSE : String
 			#]
-			println("managerservice $ACTION the trolley")
-			updateResource [# "managerservice $ACTION the trolley" #]
 			
 			if [# ParkingAreaKb.highTemperature #]{
 				[#
@@ -290,25 +288,32 @@ QActor managerservice context ctxparkmanagerservice {
 							
 				#]
 						forward trolley -m stop: stop(X) 
+						println("managerservice $ACTION the trolley")
+						updateResource [# "managerservice $ACTION the trolley" #]
 					[#}
 						"resume" -> {
 							message = Message(0, "Success")
 							RESPONSE = Json.encodeToString(message)
 					#]
 						forward trolley -m resume: resume(X)
+						println("managerservice $ACTION the trolley")
+						updateResource [# "managerservice $ACTION the trolley" #]
 					[#}
 						else -> {
 							println("action error")
 							message = Message(8, "Bad Request")
 							RESPONSE = Json.encodeToString(message)
-						}
-					#]
-					
-				[#}//end when#]				
+							#]
+							println("managerservice action error")
+							updateResource [# "managerservice action error" #]							
+						[#}
+					}//end when#]				
 			}
 			else{
-				[# message = Message(8, "Bad Request")
+				[# message = Message(9, "Forbidden: temperature is not high enough!")
 				RESPONSE = Json.encodeToString(message) #]
+				println("managerservice temperature is not high enough")
+				updateResource [# "managerservice temperature is not high enough" #]
 			}
 			replyTo updateTrolley with updateResult : $RESPONSE
 		}
@@ -362,7 +367,6 @@ QActor trolley context  ctxtrolley{
 		println("INITIAL MAP") 
  		run itunibo.planner.plannerUtil.showMap() 
 		run itunibo.planner.plannerUtil.startTimer()
-		//TODO: begin with a different position than the home one
 		
 	}
 	Goto idle

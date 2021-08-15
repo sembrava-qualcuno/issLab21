@@ -17,7 +17,7 @@ class CoapManagerObserver(val controller: String) {
                 }
             }
             "ThermometerController" -> {
-                ThermometerController(CoapThermometer("coap://localhost:8026/parkingarea/thermometer"), 30).addObserver{
+                ThermometerController(CoapThermometer("coap://localhost:8027/parkingarea/thermometer"), 30).addObserver{
                     ParkingAreaKb.highTemperature = !ParkingAreaKb.highTemperature
                     BaseController.notifyHighTemperature(ParkingAreaKb.highTemperature)
                 }
