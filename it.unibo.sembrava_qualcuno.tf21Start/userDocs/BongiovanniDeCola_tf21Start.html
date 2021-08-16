@@ -496,7 +496,7 @@
 						<div class="remark">
 								<k>NOTE THAT</k> even though we are working in a virtual environment and with virtual components, this should be done with a fair amount of abstraction that insures 
 								some sort of <bc>technology indipendence</bc>; this would help an hypothetical subsequent phase in which the simulated components will be replaced by real ones,
-								by not changing the buisness logic. This could be achieved by developing proper interfaces as well as a high level interaction protocols and architectures between components.
+								by not changing the business logic. This could be achieved by developing proper interfaces as well as a high level interaction protocols and architectures between components.
 						</div>
 						
 						<h5 id="trolleyFSM">Trolley</h5>
@@ -516,7 +516,7 @@
 								In developing our trolley, an actor implementation could be preferred above an object one as they implement a message based type of concurrency which satisfy the demand for a high level interaction between componenets and relieves the developer of handling thread safety, as well as reducing the number of threads to be used in the system. It also natively presents a message queue which is useful to our needs.<br>
 							</div>
 						<h5>Main service</h5>
-							The <tt>ParkManagerService</tt> should contain the biggest part of the <tt>buisness logic</tt>, as it is the main controller of the system. It should be able to communicate with all the components in the system to be informed about their state, react to all the events that could happen in accord to the requirements and present the results of its actions to the user interfaces.
+							The <tt>ParkManagerService</tt> should contain the biggest part of the <tt>business logic</tt>, as it is the main controller of the system. It should be able to communicate with all the components in the system to be informed about their state, react to all the events that could happen in accord to the requirements and present the results of its actions to the user interfaces.
 							It also should mantain the system state in a configuration file to be uploaded at the system's startup: in this way the system will be highly configurable without having to rely on "initial conditions" and will also be fault tolerant. The system state representation and persistance/collection will be discussed later.
 						<h5>User interfaces</h5>
 							There should be two types of user interfaces:
@@ -636,7 +636,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 						functional/testing side, as our system has no clue on where the trolley is in the virtual/real space at all times and on how to create a sequence of actions to move to robot from point A to point B: this is crucial to our system's functions
 						and with regard to our first testing plan ideas.
 						The choice of which language to use is delegated to the project phase but, indipendently on the choice, 
-						some form of design pattern should be used to ensure <k>maximux abstraction</k> between the buisness logic and 
+						some form of design pattern should be used to ensure <k>maximux abstraction</k> between the business logic and 
 						the communication protocols used</k> (to grant reusability and possibility to change communication protocol if needed).
 					</div>
 				<h3>Logic Architecture</h3>
@@ -658,7 +658,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 						</td><td style="width:80%">
 							<h4>ParkManagerService</h4>
 							<ul>
-								<li>Service that holds the buisness logic to reply to the users requests by using all the other components in the system</li>
+								<li>Service that holds the business logic to reply to the users requests by using all the other components in the system</li>
 								<li>Communicates with 3 Browsers (two ParkServiceGUI and one ParkServiceStatusGUI) with a request/response pattern</li>
 								<li>Communicates with the Trolley using dispatches</li>
 								<li>Communicates with the WeightSensorInterface and the SonarController with a request/response pattern to obtain their data</li>
@@ -672,7 +672,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 							<h4 id="TROLLEY">Trolley</h4>
 							<ul>
 								<li>Actor observable by the ParkManagerService</li>
-								<li>Holds the buisness logic to implement the trolley states</li>
+								<li>Holds the business logic to implement the trolley states</li>
 								<li>Instructs a real/virtual robot on how to move via request/response and/or fire and forget pattern</li>
 								<li>Uses/Updates a map of the area to deal with the robot position</li>
 							</ul>
@@ -684,7 +684,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 							<ul>
 								<li>Object that implements a view for the clients for both the in/outdoor areas</li>
 								<li>Takes client inputs and sends relative requests to the ParkManagerService</li>
-								<li>Present results of buisness logic tasks</li>
+								<li>Present results of business logic tasks</li>
 							</ul>
 						</td></tr>
 						<tr><td>  
