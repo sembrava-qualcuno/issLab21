@@ -277,24 +277,34 @@ QActor managerservice context ctxparkmanagerservice {
 			[# val ACTION = payloadArg(0) 
 			   lateinit var message : Message
 			   lateinit var RESPONSE : String
-			#]
 			
-			if [# ParkingAreaKb.highTemperature #]{
-				[#
-					when(ACTION){
-						"stop" -> { 
+				when(ACTION){
+					"stop" -> { 
+						if(ParkingAreaKb.highTemperature){
 							message = Message(0, "Success")
 							RESPONSE = Json.encodeToString(message)
-							
-				#]
+						}
+						else(){
+								message = Message(9, "Forbidden: temperature is not high enough!")
+								RESPONSE = Json.encodeToString(message) #]
+								println("managerservice temperature is not high enough")
+								updateResource [# "managerservice temperature is not high enough" #]
+						[#}#]		
 						forward trolley -m stop: stop(X) 
 						println("managerservice $ACTION the trolley")
 						updateResource [# "managerservice $ACTION the trolley" #]
 					[#}
 						"resume" -> {
+							if(!ParkingAreaKb.highTemperature){
 							message = Message(0, "Success")
 							RESPONSE = Json.encodeToString(message)
-					#]
+						}
+						else(){
+								message = Message(9, "Forbidden: temperature is not low enough!")
+								RESPONSE = Json.encodeToString(message) #]
+								println("managerservice temperature is not low enough")
+								updateResource [# "managerservice temperature is not low enough" #]
+						[#}#]
 						forward trolley -m resume: resume(X)
 						println("managerservice $ACTION the trolley")
 						updateResource [# "managerservice $ACTION the trolley" #]
@@ -308,13 +318,7 @@ QActor managerservice context ctxparkmanagerservice {
 							updateResource [# "managerservice action error" #]							
 						[#}
 					}//end when#]				
-			}
-			else{
-				[# message = Message(9, "Forbidden: temperature is not high enough!")
-				RESPONSE = Json.encodeToString(message) #]
-				println("managerservice temperature is not high enough")
-				updateResource [# "managerservice temperature is not high enough" #]
-			}
+					
 			replyTo updateTrolley with updateResult : $RESPONSE
 		}
 		

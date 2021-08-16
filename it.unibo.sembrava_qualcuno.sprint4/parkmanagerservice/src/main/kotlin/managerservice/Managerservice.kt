@@ -58,54 +58,62 @@ class Managerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 					transition(edgeName="t09",targetState="manage",cond=whenRequest("updateTrolley"))
 				}
 			state("manage") { //this:State
-				action { //it:State
-					if( checkMsgContent( Term.createTerm("updateTrolley(ACTION)"), Term.createTerm("updateTrolley(ACTION)"),
-									currentMsg.msgContent()) ) { //set msgArgList
-						val ACTION = payloadArg(0)
-						lateinit var message : Message
-						lateinit var RESPONSE : String
-						if(  ParkingAreaKb.highTemperature
-						){
-							when(ACTION){
-								"stop" -> {
-									message = Message(0, "Success")
-									RESPONSE = Json.encodeToString(message)
-
-									forward("stop", "stop(X)" ,"trolley" )
-									println("managerservice $ACTION the trolley")
-									updateResourceRep( "managerservice $ACTION the trolley"
-									)
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("updateTrolley(ACTION)"), Term.createTerm("updateTrolley(ACTION)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								 val ACTION = payloadArg(0) 
+											   lateinit var message : Message
+											   lateinit var RESPONSE : String
+											
+												when(ACTION){
+													"stop" -> { 
+														if(ParkingAreaKb.highTemperature){
+															message = Message(0, "Success")
+															RESPONSE = Json.encodeToString(message)
+														}
+														else(){
+																message = Message(9, "Forbidden: temperature is not high enough!")
+																RESPONSE = Json.encodeToString(message)  
+								println("managerservice temperature is not high enough")
+								updateResourceRep( "managerservice temperature is not high enough"  
+								)
+								} 
+								forward("stop", "stop(X)" ,"trolley" ) 
+								println("managerservice $ACTION the trolley")
+								updateResourceRep( "managerservice $ACTION the trolley"  
+								)
 								}
-								"resume" -> {
-									message = Message(0, "Success")
-									RESPONSE = Json.encodeToString(message)
-									forward("resume", "resume(X)" ,"trolley" )
-									println("managerservice $ACTION the trolley")
-									updateResourceRep( "managerservice $ACTION the trolley"
-									)
+														"resume" -> {
+															if(!ParkingAreaKb.highTemperature){
+															message = Message(0, "Success")
+															RESPONSE = Json.encodeToString(message)
+														}
+														else(){
+																message = Message(9, "Forbidden: temperature is not low enough!")
+																RESPONSE = Json.encodeToString(message)  
+								println("managerservice temperature is not low enough")
+								updateResourceRep( "managerservice temperature is not low enough"  
+								)
+								} 
+								forward("resume", "resume(X)" ,"trolley" ) 
+								println("managerservice $ACTION the trolley")
+								updateResourceRep( "managerservice $ACTION the trolley"  
+								)
 								}
-								else -> {
-									println("action error")
-									message = Message(8, "Bad Request")
-									RESPONSE = Json.encodeToString(message)
-									println("managerservice action error")
-									updateResourceRep( "managerservice action error"
-									)
+														else -> {
+															println("action error")
+															message = Message(8, "Bad Request")
+															RESPONSE = Json.encodeToString(message)
+								println("managerservice action error")
+								updateResourceRep( "managerservice action error"  
+								)
 								}
-							}//end when
+													}//end when 
+								answer("updateTrolley", "updateResult", "$RESPONSE"   )  
 						}
-						else
-						{ message = Message(9, "Forbidden: temperature is not high enough!")
-							RESPONSE = Json.encodeToString(message)
-							println("managerservice temperature is not high enough")
-							updateResourceRep( "managerservice temperature is not high enough"
-							)
-						}
-						answer("updateTrolley", "updateResult", "$RESPONSE"   )
 					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}
-				transition( edgeName="goto",targetState="work", cond=doswitch() )
-			}
 				state("monitor") { //this:State
 					action { //it:State
 						println("managerservice GETTING parking area state")
