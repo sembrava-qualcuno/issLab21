@@ -20,16 +20,19 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.eclipse.californium.core.CoapClient
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import parkmanagerservice.model.Trolley
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -295,6 +298,63 @@ class Sprint4TrolleyTests {
 
             assertEquals("trolley IDLE", channelForObserver.receive())
             assertEquals("trolley at HOME", channelForObserver.receive())
+        }
+    }
+
+    @Test
+    @WithMockUser(value = "manager")
+    fun testUpdateTrolleyStop() {
+        Sprint4ParkingAreaTests.thermometerMock.updateResource(35)
+        val trolleyCoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
+        Assertions.assertEquals("idle", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+        mockMvc.perform(MockMvcRequestBuilders.put("/parkingArea/trolley").contentType("application/json").content(Json.encodeToString(Trolley("stop")))).andDo(MockMvcResultHandlers.print()).andExpect(
+                MockMvcResultMatchers.status().isOk)
+        Assertions.assertEquals("stopped", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+    }
+
+    @Test
+    fun testUpdateTrolleyStopAndResume() {
+        Sprint4ParkingAreaTests.thermometerMock.updateResource(35)
+        val trolleyCoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
+        Assertions.assertEquals("idle", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+        mockMvc.perform(MockMvcRequestBuilders.put("/parkingArea/trolley").contentType("application/json").content(Json.encodeToString(Trolley("stop")))).andDo(MockMvcResultHandlers.print()).andExpect(
+                MockMvcResultMatchers.status().isOk)
+        Assertions.assertEquals("stopped", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+        mockMvc.perform(MockMvcRequestBuilders.put("/parkingArea/trolley").contentType("application/json").content(Json.encodeToString(Trolley("resume")))).andDo(MockMvcResultHandlers.print()).andExpect(
+                MockMvcResultMatchers.status().isOk)
+        Assertions.assertEquals("idle", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+    }
+
+    @Test
+    fun testUpdateTrolleyBadRequest() {
+        Sprint4ParkingAreaTests.thermometerMock.updateResource(35)
+        val trolleyCoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
+        Assertions.assertEquals("idle", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+        mockMvc.perform(MockMvcRequestBuilders.put("/parkingArea/trolley").contentType("application/json").content(Json.encodeToString(Trolley("foo")))).andDo(MockMvcResultHandlers.print()).andExpect(
+                MockMvcResultMatchers.status().isBadRequest)
+        Assertions.assertEquals("idle", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+    }
+
+    @Test
+    fun testUpdateTrolleyLowTemperature() {
+        val trolleyCoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
+        Assertions.assertEquals("idle", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+        mockMvc.perform(MockMvcRequestBuilders.put("/parkingArea/trolley").contentType("application/json").content(Json.encodeToString(Trolley("stop")))).andDo(MockMvcResultHandlers.print()).andExpect(
+                MockMvcResultMatchers.status().isForbidden)
+        Assertions.assertEquals("idle", getTrolleyStateFromCoap(trolleyCoapClient.get().responseText))
+    }
+
+    fun getTrolleyStateFromCoap(trolleyCoapResponse: String): String {
+        return when (trolleyCoapResponse) {
+            "trolley IDLE", "trolley at HOME" -> {
+                "idle"
+            }
+            "trolley STOPPED" -> {
+                "stopped"
+            }
+            else -> {
+                "working"
+            }
         }
     }
 }
