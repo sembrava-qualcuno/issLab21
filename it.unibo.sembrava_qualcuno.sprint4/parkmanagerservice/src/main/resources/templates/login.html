@@ -1,22 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login page</title>
+    <meta charset="UTF-8">
+    <title>Parking manager login</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <!-- BOOTSTRAP 4 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
+    <!-- FONT AWESOEM -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+
+    <!-- Custom styles for this template -->
+    <link href="/signin.css" rel="stylesheet">
 </head>
-<body>
-<div id="container">
-    <h2>Login page</h2>
-    <div th:if="${logOut}">
-        You have been logged out.
-    </div>
-    <form th:action="@{/manager/login}" method="post">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" autofocus="autofocus" />
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" />
-        <input id="submit" type="submit" value="Log in" />
+<body class="text-center">
+    
+    <form class="form-signin" th:action="@{/manager/login}" method="post">
+        
+        <img class="mb-4" src="/img/parking-area.png" alt="" width="150" height="150">
+        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        <label for="username" class="sr-only">Username</label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus="autofocus"/>
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required/>
+        <p th:if="${loginError}"  class="mt-3 alert alert-danger error" role="alert">Wrong username or password</p>
+        <button id="submit" value="Log in" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <div th:if="${logOut}" class="mt-3">
+            You have been logged out.
+        </div>
     </form>
-    <p th:if="${loginError}" class="error">Wrong user or password</p>
-</div>
+
+<!--
+    <div id="container">
+        <h2>Login page</h2>
+        
+        <form th:action="@{/manager/login}" method="post">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" autofocus="autofocus" />
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" />
+            <input id="submit" type="submit" value="Log in" />
+        </form>
+        <p th:if="${loginError}" class="error">Wrong user or password</p>
+    </div>
+-->
 </body>
 </html>

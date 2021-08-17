@@ -4,7 +4,6 @@ var timeout
 var timeoutValue = 60
 var seconds
 
-
 function alert(message, type) {
   //var wrapper = document.createElement('div')
   alertPlaceholder.innerHTML = alertPlaceholder.innerHTML + '<div id="my-alert" class="alert alert-' + type + ' .alert-dismissible d-flex p-3 align-items-center" role="alert" style="display:inline-block;">' + message + '</div>'
@@ -47,6 +46,10 @@ function successAlert(message) {
   alertWithIcon(message, 'success')
 }
 
+function warningAlert(message) {
+  alertWithIcon(message, 'warning')
+}
+
 function reqenter() {
   seconds = timeoutValue
   let resStatus = 0
@@ -64,7 +67,7 @@ function reqenter() {
         btnToChange.setAttribute('data-bs-dismiss', 'alert')
         btnToChange.setAttribute('data-bs-target', '#my-alert')
         if(res.parkingSlot == 0) {
-          alertWithIcon("No parking slots available, try again later", 'warning')
+          warningAlert("No parking slots available, try again later")
         }
         else {
           successAlert("Your parking slot is n. " + res.parkingSlot)
@@ -100,7 +103,6 @@ function reqenter() {
 }
 
 function carenter(slotnum) {
-  seconds = timeoutValue
   let resStatus = 0
   var apiUrl = prefix + '/client/carenter?slotnum=' + slotnum;
   fetch(apiUrl).then(response => {
@@ -118,6 +120,7 @@ function carenter(slotnum) {
         btnToChange.onclick = function() { window.location = '/client' }
         clearTimeout(timeout)
         document.getElementById("returnDiv").setAttribute("style", "visibility:visible;")
+        seconds = timeoutValue
         var x = setInterval(function() {
           seconds--
           document.getElementById("countdown").innerHTML = seconds + "s ";
@@ -147,7 +150,7 @@ function reqexit() {
   let resStatus = 0
   var tokenid = document.getElementById("token").value
   if(tokenid == "") {
-    alertWithIcon("Insert a token id", 'warning')
+    warningAlert("Insert a token id")
     var btnToChange = document.getElementById("btnToChange")
     btnToChange.setAttribute('data-bs-dismiss', 'alert')
     btnToChange.setAttribute('data-bs-target', '#my-alert')
@@ -185,7 +188,7 @@ function reqexit() {
       case 400:
         console.log('error')
         console.log(res)
-        alertWithIcon(res.message, 'warning')
+        warningAlert(res.message)
         var btnToChange = document.getElementById("btnToChange")
         btnToChange.setAttribute('data-bs-dismiss', 'alert')
         btnToChange.setAttribute('data-bs-target', '#my-alert')

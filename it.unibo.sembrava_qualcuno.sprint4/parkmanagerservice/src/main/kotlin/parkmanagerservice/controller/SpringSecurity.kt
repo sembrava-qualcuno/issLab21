@@ -2,6 +2,7 @@ package parkmanagerservice.controller
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 
@@ -10,10 +11,10 @@ class AdminSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
         http
+                ?.csrf()?.disable()
                 ?.authorizeRequests()
                     ?.antMatchers("/client*/**")?.permitAll()
-                    ?.antMatchers("/manager")?.authenticated()
-                    ?.antMatchers("/parkingArea/**")?.authenticated()
+                    ?.antMatchers("/manager", "/parkingArea/**")?.authenticated()
                 ?.and()
                 ?.formLogin()
                     ?.loginPage("/manager/login")
@@ -22,6 +23,8 @@ class AdminSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 ?.and()
                 ?.logout()
                     ?.logoutUrl("/manager/logout")
+                    ?.logoutSuccessUrl("/manager/logout")
+                    ?.invalidateHttpSession(true)
             }
 }
 

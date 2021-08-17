@@ -246,9 +246,7 @@ QActor clientservice context ctxparkmanagerservice {
 }
 
 QActor managerservice context ctxparkmanagerservice {
-	[#	
-		val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://localhost:8025/weightSensor")
-        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"), 60)
+	[#
         val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
         val thermometerController = ThermometerController(CoapThermometer("coap://localhost:8027/parkingarea/thermometer"), 30)
         val fanResource : FanInterface = CoapFan("coap://localhost:8027/parkingarea/fan") 
@@ -257,10 +255,6 @@ QActor managerservice context ctxparkmanagerservice {
 	State s0 initial{
 		println("managerservice STARTS")
 		updateResource [# "managerservice STARTS" #]
-		[#
-			managerservice.CoapManagerObserver("SonarController").start()
-			managerservice.CoapManagerObserver("ThermometerController").start()
-		#]
 	}
 	Goto work
 	
@@ -284,7 +278,7 @@ QActor managerservice context ctxparkmanagerservice {
 							message = Message(0, "Success")
 							RESPONSE = Json.encodeToString(message)
 						}
-						else(){
+						else{
 								message = Message(9, "Forbidden: temperature is not high enough!")
 								RESPONSE = Json.encodeToString(message) #]
 								println("managerservice temperature is not high enough")
@@ -299,7 +293,7 @@ QActor managerservice context ctxparkmanagerservice {
 							message = Message(0, "Success")
 							RESPONSE = Json.encodeToString(message)
 						}
-						else(){
+						else{
 								message = Message(9, "Forbidden: temperature is not low enough!")
 								RESPONSE = Json.encodeToString(message) #]
 								println("managerservice temperature is not low enough")

@@ -11,6 +11,10 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
         <meta name="theme-color" content="#11a7d9" />
+        <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+        <script src="/webjars/jquery/jquery.min.js"></script>
+        <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+        <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     </head>
     <body>
         <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -26,28 +30,42 @@
         </svg>
         
         <nav class="navbar navbar-dark" style="background-color: #11a7d9">
-            <div class="container">
-                <a class="navbar-brand" href="/client">Parking Area 🚗</a>
+            <div class="container pl-3">
+                <a class="navbar-brand" href="/manager">Parking Area 🚗</a>
+                <form th:action="@{/manager/logout}" method="post">
+                    <input type="submit" value="Log Out" class="btn btn-dark"/>
+                </form>
             </div>
         </nav>
 
-        <main class="container p-4">
-            <div class="row">
+        <main class="container pl-3 pt-3">
+            <h4>Parking Manager Dashboard</h4>
+            <div class="row mb-4">
+                <div id="liveAlertPlaceholder"></div>
+            </div>
+            <div class="row mb-4">
                 <div class="col">
-                    <div id="liveAlertPlaceholder"></div>
-                    <button id="btnToChange" type="button" onclick="reqenter();" class="btn btn-primary">Request to park</button>
-                    <div id="returnDiv" style="visibility:hidden;">
-                        <p>Seconds left: <span id="countdown"></span></p>
-                    </div>
+                    <div>Fan state: <b id="fanValuePlaceholder"></b></div>
+                    <div>Temperature: <b id="temperatureValuePlaceholder"></b>°C</div>
                 </div>
             </div>
-            <form th:action="@{/manager/logout}" method="post">
-                <input type="submit" value="Log Out"/>
-            </form>
+            <div class="row mt-4">
+                <div>Trolley state:</div>
+                <div class="ms-0.5 mt-2">
+                    <input id="trolleyToggle" type="checkbox" checked data-toggle="toggle" data-on="Idle" data-off="Stopped" data-onstyle="success" data-offstyle="danger" disabled>                
+                </div>
+                <div class="handle"></div>
+                </button>  
+            </div>        
         </main>
-
-        <script src="app.js"></script>
+        
         <!-- BOOTSTRAP 4 SCRIPTS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+        <!-- JQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <!-- Toggle button -->
+        <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+        <script src="/utils.js"></script>
+        <script src="/manager.js"></script>
     </body>
 </html>

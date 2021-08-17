@@ -26,9 +26,10 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.security.test.context.support.WithUserDetails
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -297,6 +298,7 @@ class Sprint4ParkingAreaTests {
     }
 
     @Test
+    @WithMockUser(value = "manager")
     fun testGetParkingArea() {
         val thermometerController = ThermometerController(CoapThermometer("coap://localhost:8027/parkingarea/thermometer"), 30)
         val fan: FanInterface = CoapFan("coap://localhost:8027/parkingarea/fan")
@@ -312,6 +314,7 @@ class Sprint4ParkingAreaTests {
     }
 
     @Test
+    @WithMockUser(value = "manager")
     fun testUpdateTrolleyStop() {
         thermometerMock.updateResource(35)
         val trolleyCoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
