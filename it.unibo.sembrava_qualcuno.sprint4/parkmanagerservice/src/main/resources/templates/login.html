@@ -24,11 +24,9 @@
         <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus="autofocus"/>
         <label for="password" class="sr-only">Password</label>
         <input type="password" id="password" name="password" class="form-control" placeholder="Password" required/>
+        <p th:if="${(param.logout != null)}" class="mt-3 alert alert-info" role="alert">You have been logged out</p>
         <p th:if="${loginError}"  class="mt-3 alert alert-danger error" role="alert">Wrong username or password</p>
         <button id="submit" value="Log in" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-        <div th:if="${logOut}" class="mt-3">
-            You have been logged out.
-        </div>
     </form>
 
 <!--

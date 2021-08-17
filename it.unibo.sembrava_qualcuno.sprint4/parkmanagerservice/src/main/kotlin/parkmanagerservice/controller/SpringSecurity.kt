@@ -23,7 +23,6 @@ class AdminSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 ?.and()
                 ?.logout()
                     ?.logoutUrl("/manager/logout")
-                    ?.logoutSuccessUrl("/manager/logout")
                     ?.invalidateHttpSession(true)
             }
 }
