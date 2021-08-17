@@ -18,11 +18,13 @@ class AdminSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 ?.and()
                 ?.formLogin()
                     ?.loginPage("/manager/login")
+                    ?.successForwardUrl("/manager")
                     ?.failureUrl("/manager/loginError")
                     ?.permitAll()
                 ?.and()
                 ?.logout()
                     ?.logoutUrl("/manager/logout")
+                    ?.deleteCookies("JSESSID")
                     ?.invalidateHttpSession(true)
             }
 }
