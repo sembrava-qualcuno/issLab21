@@ -77,10 +77,11 @@ class SpringController {
 
     @PutMapping("/parkingArea/trolley")
     fun updateTrolley(@RequestBody trolley: Trolley) {
+        println("PUT REQUEST")
         val request = MsgUtil.buildRequest("springcontroller", "updateTrolley", "updateTrolley(${trolley.state})", "managerservice")
         val reply = ApplMessageUtil.messageFromString(connManagerService.request(request))
         val message: Message = Json.decodeFromString(reply.msgContent)
-
+        println("MESSAGGIO $message")
         //Error
         if(message.code == 8)
             throw ApiErrorException(HttpStatus.BAD_REQUEST, ApiError(message.code, message.message))

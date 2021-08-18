@@ -4,22 +4,35 @@ import fan.FanMock
 import org.eclipse.californium.core.CoapResource
 import org.eclipse.californium.core.CoapServer
 import thermometer.ThermometerMock
+import kotlin.system.exitProcess
 
 fun main() {
-    val thermometerMock = ThermometerMock( 25)
-    val fanMock = FanMock(false)
+    try {
+        val THERMOMETER_START_VALUE = (System.getenv("THERMOMETER_START_VALUE") ?: "25").toInt()
+        val FAN_START_VALUE = System.getenv("FAN_START_VALUE").toBoolean()
 
-    val server = CoapServer(8027)
-    server.add(CoapResource("parkingarea").add(thermometerMock, fanMock))
-    server.start()
+        println("ThermometerMock: Start with start value $THERMOMETER_START_VALUE")
+        println("FanMock: Start with start value $FAN_START_VALUE")
 
-    while(true) {
-        try {
-            val temperature = readLine()!!.toInt()
-            println("Temperature updated to $temperature")
-            thermometerMock.updateResource(temperature)
-        } catch (e: NumberFormatException) {
-            println("Error: temperature must be an integer")
+        val thermometerMock = ThermometerMock(THERMOMETER_START_VALUE)
+        val fanMock = FanMock(FAN_START_VALUE)
+
+        val server = CoapServer(8027)
+        server.add(CoapResource("parkingarea").add(thermometerMock, fanMock))
+        server.start()
+
+        while(true) {
+            try {
+                val temperature = readLine()!!.toInt()
+                println("Temperature updated to $temperature")
+                thermometerMock.updateResource(temperature)
+            } catch (e: NumberFormatException) {
+                println("Error: temperature must be an integer")
+            }
         }
+    } catch (e: NumberFormatException) {
+        println("THERMOMETER_START_VALUE must be an integer")
+        exitProcess(1)
     }
+
 }

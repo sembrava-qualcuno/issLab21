@@ -1,9 +1,9 @@
 package weightsensor
 
 import org.eclipse.californium.core.CoapResource
-import org.eclipse.californium.core.server.resources.CoapExchange
 import org.eclipse.californium.core.CoapServer
-import java.lang.NumberFormatException
+import org.eclipse.californium.core.server.resources.CoapExchange
+import kotlin.system.exitProcess
 
 class WeightSensorMock(port: Int) : CoapResource("weightSensor") {
     var weight: Int = 0
@@ -29,15 +29,22 @@ class WeightSensorMock(port: Int) : CoapResource("weightSensor") {
 }
 
 fun main() {
-    val mock = WeightSensorMock(8025, 0)
+    try {
+        val START_VALUE= (System.getenv("START_VALUE") ?: "0").toInt()
+        println("WeightSensorMock: Start with start value $START_VALUE")
+        val mock = WeightSensorMock(8025, START_VALUE)
 
-    while (true) {
-        try {
-            val weight = readLine()!!.toInt()
-            println("Weight updated to $weight")
-            mock.updateResource(weight)
-        } catch (e: NumberFormatException) {
-            println("Error: weight must be an integer")
+        while (true) {
+            try {
+                val weight = readLine()!!.toInt()
+                println("Weight updated to $weight")
+                mock.updateResource(weight)
+            } catch (e: NumberFormatException) {
+                println("Error: weight must be an integer")
+            }
         }
+    } catch (e: NumberFormatException) {
+        println("START_VALUE must be an integer")
+        exitProcess(1)
     }
 }

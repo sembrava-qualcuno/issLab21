@@ -111,7 +111,7 @@ dependencies {
 
 application {
 	// Define the main class for the application.
-	mainClass = 'parkmanagerservice.Sprint3ApplicationKt'
+	mainClass = 'parkmanagerservice.Sprint4ApplicationKt'
 }
 
 test {

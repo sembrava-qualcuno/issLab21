@@ -4,6 +4,7 @@ ADD ./build/distributions/*.tar /
 
 WORKDIR /parkmanagerservice-boot-1.0/bin
 COPY ./src/main/resources/*.pl ./
+COPY ./src/main/resources/parkingMap.bin ./
 RUN ls
 
 ENTRYPOINT ["bash", "parkmanagerservice"]

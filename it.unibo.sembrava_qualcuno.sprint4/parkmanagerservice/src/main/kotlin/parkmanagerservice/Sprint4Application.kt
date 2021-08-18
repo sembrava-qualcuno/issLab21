@@ -6,14 +6,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.security.core.userdetails.User
 import org.springframework.boot.runApplication
 import org.springframework.context.support.beans
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.core.userdetails.User
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
-import org.springframework.security.provisioning.UserDetailsManager
 
 @SpringBootApplication
 @EnableWebSecurity
@@ -21,6 +19,11 @@ class Sprint4Application
 
 @ObsoleteCoroutinesApi
 fun main(args: Array<String>) {
+    val MANAGER_USERNAME = System.getenv("MANAGER_USERNAME") ?: "manager"
+    val MANAGER_PASSWORD = System.getenv("MANAGER_PASSWORD") ?: "admin"
+
+    println("SpringBootApplication: Manager credentials set to username=$MANAGER_USERNAME passowrd=$MANAGER_PASSWORD")
+
     runBlocking {
         launch {
             QakContext.createContexts("localhost", this, "carparking.pl", "sysRules.pl")
@@ -35,7 +38,7 @@ fun main(args: Array<String>) {
                                 .password(encoder.encode(password))
                                 .roles(*roles)
                                 .build()
-                        InMemoryUserDetailsManager(user("manager", "admin", "MANAGER"))
+                        InMemoryUserDetailsManager(user(MANAGER_USERNAME, MANAGER_PASSWORD, "MANAGER"))
                     }
                 })
             }

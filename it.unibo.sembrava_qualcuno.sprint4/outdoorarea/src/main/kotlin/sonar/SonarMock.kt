@@ -3,6 +3,7 @@ package sonar
 import org.eclipse.californium.core.CoapResource
 import org.eclipse.californium.core.CoapServer
 import org.eclipse.californium.core.server.resources.CoapExchange
+import kotlin.system.exitProcess
 
 class SonarMock(port: Int) : CoapResource("sonar") {
     var engaged: Boolean = false
@@ -30,7 +31,9 @@ class SonarMock(port: Int) : CoapResource("sonar") {
 }
 
 fun main() {
-    val mock = SonarMock(8026, false)
+    val START_VALUE= (System.getenv("START_VALUE")).toBoolean()
+    println("SonarMock: Start with start value $START_VALUE")
+    val mock = SonarMock(8026, START_VALUE)
 
     while (true) {
         val engaged = readLine().toBoolean()

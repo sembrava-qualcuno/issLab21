@@ -36,15 +36,23 @@ Request step       : step( TIME )
 
 Context ctxparkmanagerservice ip[host="localhost" port=8023]
 Context ctxtrolley ip[host="localhost" port=8024]
-Context ctxbasicrobot ip [host="127.0.0.1" port=8020]    
+Context ctxbasicrobot ip [host="basicrobot" port=8020]
 
 ExternalQActor basicrobot context ctxbasicrobot 
  
 QActor clientservice context ctxparkmanagerservice {
-	[#	
-		val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://localhost:8025/weightSensor")
-        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"), 60)
+	[#
+	    val WEIGHTSENSOR_HOSTNAME = System.getenv("WEIGHTSENSOR_HOSTNAME") ?: "indoorarea"
+        val WEIGHTSENSOR_PORT = System.getenv("WEIGHTSENSOR_PORT") ?: "8025"
+        val SONAR_HOSTNAME = System.getenv("SONAR_HOSTNAME") ?: "outdoorarea"
+        val SONAR_PORT = System.getenv("SONAR_PORT") ?: "8026"
+
+	    val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://$WEIGHTSENSOR_HOSTNAME:$WEIGHTSENSOR_PORT/weightSensor")
+        val sonarController = SonarController(CoapSonar("coap://$SONAR_HOSTNAME:$SONAR_PORT/sonar"), 60)
         val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
+
+        println("clientservice connected to weight sensor at $WEIGHTSENSOR_HOSTNAME:$WEIGHTSENSOR_PORT")
+        println("clientservice connected to sonar at $SONAR_HOSTNAME:$SONAR_PORT")
 	#]
 	
 	State s0 initial {
@@ -247,9 +255,14 @@ QActor clientservice context ctxparkmanagerservice {
 
 QActor managerservice context ctxparkmanagerservice {
 	[#
+	    val PARKINGAREA_HOSTNAME = System.getenv("PARKINGAREA_HOSTNAME") ?: "parkingarea"
+ 		val PARKINGAREA_PORT = System.getenv("PARKINGAREA_PORT") ?: "8027"
+
         val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
-        val thermometerController = ThermometerController(CoapThermometer("coap://localhost:8027/parkingarea/thermometer"), 30)
-        val fanResource : FanInterface = CoapFan("coap://localhost:8027/parkingarea/fan") 
+        val thermometerController = ThermometerController(CoapThermometer("coap://$PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT/parkingarea/thermometer"), 30)
+        val fanResource : FanInterface = CoapFan("coap://$PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT/parkingarea/fan")
+
+        println("managerservice connected to parkingarea at $PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT")
 	#]
 	
 	State s0 initial{

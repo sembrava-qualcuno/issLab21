@@ -28,10 +28,17 @@ class Clientservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 	@ObsoleteCoroutinesApi
 	@ExperimentalCoroutinesApi
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+				val WEIGHTSENSOR_HOSTNAME = System.getenv("WEIGHTSENSOR_HOSTNAME") ?: "indoorarea"
+				val WEIGHTSENSOR_PORT = System.getenv("WEIGHTSENSOR_PORT") ?: "8025"
+				val SONAR_HOSTNAME = System.getenv("SONAR_HOSTNAME") ?: "outdoorarea"
+				val SONAR_PORT = System.getenv("SONAR_PORT") ?: "8026"
 			
-				val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://localhost:8025/weightSensor")
-		        val sonarController = SonarController(CoapSonar("coap://localhost:8026/sonar"), 60)
+				val weightSensor : WeightSensorInterface = CoapWeightSensor("coap://$WEIGHTSENSOR_HOSTNAME:$WEIGHTSENSOR_PORT/weightSensor")
+		        val sonarController = SonarController(CoapSonar("coap://$SONAR_HOSTNAME:$SONAR_PORT/sonar"), 60)
 		        val trolleyResource : CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
+
+				println("clientservice connected to weight sensor at $WEIGHTSENSOR_HOSTNAME:$WEIGHTSENSOR_PORT")
+				println("clientservice connected to sonar at $SONAR_HOSTNAME:$SONAR_PORT")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

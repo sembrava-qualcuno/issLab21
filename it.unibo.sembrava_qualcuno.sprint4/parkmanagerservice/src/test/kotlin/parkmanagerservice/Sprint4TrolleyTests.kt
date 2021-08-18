@@ -3,6 +3,7 @@ package parkmanagerservice
 import ctxparkmanagerservice.main
 import connQak.connQakBase
 import connQak.connQakTcp
+import fan.FanMock
 import it.unibo.kactor.ActorBasic
 import it.unibo.kactor.MsgUtil
 import it.unibo.kactor.QakContext
@@ -21,6 +22,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.eclipse.californium.core.CoapClient
+import org.eclipse.californium.core.CoapResource
+import org.eclipse.californium.core.CoapServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.jupiter.api.*
@@ -33,6 +36,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import parkmanagerservice.model.Trolley
+import thermometer.ThermometerMock
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -50,6 +54,9 @@ class Sprint4TrolleyTests {
         var counter = 1
         val weightSensor = WeightSensorMock(8025, 1000)
         val sonarMock = SonarMock(8026, false)
+        val thermometerMock = ThermometerMock(25)
+        val fanMock = FanMock(false)
+        val server = CoapServer(8027).add(CoapResource("parkingarea").add(fanMock, thermometerMock)).start()
         val connParkClientService: connQakBase = connQakTcp()
 
         @JvmStatic
@@ -245,6 +252,7 @@ class Sprint4TrolleyTests {
         testingObserver!!.addObserver(channelForObserver)
 
         runBlocking {
+            assertEquals("trolley at HOME", channelForObserver.receive())
             assertEquals("trolley STOPPED", channelForObserver.receive())
         }
 

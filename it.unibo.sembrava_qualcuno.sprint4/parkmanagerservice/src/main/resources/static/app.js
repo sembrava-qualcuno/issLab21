@@ -1,8 +1,8 @@
 var prefix = ""
 var alertPlaceholder = document.getElementById('liveAlertPlaceholder')
-var timeout
 var timeoutValue = 60
 var seconds
+var reqenterTimer
 
 function alert(message, type) {
   //var wrapper = document.createElement('div')
@@ -74,11 +74,11 @@ function reqenter() {
           btnToChange.innerHTML = "Car placed"
           btnToChange.onclick = function() { carenter(res.parkingSlot) }
           document.getElementById("returnDiv").setAttribute("style", "visibility:visible;")
-          timeout = setInterval(function() {
+          reqenterTimer = setInterval(function() {
             seconds--
             document.getElementById("countdown").innerHTML = seconds + "s ";
             if (seconds == 0) {
-              clearInterval(x);
+              clearInterval(reqenterTimer);
               window.location = '/client'
             }
           }, 1000);
@@ -118,7 +118,7 @@ function carenter(slotnum) {
         btnToChange.innerHTML = "Return to Home Page"
         //TODO Make it also automatic
         btnToChange.onclick = function() { window.location = '/client' }
-        clearTimeout(timeout)
+        clearInterval(reqenterTimer)
         document.getElementById("returnDiv").setAttribute("style", "visibility:visible;")
         seconds = timeoutValue
         var x = setInterval(function() {

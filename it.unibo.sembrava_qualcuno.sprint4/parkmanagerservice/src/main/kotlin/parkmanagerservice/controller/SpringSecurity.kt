@@ -18,7 +18,7 @@ class AdminSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 ?.and()
                 ?.formLogin()
                     ?.loginPage("/manager/login")
-                    ?.successForwardUrl("/manager")
+                    ?.defaultSuccessUrl("/manager", true)
                     ?.failureUrl("/manager/loginError")
                     ?.permitAll()
                 ?.and()

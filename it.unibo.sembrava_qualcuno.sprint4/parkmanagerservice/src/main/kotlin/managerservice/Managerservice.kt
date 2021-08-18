@@ -23,10 +23,14 @@ class Managerservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 	@kotlinx.coroutines.ObsoleteCoroutinesApi
 	@kotlinx.coroutines.ExperimentalCoroutinesApi			
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+				val PARKINGAREA_HOSTNAME = System.getenv("PARKINGAREA_HOSTNAME") ?: "parkingarea"
+				val PARKINGAREA_PORT = System.getenv("PARKINGAREA_PORT") ?: "8027"
 
 		        val trolleyResource : org.eclipse.californium.core.CoapClient = CoapClient("coap://localhost:8024/ctxtrolley/trolley")
-		        val thermometerController = ThermometerController(CoapThermometer("coap://localhost:8027/parkingarea/thermometer"), 30)
-		        val fanResource : FanInterface = CoapFan("coap://localhost:8027/parkingarea/fan")
+		        val thermometerController = ThermometerController(CoapThermometer("coap://$PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT/parkingarea/thermometer"), 30)
+		        val fanResource : FanInterface = CoapFan("coap://$PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT/parkingarea/fan")
+
+				println("managerservice connected to parkingarea at $PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

@@ -2,6 +2,7 @@ package parkmanagerservice.controller
 
 import fan.CoapFan
 import fan.FanInterface
+import it.unibo.actor0.sysUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -22,21 +23,48 @@ import thermometer.ThermometerController
 
 @Controller
 class BaseController() {
+    val PARKINGAREA_HOSTNAME = System.getenv("PARKINGAREA_HOSTNAME") ?: "parkingarea"
+    val PARKINGAREA_PORT = System.getenv("PARKINGAREA_PORT") ?: "8027"
+    val SONAR_HOSTNAME = System.getenv("SONAR_HOSTNAME") ?: "outdoorarea"
+    val SONAR_PORT = System.getenv("SONAR_PORT") ?: "8026"
+
+    var THERMOMETER_THRESHOLD = 30
+    var TIMER_THRESHOLD = 60
+
     private lateinit var template: SimpMessagingTemplate
 
     @Autowired
     constructor (template: SimpMessagingTemplate) : this() {
         this.template = template
+
+        try {
+            val tmax = System.getenv("TMAX")
+            if(tmax != null)
+                THERMOMETER_THRESHOLD = tmax.toInt()
+            else
+                println("BaseController: Use default value TMAX=$THERMOMETER_THRESHOLD")
+        } catch (e: NumberFormatException) {
+            println("BaseController: TMAX must be an integer. Use default value $THERMOMETER_THRESHOLD")
+        }
+        try {
+            val dtfree = System.getenv("DTFREE")
+            if(dtfree != null)
+                TIMER_THRESHOLD = dtfree.toInt()
+            else
+                println("BaseController: Use default value DTFREE=$TIMER_THRESHOLD")
+        } catch (e: NumberFormatException) {
+            println("BaseController: DTFREE must be an integer. Use default value $TIMER_THRESHOLD")
+        }
     }
 
     //TODO Initialize temperature in ParkingAreaKb
 
     init {
-        println("%%%%%% BaseController | START FOR OBSERVE: ThermometerController")
-        ThermometerController(CoapThermometer("coap://localhost:8027/parkingarea/thermometer"), 30).addObserver{
+        println("%%%%%% BaseController | START FOR OBSERVE: ThermometerController at $PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT")
+        ThermometerController(CoapThermometer("coap://$PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT/parkingarea/thermometer"), THERMOMETER_THRESHOLD).addObserver{
             println("%%%%%% BaseController | OBSERVE: ThermometerController")
             ParkingAreaKb.highTemperature = !ParkingAreaKb.highTemperature
-            val fanResource : FanInterface = CoapFan("coap://localhost:8027/parkingarea/fan")
+            val fanResource : FanInterface = CoapFan("coap://$PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT/parkingarea/fan")
             if(ParkingAreaKb.highTemperature) {
                 template.convertAndSend("/manager/temperature", Message(1, "High Temperature!"))
                 fanResource.updateResource("start")
@@ -46,8 +74,8 @@ class BaseController() {
                 fanResource.updateResource("stop")
             }
         }
-        println("%%%%%% BaseController | START FOR OBSERVE: SonarController")
-        SonarController(CoapSonar("coap://localhost:8026/sonar"), 3).addObserver {
+        println("%%%%%% BaseController | START FOR OBSERVE: SonarController at $SONAR_HOSTNAME:$SONAR_PORT")
+        SonarController(CoapSonar("coap://$SONAR_HOSTNAME:$SONAR_PORT/sonar"), TIMER_THRESHOLD).addObserver {
             println("%%%%%% BaseController | OBSERVE: ThermometerController")
             template.convertAndSend("/manager/sonar", Message(3, "Sonar engaged!"))
         }
@@ -82,13 +110,6 @@ class BaseController() {
     @RequestMapping("/manager/loginError")
     fun loginError(model: Model): String {
         model.addAttribute("loginError", true)
-        return "login"
-    }
-
-    // Logout
-    @RequestMapping("/manager/logout")
-    fun logout(model: Model): String {
-        model.addAttribute("logOut", true)
         return "login"
     }
 
