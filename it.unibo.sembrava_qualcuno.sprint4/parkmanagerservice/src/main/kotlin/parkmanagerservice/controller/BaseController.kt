@@ -2,7 +2,6 @@ package parkmanagerservice.controller
 
 import fan.CoapFan
 import fan.FanInterface
-import it.unibo.actor0.sysUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -36,11 +35,17 @@ class BaseController() {
     @Autowired
     constructor (template: SimpMessagingTemplate) : this() {
         this.template = template
+    }
 
+    //TODO Initialize temperature in ParkingAreaKb
+
+    init {
         try {
             val tmax = System.getenv("TMAX")
-            if(tmax != null)
+            if(tmax != null){
                 THERMOMETER_THRESHOLD = tmax.toInt()
+                println("BaseController: Use value TMAX=$THERMOMETER_THRESHOLD")
+            }
             else
                 println("BaseController: Use default value TMAX=$THERMOMETER_THRESHOLD")
         } catch (e: NumberFormatException) {
@@ -48,18 +53,16 @@ class BaseController() {
         }
         try {
             val dtfree = System.getenv("DTFREE")
-            if(dtfree != null)
+            if(dtfree != null) {
                 TIMER_THRESHOLD = dtfree.toInt()
+                println("BaseController: Use value DTFREE=$TIMER_THRESHOLD")
+            }
             else
                 println("BaseController: Use default value DTFREE=$TIMER_THRESHOLD")
         } catch (e: NumberFormatException) {
             println("BaseController: DTFREE must be an integer. Use default value $TIMER_THRESHOLD")
         }
-    }
 
-    //TODO Initialize temperature in ParkingAreaKb
-
-    init {
         println("%%%%%% BaseController | START FOR OBSERVE: ThermometerController at $PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT")
         ThermometerController(CoapThermometer("coap://$PARKINGAREA_HOSTNAME:$PARKINGAREA_PORT/parkingarea/thermometer"), THERMOMETER_THRESHOLD).addObserver{
             println("%%%%%% BaseController | OBSERVE: ThermometerController")
