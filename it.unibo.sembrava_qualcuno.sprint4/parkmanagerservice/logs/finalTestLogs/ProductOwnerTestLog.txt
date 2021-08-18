@@ -1,0 +1,348 @@
+waiting for system startup ...
+               %%% sysUtil | createTheContext ctxparkmanagerservice FOR host=localhost  
+               %%% CoapResourceCtx ctxparkmanagerservice | created  
+               %%% QakContext |  localhost:8023 INIT 
+               %%% QakContext ctxparkmanagerservice |  serverCoap started on port: 8023
+               %%% sysUtil | createTheContext ctxtrolley FOR host=localhost  
+               %%% CoapResourceCtx ctxtrolley | created  
+               %%% QakContextServer serverctxparkmanagerservice | READY TO RECEIVE TCP CONNS on 8023 
+               %%% QakContext |  localhost:8024 INIT 
+               %%% QakContext ctxtrolley |  serverCoap started on port: 8024
+               %%% sysUtil | createTheContext ctxbasicrobot for DIFFERENT host=127.0.0.1} 
+               %%% QakContextServer serverctxtrolley | READY TO RECEIVE TCP CONNS on 8024 
+               %%% CoapResourceCtx ctxbasicrobot | created  
+               %%% sysUtil | FOR ACTIVATED CONTEXT ctxparkmanagerservice: ADDING A PROXY to ctxbasicrobot 
+               %%% NodeProxy proxyctxbasicrobot | in ctxparkmanagerservice PROXY DONE TO 127.0.0.1:8020 
+               %%% sysUtil | FOR ACTIVATED CONTEXT ctxtrolley: ADDING A PROXY to ctxbasicrobot 
+               %%% NodeProxy proxyctxbasicrobot | in ctxtrolley PROXY DONE TO 127.0.0.1:8020 
+               %%% QakContext | CREATING THE ACTORS on localhost 
+clientservice connected to weight sensor at localhost:8025
+clientservice connected to sonar at localhost:8026
+               %%% CoapResourceCtx ctxparkmanagerservice | addActorResource clientservice
+2021-08-18 14:12:32.404  INFO 12768 --- [-2 @coroutine#3] o.e.c.core.network.RandomTokenGenerator  : using tokens of 8 bytes in length
+2021-08-18 14:12:32.404  INFO 12768 --- [-2 @coroutine#3] o.e.c.core.network.CoapEndpoint          : CoapEndpoint uses udp plain
+2021-08-18 14:12:32.404  INFO 12768 --- [-2 @coroutine#3] o.e.c.core.network.stack.BlockwiseLayer  : BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000 and MAX_RESOURCE_BODY_SIZE=8192
+2021-08-18 14:12:32.419  INFO 12768 --- [-2 @coroutine#3] o.e.c.c.network.stack.ReliabilityLayer   : ReliabilityLayer uses ACK_TIMEOUT=2000, ACK_RANDOM_FACTOR=1.5, and ACK_TIMEOUT_SCALE=2.0
+2021-08-18 14:12:32.419  INFO 12768 --- [-2 @coroutine#3] o.e.c.core.network.CoapEndpoint          : Endpoint [coap://0.0.0.0:0] requires an executor to start, using default single-threaded daemon executor
+2021-08-18 14:12:32.419  INFO 12768 --- [-2 @coroutine#3] o.e.californium.elements.UDPConnector    : UDPConnector starts up 12 sender threads and 12 receiver threads
+2021-08-18 14:12:32.419  INFO 12768 --- [-2 @coroutine#3] o.e.californium.elements.UDPConnector    : UDPConnector listening on 0.0.0.0/0.0.0.0:58374, recv buf = 65536, send buf = 65536, recv packet size = 2048
+2021-08-18 14:12:32.435  INFO 12768 --- [-2 @coroutine#3] o.e.c.core.network.CoapEndpoint          : Started endpoint at coap://0.0.0.0:58374
+2021-08-18 14:12:32.435  INFO 12768 --- [-2 @coroutine#3] o.e.c.core.network.EndpointManager       : created implicit endpoint coap://0.0.0.0:58374 for coap
+waiting for system startup ...
+  __  __     _ __        ___       __        __  _____     _
+ / / / /__  (_) /  ___  / _ \___  / /  ___  / /_/ ___/_ __(_)
+/ /_/ / _ \/ / _ \/ _ \/ , _/ _ \/ _ \/ _ \/ __/ (_ / // / /
+\____/_//_/_/_.__/\___/_/|_|\___/_.__/\___/\__/\___/\_,_/_/
+
+managerservice connected to parkingarea at localhost:8027
+               %%% CoapResourceCtx ctxparkmanagerservice | addActorResource managerservice
+2021-08-18 14:12:32.701  INFO 12768 --- [    Test worker] parkmanagerservice.Sprint4FinalTest      : Starting Sprint4FinalTest using Java 1.8.0_211 on windows-laptop with PID 12768 (started by gianm in D:\Uni\Magistrale\I Anno\II Semestre\Ingegneria dei Sistemi Software M\sembrava_qualcuno_issLab21\issLab21\it.unibo.sembrava_qualcuno.sprint4\parkmanagerservice)
+2021-08-18 14:12:32.716  INFO 12768 --- [    Test worker] parkmanagerservice.Sprint4FinalTest      : No active profile set, falling back to default profiles: default
+               %%% CoapResourceCtx ctxtrolley | addActorResource trolley
+               %%% QakContext | createContexts on localhost ENDS 
+clientservice STARTS
+managerservice STARTS
+trolley STARTS
+loadRoomMap = parkingMap DONE
+plannerUtil initAI done
+INITIAL MAP
+|r, 0, 0, 0, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, 0, 0, 0, 0, 0, X, 
+|X, X, X, X, X, X, X, X, 
+(0,0) DOWN
+clientservice waiting ...
+managerservice WAITING for requests
+trolley IDLE
+trolley at HOME
+2021-08-18 14:12:33.289  WARN 12768 --- [kground-preinit] o.s.h.c.j.Jackson2ObjectMapperBuilder    : For Jackson Kotlin classes support please add "com.fasterxml.jackson.module:jackson-module-kotlin" to the classpath
+2021-08-18 14:12:35.875  INFO 12768 --- [    Test worker] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'clientInboundChannelExecutor'
+2021-08-18 14:12:35.890  INFO 12768 --- [    Test worker] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'clientOutboundChannelExecutor'
+2021-08-18 14:12:35.890  INFO 12768 --- [    Test worker] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'brokerChannelExecutor'
+%%%%%% BaseController | START FOR OBSERVE: ThermometerController at localhost:8027
+%%%%%% BaseController | START FOR OBSERVE: SonarController at localhost:8026
+BaseController: Use default value TMAX=30
+BaseController: Use default value DTFREE=60
+2021-08-18 14:12:35.953  INFO 12768 --- [   CoapServer#1] o.eclipse.californium.core.CoapResource  : successfully established observe relation between /127.0.0.1:58374#[97f6d5905d282d31] and resource /parkingarea/thermometer (Exchange[R9], size 1)
+2021-08-18 14:12:35.953  INFO 12768 --- [   CoapServer#1] o.eclipse.californium.core.CoapResource  : successfully established observe relation between /127.0.0.1:58374#[4d0d44b45f884978] and resource /sonar (Exchange[R10], size 1)
+      connQakTcp | connected with localhost
+      connQakTcp | connected with localhost
+2021-08-18 14:12:36.229  INFO 12768 --- [    Test worker] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'messageBrokerTaskScheduler'
+2021-08-18 14:12:36.635  INFO 12768 --- [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 207b67d7-3db8-41ef-822f-cded0a14bcf8
+
+2021-08-18 14:12:36.979  INFO 12768 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@154db29b, org.springframework.security.web.context.SecurityContextPersistenceFilter@66c46d8d, org.springframework.security.web.header.HeaderWriterFilter@53d3f3e8, org.springframework.security.web.authentication.logout.LogoutFilter@957428e, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@60f36952, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7bf4c908, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@13eaaa00, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2d50d57f, org.springframework.security.web.session.SessionManagementFilter@5fe94ee4, org.springframework.security.web.access.ExceptionTranslationFilter@ca26092, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@77f93199]
+2021-08-18 14:12:39.569  INFO 12768 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2021-08-18 14:12:39.585  INFO 12768 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2021-08-18 14:12:39.585  INFO 12768 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2021-08-18 14:12:39.619  INFO 12768 --- [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2021-08-18 14:12:39.619  INFO 12768 --- [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@4fbfa872]]
+2021-08-18 14:12:39.619  INFO 12768 --- [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2021-08-18 14:12:39.635  INFO 12768 --- [    Test worker] parkmanagerservice.Sprint4FinalTest      : Started Sprint4FinalTest in 7.885 seconds (JVM running for 11.153)
+
+=================================================================== 
++++++++++ BEFOREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE testingObserver=null
++++++++++ checkSystemStarted resumed 
+%%%%%% obstesting1 | START uriStr: coap://localhost:8024/ctxtrolley/trolley
+2021-08-18 14:12:40.103  INFO 12768 --- [   CoapServer#2] o.eclipse.californium.core.CoapResource  : successfully established observe relation between /127.0.0.1:58374#[55d36e5aa6597ee7] and resource /ctxtrolley/trolley (Exchange[R14], size 1)
+%%%%%% h_obstesting1 | content=trolley at HOME RESP-CODE=2.05
+connQakTcp | request= msg(reqenter,request,springcontroller,clientservice,reqenter(X),16)
+clientservice in handleEnterRequest | msg(reqenter,request,springcontroller,clientservice,reqenter(X),16)
+clientservice reply to reqenter
+clientservice reply enter(2)
+connQakTcp | answer= msg(enter,reply,clientservice,springcontroller,'{"code":0,"message":"2"}',17)
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /client/reqenter
+       Parameters = {}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = parkmanagerservice.controller.SpringController
+           Method = parkmanagerservice.controller.SpringController#reqenter()
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json", X-Content-Type-Options:"nosniff", X-XSS-Protection:"1; mode=block", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
+     Content type = application/json
+             Body = {"parkingSlot":2}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+connQakTcp | request= msg(carenter,request,springcontroller,clientservice,carenter(2),18)
+clientservice in enterthecar | msg(carenter,request,springcontroller,clientservice,carenter(2),18)
+clientservice reply to carenter
+connQakTcp | answer= msg(receipt,reply,clientservice,springcontroller,'{"code":0,"message":"218082021021242"}',19)
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /client/carenter
+       Parameters = {slotnum=[2]}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = parkmanagerservice.controller.SpringController
+           Method = parkmanagerservice.controller.SpringController#carenter(int)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json", X-Content-Type-Options:"nosniff", X-XSS-Protection:"1; mode=block", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
+     Content type = application/json
+             Body = {"tokenId":"218082021021242"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+trolley in working | msg(moveToInOutdoor,dispatch,clientservice,trolley,moveToInOutdoor(indoor),20)
+trolley WORKING
+trolley trip to INDOOR start
+setGoal 6,0 while robot in cell: 0,0 direction=downDir 
+|r, 0, 0, 0, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, 0, 0, 0, 0, 0, X, 
+|X, X, X, X, X, X, X, X, 
+(0,0) DOWN
+plannerUtil doPlan  
+plannerUtil doPlan newProblem (A) itunibo.planner.plannerUtil$setGoal$1@b1317ff
+plannerUtil doPlan newProblem (A) search 
+%%%%%% h_obstesting1 | content=trolley trip to INDOOR start RESP-CODE=2.05
+plannerUtil doPlan actions=[l, w, w, w, w, w, w]
+clientservice moves the car to SLOTNUM = 2
+connQakTcp | request= msg(reqexit,request,springcontroller,clientservice,reqexit(117082021120000),28)
+clientservice reply
+		               %%%  ActorBasicFsm clientservice |  added msg(reqexit,request,springcontroller,clientservice,reqexit(117082021120000),28) in msgQueueStore
+clientservice waiting ...
+clientservice in handleOutRequest | msg(reqexit,request,springcontroller,clientservice,reqexit(117082021120000),28)
+clientservice reply to reqexit
+connQakTcp | answer= msg(exit,reply,clientservice,springcontroller,'{"code":0,"message":"Success"}',30)
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /client/reqexit
+       Parameters = {tokenid=[117082021120000]}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = parkmanagerservice.controller.SpringController
+           Method = parkmanagerservice.controller.SpringController#reqexit(String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [X-Content-Type-Options:"nosniff", X-XSS-Protection:"1; mode=block", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
+     Content type = null
+             Body = 
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+trolley trip to INDOOR end
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),233) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),235) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),237) in msgQueueStore
+%%%%%% h_obstesting1 | content=trolley trip to INDOOR end RESP-CODE=2.05
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),239) in msgQueueStore
+trolley in working | msg(moveToPark,dispatch,clientservice,trolley,moveToPark(2),27)
+trolley WORKING
+trolley moveToPark(2)
+setGoal 1,2 while robot in cell: 6,0 direction=rightDir 
+|1, 1, 1, 1, 1, 1, r, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, 0, 0, 0, 0, 0, X, 
+|X, X, X, X, X, X, X, X, 
+(6,0) RIGHT
+plannerUtil doPlan  
+plannerUtil doPlan newProblem (A) itunibo.planner.plannerUtil$setGoal$1@6e63bc67
+plannerUtil doPlan newProblem (A) search 
+%%%%%% h_obstesting1 | content=trolley moveToPark(2) RESP-CODE=2.05
+plannerUtil doPlan actions=[l, l, w, w, w, w, w, l, w, w]
+clientservice moves the car from SLOTNUM = 1
+clientservice reply
+clientservice waiting ...
+trolley trip to park slot 2 end
+%%%%%% h_obstesting1 | content=trolley trip to park slot 2 end RESP-CODE=2.05
+trolley in working | msg(moveToPark,dispatch,clientservice,trolley,moveToPark(1),31)
+trolley WORKING
+trolley moveToPark(1)
+setGoal 1,1 while robot in cell: 1,2 direction=downDir 
+|1, 1, 1, 1, 1, 1, 1, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, r, X, X, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, 0, 0, 0, 0, 0, X, 
+|X, X, X, X, X, X, X, X, 
+(1,2) DOWN
+plannerUtil doPlan  
+plannerUtil doPlan newProblem (A) itunibo.planner.plannerUtil$setGoal$1@3f278a8b
+plannerUtil doPlan newProblem (A) search 
+plannerUtil doPlan actions=[r, r, w]
+%%%%%% h_obstesting1 | content=trolley moveToPark(1) RESP-CODE=2.05
+trolley trip to park slot 1 end
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),241) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),243) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),245) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),247) in msgQueueStore
+%%%%%% h_obstesting1 | content=trolley trip to park slot 1 end RESP-CODE=2.05
+trolley in working | msg(moveToInOutdoor,dispatch,clientservice,trolley,moveToInOutdoor(outdoor),38)
+trolley WORKING
+trolley trip to OUTDOOR start
+setGoal 6,4 while robot in cell: 1,1 direction=upDir 
+|1, 1, 1, 1, 1, 1, 1, X, 
+|0, r, X, X, 0, 0, 0, X, 
+|0, 1, X, X, 0, 0, 0, X, 
+|0, 0, X, X, 0, 0, 0, X, 
+|0, 0, 0, 0, 0, 0, 0, X, 
+|X, X, X, X, X, X, X, X, 
+(1,1) UP
+plannerUtil doPlan  
+plannerUtil doPlan newProblem (A) itunibo.planner.plannerUtil$setGoal$1@15a9c4ce
+plannerUtil doPlan newProblem (A) search 
+%%%%%% h_obstesting1 | content=trolley trip to OUTDOOR start RESP-CODE=2.05
+plannerUtil doPlan actions=[l, l, w, w, w, l, w, w, w, w, w]
+trolley trip to OUTDOOR end
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),249) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),251) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),253) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),255) in msgQueueStore
+%%%%%% h_obstesting1 | content=trolley trip to OUTDOOR end RESP-CODE=2.05
+trolley IDLE
+setGoal 0,0 while robot in cell: 6,4 direction=rightDir 
+|0, 1, 1, 1, 1, 1, 1, X, 
+|0, 1, X, X, 0, 0, 0, X, 
+|0, 1, X, X, 0, 0, 0, X, 
+|0, 1, X, X, 0, 0, 0, X, 
+|0, 1, 1, 1, 1, 1, r, X, 
+|X, X, X, X, X, X, X, X, 
+(6,4) RIGHT
+plannerUtil doPlan  
+plannerUtil doPlan newProblem (A) itunibo.planner.plannerUtil$setGoal$1@28e8a3cc
+plannerUtil doPlan newProblem (A) search 
+%%%%%% h_obstesting1 | content=trolley IDLE RESP-CODE=2.05
+plannerUtil doPlan actions=[l, w, w, w, w, l, w, w, w, w, w, w]
+trolley at HOME
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),257) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),259) in msgQueueStore
+%%%%%% h_obstesting1 | content=trolley at HOME RESP-CODE=2.05
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),261) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),263) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),265) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),267) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),269) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),271) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),273) in msgQueueStore
+trolley IDLE
+trolley at HOME
+%%%%%% h_obstesting1 | content=trolley IDLE RESP-CODE=2.05
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),275) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),277) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),279) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),281) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),283) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),285) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),287) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),289) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),291) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),293) in msgQueueStore
+		               %%%  ActorBasicFsm trolley |  added msg(stepdone,reply,basicrobot,trolley,stepdone(ok),295) in msgQueueStore
++++++++++ AFTERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR  obstesting1
+%%%%%% obstesting1 | terminate parkmanagerservice.UpdateHandler@459a5
+terminate the testing

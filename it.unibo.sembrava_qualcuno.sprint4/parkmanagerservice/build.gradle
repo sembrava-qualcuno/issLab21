@@ -116,6 +116,9 @@ application {
 
 test {
 	useJUnitPlatform()
+	environment("PARKINGAREA_HOSTNAME", "localhost")
+	environment("SONAR_HOSTNAME", "localhost")
+	environment("WEIGHTSENSOR_HOSTNAME", "localhost")
 }
 
 compileKotlin {
@@ -140,7 +143,8 @@ sourceSets {
 
 	main.kotlin.srcDirs += 'src/main/resources/'
 	main.resources.srcDirs = [ "src/main/resources/" ]
-	test.resources.srcDirs += [ "src/main/resources/" ]
+	test.resources.srcDirs = ["src/test/resources/"]
+	//test.resources.srcDirs += [ "src/main/resources/" ]
 	//main.resources {}
 }
 
