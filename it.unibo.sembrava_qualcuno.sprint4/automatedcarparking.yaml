@@ -13,22 +13,30 @@ services:
     depends_on:
       - wenv
   indoorarea:
-    image: indoorarea
+    image: docker.io/sembravaqualcuno/automatedcarparking-indoorarea:1.0
+    env_file:
+      - variables.env
     stdin_open: true
     ports:
       - 8025:8025/udp
   outdoorarea:
-    image: outdoorarea
+    image: docker.io/sembravaqualcuno/automatedcarparking-outdoorarea:1.0
+    env_file:
+      - variables.env
     stdin_open: true
     ports:
       - 8026:8026/udp
   parkingarea:
-    image: parkingarea
+    image: docker.io/sembravaqualcuno/automatedcarparking-parkingarea:1.0
+    env_file:
+      - variables.env
     stdin_open: true
     ports:
       - 8027:8027/udp
   parkmanagerservice:
-    image: parkmanagerservice
+    image: docker.io/sembravaqualcuno/automatedcarparking-parkmanagerservice:1.0
+    env_file:
+      - variables.env
     ports:
       - 8080:8080/tcp
       - 8080:8080/udp
@@ -37,11 +45,3 @@ services:
       - indoorarea
       - outdoorarea
       - parkingarea
-## -------------------------------------------------------------
-## TODO See https://docs.docker.com/compose/startup-order/
-## Compose does not wait until a container is â€œreadyâ€� (whatever that means for your particular application)
-## - only until itâ€™s running. Thereâ€™s a good reason for this.
-## The best solution is to perform this check in your application code,
-## -------------------------------------------------------------
-## docker-compose run --service-ports wenv
-## docker-compose run --service-ports vrobotclient  ATTIVA ANCHE wenv

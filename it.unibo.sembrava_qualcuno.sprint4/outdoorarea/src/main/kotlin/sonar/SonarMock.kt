@@ -31,7 +31,7 @@ class SonarMock(port: Int) : CoapResource("sonar") {
 }
 
 fun main() {
-    val START_VALUE= (System.getenv("START_VALUE")).toBoolean()
+    val START_VALUE= (System.getenv("SONAR_START_VALUE")).toBoolean()
     println("SonarMock: Start with start value $START_VALUE")
     val mock = SonarMock(8026, START_VALUE)
 

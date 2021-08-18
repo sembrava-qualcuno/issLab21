@@ -30,7 +30,7 @@ class WeightSensorMock(port: Int) : CoapResource("weightSensor") {
 
 fun main() {
     try {
-        val START_VALUE= (System.getenv("START_VALUE") ?: "0").toInt()
+        val START_VALUE= (System.getenv("WEIGHTSENSOR_START_VALUE") ?: "0").toInt()
         println("WeightSensorMock: Start with start value $START_VALUE")
         val mock = WeightSensorMock(8025, START_VALUE)
 
