@@ -299,6 +299,7 @@
 				the components we require for this sprint: SpringController/View, ClientService. Furthermore, we want to specify that all what we developed in Sprint2 stand also for this sprint and only changes and updates to it are hereby presented. 
 				
 				<h3>SpringIndoorView</h3>
+					We used <a href="https://getbootstrap.com/">bootrastrap</a> to develop all the view in the project.
 					<table>
 						<tr><td>
 							<h4>Client home page</h4>
@@ -352,13 +353,15 @@
 							<center><img src="./img/ClientReqexit.png" width="70%"></center>
 						</td></tr>
 					</table></center>
-
+				<div class="remark">
+					<lr>F1</lr>, <lr>F4</lr> and <lr>F7</lr> are now met.
+				</div>
 				<h3>SpringController</h3>
 					<table style="width:98%">
 						<tbody>
 						<tr><td style="width:60%">
 							<h4>Using RESTful APIs for the M2M interaction (cont.d) and JS for H2M interaction</h4>
-							As already known, the M2M interaction has been developed using RESTful APIs (<a href=" ../../it.unibo.sembrava_qualcuno.sprint1/userDocs/REST-APIdocs.html">API docs</a>).
+							As already known, the M2M interaction has been developed using RESTful APIs (<a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/swagger-ui/REST-APIdocs.html">API docs</a>).
 							These are managed by the already known <a href="../parkmanagerservice/src/main/kotlin/controller/SpringController.kt">SpringController</a>; the H2M interaction, however, is orchestrated by
 							a client-side <a href="../parkmanagerservice/src/main/resources/static/app.js">app.js</a> file and a <a href="../parkmanagerservice/src/main/kotlin/controller/BaseController.kt">BaseController</a>: the BaseController
 							accepts <tt>/client</tt> or <tt>/clientOut</tt> request to return to the home pages while the app.js changes the DOM elements of the page according to the responses of the SpringController (e.g. changes
@@ -454,17 +457,17 @@ class SpringController {
 			<h2>Deployment</h2>
 				To end this sprint we thought to deploy what has been completed, as all the client business logic has been developed. We decided to divide our system in 5 nodes:
 				<ul>
-					<li>The <em>indoorarea</em> node: holds the WeightSensorMock and Interface and its configuration files</li>
-					<li>The </em>outdoorarea</em> node: holds the SonarMock and Interface and its configuration files</li>
-					<li>The </em>parkmanagerservice</em> node: holds two artifacts:
+					<li>The <em>indoorarea</em> node: holds the WeightSensorMock and its configuration files</li>
+					<li>The <em>outdoorarea</em> node: holds the SonarMock and its configuration files</li>
+					<li>The <em>parkmanagerservice</em> node: holds two artifacts:
 						<ul>
-							<li><em>parkmanagerservice-1.0.tar</em>: contains the ClientService, Trolley, WeightSensor/Sonar Interface and SonarController and its configuration files. Also contains the prolog knowledge base for the qak infrastructure</li>
-							<li><em>parkmanagerservice-boot-1.0.tar</em>: contains the SpringBoot components: BaseController, SpringController and the SpringModel (e.g. ParkingSlot.kt, ApiError.kt, etc...)</li>
+							<li><tt>parkmanagerservice-1.0.tar</tt>: contains the ClientService, Trolley, WeightSensor/Sonar Interface and SonarController and its configuration files. Also contains the prolog knowledge base for the qak infrastructure</li>
+							<li><tt>parkmanagerservice-boot-1.0.tar</tt>: contains the SpringBoot components: BaseController, SpringController and the SpringModel (e.g. ParkingSlot.kt, ApiError.kt, etc...)</li>
 						</ul>
 						Depends on the indoorarea, outdoorarea and basicrobot.
 					</li>
-					<li>The </em>basicrobot</em> node: holds the BasicRobot; depends on wenv</li>
-					<li>The </em>wenv</em> node: holds the WEnv and the virtual robot</li>
+					<li>The <em>basicrobot</em> node: holds the BasicRobot; depends on wenv</li>
+					<li>The <em>wenv</em> node: holds the WEnv and the virtual robot</li>
 				</ul>
 				See the image below for a deployment diagram:<br>
 				<center><img id="Deployment" src="./img/Sprint3Deployment.png" width="70%"></center>
@@ -473,7 +476,7 @@ class SpringController {
 				<h3>indoorarea Dockerfile</h3>
 					We provide a <a href="../indoorarea/Dockerfile">Dockerfile</a> to build and run a Docker image for the indoor area.<br>
 					
-<pre><tt># To build (in the indoorarea/ folder):</tt>
+<pre id="dockerDepl"><tt># To build (in the indoorarea/ folder):</tt>
 docker build --rm -t indoorarea .
 <tt># To run:</tt>
 docker run -rm -i -p8025:8025 indoorarea 
@@ -496,7 +499,7 @@ docker run -rm -i -p8080:8080 parkmanagerservice
 				<h3>Deployment using Docker</h3>
 					We also provide a <a href="../automatedcarparking.yaml">script</a> to automatically deploy the system using one container per node, as described above.<br>
 					Use it invoking 
-<pre>docker-compose -f automatedcarparking.yaml</pre>
+<pre id="compose">docker-compose -f automatedcarparking.yaml</pre>
 			<h2>Sprint Summary</h2>
 			
 			The coming figure represents the final outline resulting from the Sprint3. The dashed lines that group components together gives a glance of the physical deployment organization<br> 			<div>

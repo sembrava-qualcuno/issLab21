@@ -260,7 +260,7 @@
 		</div>   
 
 		<div class="body"> 
-			<h2 id="sprint3">Introduction</h2>
+			<h2 id="sprint4">Introduction</h2>
 				<div class="remark">
 					Our motto:<br/>   
 					<k>there is no code without a project, no project without problem analysis and no problem without requirements</k>.
@@ -289,74 +289,376 @@
 						</tbody>
 					</table>
 				This sprint should end the development cycle and should be done in <k>5 days</k>.
-			<div class="remark">
-				<center><em>In the following diagrams, the Green color is associated with "Controller" or "Buisness logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br> 
-			</div>
+				<div class="remark">
+					<center><em>In the following diagrams, the Green color is associated with "Controller" or "Business logic" components, the Blue color to "Model" components and the Red color to "Interface" components (e.g. GUIs, Communication interfaces, etc.)</em></center><br>
+				</div>
 			<h2>Project</h2>
-				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase and considering the results of <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint3.html#Final outline">Sprint3</a> let's now "zoom in" and update 
-				the components we require for this sprint: SpringController/View, ManagerService, ThermometerController and mock, Fan. Furthermore, we want to specify that all what we developed in Sprint3 stand also for this sprint and only changes and updates to it are hereby presented. 
-				
-				<h3>SpringManagerView</h3>
-					<table>
-						<tr><td>
-							
-						</td><td>
-							
-						</td></tr>
-						<tr><td>
-							
-						</td><td>
-							
-						</td></tr>
-						<tr><td>
-							
-						</td><td>
-							
-						</td></tr>
-					</table>
-					<center><table>
-						<tr><td>
-								
-						</td></tr>
-					</table></center>
-
-				<h3>SpringController</h3>
-					<table style="width:98%">
-						<tbody>
-						<tr><td style="width:60%">
-							
-						</td>
-						<td>  
-							<center><img src="./img/ClientServiceFSM.png" width="100%"></center>
-						</td></tr>
-
-					</table>
+				Starting from the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#archLogica">logic architecture</a> derived during the analysis phase and considering the results of <a href="../../it.unibo.sembrava_qualcuno.sprint3/userDocs/BongiovanniDeCola_Sprint3.html#Final outline">Sprint3</a> let's now "zoom in" and update 
+				the components we require for this sprint: ManagerService, ParkServiceStatusGUI(SpringController/View), ThermometerController and mock, Fan, SonarController and Interface. Furthermore, we want to specify that all what we developed in Sprint3 stand also for this sprint and only changes and updates to it are hereby presented.
 				<h3>ManagerService</h3>
 					<table style="width:98%">
 						<tbody>
 						<tr><td style="width:60%">
-							
+							<h4>The ManagerService as a Moore's Finite State Machine</h4>
+							The ManagerService is the component that contains most of the business logic in these sprint use cases. It will be implemented as an actor, because we need a component capable of accepting and queuing different requests in a non-blocking manner and to
+							communicate and behave with a message-based strategy. For this reason we will once again exploit the qak infrastructure and language, implementing the service as a FSM, whose state changes are triggered by events and messages. <br>
+							The FSM Diagram attached describes the service states and the behaviour of the one which are of interest for this sprint. The diagram was designed loosely basing on the ManagerService designed and developed for the First Executable Model (<a target="code" href="../../it.unibo.sembrava_qualcuno.tf21Start/src/parkingArea.qak">parkingArea.qak</a>) of the system.
 						</td>
-						<td>  
-							<center><img src="./img/ClientServiceFSM.png" width="100%"></center>
-						</td></tr>
+							<td>
+								<center><img src="./img/ManagerServiceFSM.png" width="100%"></center>
+							</td></tr>
 
 					</table>
-					
+				<h3>ParkServiceStatusGUI</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:60%">
+							As already seen in <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#ParkServiceGUI">Sprint1</a>, we divided the ParkServiceStatusGUI component, identified during the analysis phase in a SpringController and View.
+							<h4>SpringController/BaseController</h4>
+								Methods to manage the remaining RestAPIs where added to the <a href="../parkmanagerservice/src/main/kotlin/parkmanagerservice/controller/SpringController.kt">SpringController</a> and methods to present the right views were added to the <a href="../parkmanagerservice/src/main/kotlin/parkmanagerservice/controller/BaseController.kt">BaseController</a>.<br>
+								The BaseController has also been updated to be notified when the temperature exceeds (or goes back under) the <k>TMAX(= 30)</k> value and when a car engages the OUTDOOR area
+								for more than <k>DTFREE(=60)</k> seconds. It will implement an observer (registering to the SonarController and ThermometerController) to send an asynchronous message to the manager and let him/her know that an alarm was fired.
+								It will also update the fan resource whenever the temperature raises above/below the threshold, as per <lr>F15</lr>. This was delegated to the observer as it is the one to be notified of the temperature change and it seemed pointless to send a message to the ManagerService, creating another state for this actor, just to update the fan resource.
+						<td>
+							<center><img src="./img/ParkServiceStatusGUI.png" width="60%"></center>
+						</td></tr>
+						<tr><td>
+							<h4>Another Spring feature for authentication: SpringSecurity</h4>
+								An addition was made to the already presented controllers: the <a href="../parkmanagerservice/src/main/kotlin/parkmanagerservice/controller/SpringSecurity.kt">SpringSecurity</a> controller has been introduced to deal with the manager login/logout tasks, as per POR <em>authorize</em> and <lr>F16</lr>
+								This class inherits from the WebSecurityConfigurerAdapter offered by Spring, to automatically configure what pages require authentication, what are the login/logout urls, what to do after a succesfull authentication, or if there are errors and what user can access what pages/APIs.
+								For demoing purposes, the "manager" user and its password are stored in memory (cyphering the password) at the Spring startup.<br>
+							<h4>Using RESTful APIs for the M2M interaction and JS for H2M interaction (cont.d)</h4>
+								As already known, the M2M interaction has been developed using RESTful APIs (<a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/swagger-ui/REST-APIdocs.html">API docs</a>); these have been updated to match the PORs <em>manage</em> and <em>monitor</em>. A sequence diagram for these PORs is presented to the right.<br>
+								A client-side <a href="../parkmanagerservice/src/main/resources/static/manager.js">manager.js</a> file
+								changes the DOM elements of the page according to the responses of the SpringController (e.g. changes buttons to let the manager perform different actions, updates the system state after a notification, etc.).<br>
+								Moreover, the manager.js file also opens a <tt>WebSocket</tt> connection, that will be managed server-side by our <a href="../parkmanagerservice/src/main/kotlin/parkmanagerservice/config/WebSocketConfig.kt">WebSocketConfig</a> configuration class: another Spring feature that allows a simple and automatic configuration of message handling from WebSocket clients, using <a href="https://en.wikipedia.org/wiki/Streaming_Text_Oriented_Messaging_Protocol#:~:text=Simple%20(or%20Streaming)%20Text%20Oriented,message%20broker%20supporting%20the%20protocol.">STOMP</a>.
+								From this connection, the BaseController will notify the manager when the temperature exceeds (or goes back under) the <k>TMAX(= 30)</k> value and when a car engages the OUTDOOR area
+								for more than <k>DTFREE(=60)</k> seconds.<br>
+								Finally, the manager.js file will also activate a <k>1s timer</k>, to fetch fresh information about the parking area every second.
+						<td>
+							<center><img src="./img/APISequenceDiagram.png" width="98%"></center>
+						</td></tr>
+						</tbody>
+					</table>
+				<h3>SpringManagerView</h3>
+					<table>
+						<tr><td>
+							<h4>Manager Login</h4>
+							<center><img src="./img/ManagerLogin.png" width="75%"></center>
+						</td><td>
+							<h4>Manager Login failed</h4>
+							<center><img src="./img/ManagerLoginFailed.png" width="60%"></center>
+						</td></tr>
+						<tr><td>
+							<h4>Manager Homepage</h4>
+							<center><img src="./img/ManagerHomepage.png" width="90%"></center>
+						</td><td>
+							<h4>Manager Logout</h4>
+							<center><img src="./img/ManagerLogout.png" width="63%"></center>
+						</td></tr>
+						<tr><td>
+							<h4>Manager Homepage: outdoor area engaged alarm</h4>
+							<center><img src="./img/ManagerOutdoor.png" width="75%"></center>
+						</td><td>
+							<h4>Manager Homepage: high temperature alarm</h4>
+							<center><img src="./img/ManagerHighTemp.png" width="58%"></center>
+						</td></tr>
+						<tr><td>
+							<h4>Manager Homepage: trolley can't be stopped (low temperature)</h4>
+							<center><img src="./img/ManagerHomepage.png" width="90%"></center>
+						</td><td>
+							<h4>Manager Homepage: trolley stopped</h4>
+							<center><img src="./img/ManagerStop.png" width="60%"></center>
+						</td></tr>
+					</table>
+				<div class="remark">
+					<lr>F10</lr> is now met.
+				</div>
+				<h3>Thermometer</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:50%">
+							<h4 id="thermometerinterface">The need of a Sensor Interface (cont.d)</h4>
+								As for the weight sensor in the first sprint and the sonar in the second sprint, we have added a <a target="code" href="../parkmanagerservice/src/main/kotlin/thermometer/ThermometerInterface.kt">ThermometerInterface</a> to abstract the concept of Thermometer from the technology that it uses to communicate. As thermometers are deemed sensors, they are usually constrained devices, so we decided to use the CoAP protocol once again for
+								<a target="code" href="../parkmanagerservice/src/main/kotlin/thermometer/CoapThermometer.kt">our implementation</a> of the interface.<br>
+								Apart from the usual <tt>get&lt;RESOURCESTATE&gt;</tt>, this interface also provides a method to register observers to the attached Resource: in our case, as CoAP provides an <k>observe feature</k>, we can implement the high temperature notification discussed in the analysis phase in this way. For this, our CoapThermometer should also implement the CoapHandler interface, which is required to attach an handler to the <k>changed()</k> event that the resource will send every time it is updated.
+							<h4>The ThermometerController and ThermometerMock</h4>
+							The <a target="code" href="../parkmanagerservice/src/main/kotlin/thermometer/ThermometerController.kt">ThermometerController</a> will both offer the way for the ManagerService to ask the Thermometer (in the form of our <a href="../parkingarea/src/main/kotlin/thermometer/ThermometerMock.kt">ThermometerMock</a>) for the temperature every second, and a method to let the BaseController observer to listen for <k>high temperature notifications</k>.
+						</td>
+							<td>
+								<center><img src="./img/ThermometerClassDiagram.png" width="100%"></center>
+							</td></tr>
+						</tbody>
+					</table>
+				<h3>Fan</h3>
+					<table style="width:98%">
+						<tbody>
+						<tr><td style="width:50%">
+							<h4>The need of a Sensor Interface (cont.d)</h4>
+								As for all our sensors, we have added a <a target="code" href="../parkmanagerservice/src/main/kotlin/fan/FanInterface.kt">FanInterface</a> even for the fan. The CoAP protocol was once again used for
+								<a target="code" href="../parkmanagerservice/src/main/kotlin/fan/CoapFan.kt">our implementation</a> of the interface.<br>
+								Apart from the usual <tt>get&lt;RESOURCESTATE&gt;</tt>, this interface also provides a method to update the Resource: this is used by the BaseController observer whenever a <k>high temperature notification</k> arrives from the ThermometerController, to start/stop the fan accordingly.<br>
+							<h4>FanMock</h4>
+								We implemented our fan as a <a href="../parkingarea/src/main/kotlin/fan/FanMock.kt">FanMock</a> and we decided not to make this resource observable, as it can be simply queried on request.
+						</td>
+							<td>
+								<center><img src="./img/FanClassDiagram.png" width="100%"></center>
+							</td></tr>
+						</tbody>
+					</table>
+				<h3>SonarController/SonarInterface</h3>
+			The <a href="../parkmanagerservice/src/main/kotlin/sonar/SonarInterface.kt">SonarInterface</a> has been updated in the same way discussed in the <a href="#thermometerinterface">ThermometerInterface</a> section (see also the attached image for a class diagram update).<br>
+					The <a href="../parkmanagerservice/src/main/kotlin/sonar/SonarController.kt">SonarController</a> has been updated with the remaining of its business logic: it now has a method <tt>addObserver()</tt> which allows
+					external observer to be notified when the outdoor area is engaged for more than 60s (implemented as a <k>Timer</k> task). The observer will specify a lambda to be fired when the SonarController sends the notification.
+<pre>
+private lateinit var timer: Timer
+private val timerTreshold: Int
+
+private fun checkSonarEngaged(engaged: Boolean) {
+        timer = Timer()
+        if(engaged)
+            timer.schedule(this, (timerThreshold * 1000).toLong())
+        else
+            timer.cancel()
+}
+
+override fun run() {
+        thread { observer() }
+}
+</pre>
 			<h2>Testing</h2>
-			
+				To exploit the qak CoAP observable resources for testing purposes, as already done during the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#tests">first test plans</a> of the analysis phase<br> and the <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html#tests">tests of the sprint1</a>, and <a href="../../it.unibo.sembrava_qualcuno.sprint2/userDocs/BongiovanniDeCola_Sprint2.html#tests">sprint2</a>, the <a href="../parkmanagerservice/src/test/kotlin/parkmanagerservice/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a> has been reintroduced in this sprint tests.<br>
+				We used the MockMVC class, provided by the SpringFramework to create mock requests and automatically test HTTP status codes/responses and the <tt>@WithMockUser(value = "manager")</tt> annotation to create a mock user that has "MANAGER" roles to perform authenticated requests.
+				<br>For all the tests we assumed these starting conditions:
+				<ul>
+					<li>The trolley is not stopped by the manager</li>
+					<li>The INDOOR is not relevant for this sprint</li>
+					<li>The OUTDOOR is not engaged</li>
+					<li>The temperature is below 30</li>
+					<li>The parking slots' state is not relevant in this sprint</li>
+				</ul>
+				These conditions were individually changed by the single tests if they needed some other context, as described below.<br>
+				We decided to implement the tests relative to this sprint under seven test classes:
+				<ul>
+					<li><a href="../parkmanagerservice/src/test/kotlin/parkmanagerservice/Sprint4ParkingAreaTests.kt">Sprint4ParkingAreaTests.kt</a>: parking area related functional tests</li>
+					<li><a href="../parkmanagerservice/src/test/kotlin/parkmanagerservice/Sprint4TrolleyTests.kt">Sprint4TrolleyTests.kt</a>: trolley related functional tests</li>
+					<li><a href="../parkmanagerservice/src/test/kotlin/thermometer/ThermometerControllerTest.kt">ThermometerControllerTest.kt</a>: ThermometerController unit tests</li>
+					<li><a href="../parkmanagerservice/src/test/kotlin/thermometer/CoapThermometerTest.kt">CoapThermometerTest.kt</a>: CoapThermometer unit tests</li>
+					<li><a href="../parkingarea/src/test/kotlin/thermometer/ThermometerMockTest.kt">ThermometerMockTest.kt</a>: ThermometerMock unit tests</li>
+					<li><a href="../parkmanagerservice/src/test/kotlin/fan/CoapFanTest.kt">CoapFanTest.kt</a>: CoapFan unit tests</li>
+					<li><a href="../parkingarea/src/test/kotlin/fan/FanMockTest.kt">FanMockTest.kt</a>: FanMock unit tests</li>
+				</ul>
+				<br>Hereafter is a description of the functional tests for this <a href="#sprint4"> sprint requirements</a>:
+				<ul>
+					<li>Test that, if a car engages the OUTDOOR area for more than <k>5s</k>, a notification is sent to the manager, as per <k>F11</k>.</li>
+					<li>Test that the SpringController correctly answers a <k>/parkingArea</k> request by checking if the state got from the CoAP resources involved matches what returned by the ManagerService, as per <k>F12</k></li>
+					<li>Test that the SpringController successfully manages a <k>/parkingArea/trolley</k> PUT request of stopping the trolley by checking if the trolley state from the CoAP resource is "trolley STOPPED", as per <k>F14</k>-<k>NF4</k>. Also check that this is only possible in the right circumstances: a stop request can be forwarded only if TMAX>30, and a resume only if TMAX<30. Check that the server answers with a code <tt>401 Forbidden</tt> if that is not the case</li>
+					<li>Test that the system automatically starts (stops) the fan when TMAX>30 (<30), as per <k>F15</k>. Test this by updating the ThermometerMock and asserting that the fan CoAP state matches the requirements</li>
+				</ul>
+				Single components unit tests are self-explanatory, and omitted for brevity.
+
+				<h3>Last product owner test</h3>
+					As last assignment, the product owner has instructed us to conduct the following test:
+					<ol>
+						<li>The system has <k>nfree</k> free slots
+							<ul>
+								<li>0 < <k>nfree</k> < 6</li>
+							</ul>
+						</li>
+						<li>Temperature <k>< TMAX</k>; Fan <k>off</k>; IN/OUTDOOR area <k>free</k></li>
+						<li>Simulate the system receiving (spaced out by two seconds):
+							<ul>
+								<li>an <k>enter</k> request</li>
+								<li>a <k>carenter</k> request</li>
+								<li>a <k>pickup</k> request</li>
+							</ul>
+						</li>
+						<li>Define the <k>state changes</k> of the system answering the requests</li>
+						<li>Point out the <k>strategy</k> used to <k>automate</k> the test</li>
+					</ol>
+
+			The full test code is available <a href="../parkmangerservice/src/test/kotlin/parkmanagerservice/Sprint4FinalTest.kt">here</a>.<br>
+
+			<h4>System states transitions explanation</h4>
+				As one can see from the <a href="../parkmanagerservice/logs/finalTestLogs/productOwnerTestLog.txt">test logs</a>, after the system startup, the clientservice actor
+				accept the first <k>enter</k> request (<k>reqenter</k> in our system), transitioning in the <tt>handleEnterRequest</tt> state:
+<pre>
+connQakTcp | request= msg(reqenter,request,springcontroller,clientservice,reqenter(X),16)
+<k>clientservice in handleEnterRequest </k>| msg(reqenter,request,springcontroller,clientservice,reqenter(X),16)
+</pre>
+				The service computes the first free parking slot and answers to the SpringController with a <k>enter(2)</k> reply
+<pre>
+clientservice reply to reqenter
+<k>clientservice reply enter(2)</k>
+connQakTcp | answer= msg(enter,reply,clientservice,springcontroller,'{"code":0,"message":"2"}',17)
+</pre>
+				That is translated by the SpringController in a "success" HTTP response for the client:
+<pre>
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /client/reqenter
+       [...]
+
+MockHttpServletResponse:
+           <k>Status = 200</k>
+    		[...]
+			<k>Body = {"parkingSlot":2}</k>
+</pre>
+				After two seconds, the <k>carenter(2)</k> request is sent by the client: it is forwarded by the SprinController to the ClientService actor, triggering its transition into the
+				<k>enterthecar</k> state:
+<pre>
+connQakTcp | request= msg(carenter,request,springcontroller,clientservice,carenter(2),18)
+	<k>clientservice in enterthecar</k> | msg(carenter,request,springcontroller,clientservice,carenter(2),18)
+</pre>
+				Once again, the request is successfully accepted and processed by the ClientService, which answers to the SpringController with the generated <k>TOKENID</k>> (<k>receipt</k> response):
+<pre>
+<k>clientservice reply to carenter</k>
+connQakTcp | answer= msg(<k>receipt</k>,reply,clientservice,springcontroller,'{"code":0,"message":"218082021021242"}',19)
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /client/carenter
+      [...]
+MockHttpServletResponse:
+	<k> Status = 200</k>>
+    [...]
+	<k>Body = {"tokenId":"218082021021242"}</k>
+</pre>
+				The ClientService now sends the first <k>moveToInOutdoor(indoor)</k> dispatch to the trolley, triggering its <k>working state</k>; the trolley plans a path to the INDOOR area and reaches it to collect the car to park:
+<pre>
+<k>trolley in working</k> | msg(moveToInOutdoor,dispatch,clientservice,trolley,<k>moveToInOutdoor(indoor)</k>,20)
+trolley trip to INDOOR start
+<k>setGoal 6,0</k> while robot in cell: 0,0 direction=downDir
+[...]
+plannerUtil doPlan actions=[l, w, w, w, w, w, w]
+trolley trip to INDOOR end
+</pre>
+				At this point the ClientService sends a <k>moveToPark(2)</k> dispatch to the trolley to make it move to the slotnum 2; the trolley doesn't leave the working state, and promptly performs the moveToPark task:
+<pre>
+clientservice moves the car to SLOTNUM = 2
+<k>trolley in working</k> | msg(moveToPark,dispatch,clientservice,trolley,<k>moveToPark(2)</k>,27)
+<k>trolley moveToPark(2)</k>
+<k>setGoal 1,2</k> while robot in cell: 6,0 direction=rightDir
+[...]
+plannerUtil doPlan actions=[l, l, w, w, w, w, w, l, w, w]
+</pre>
+				At the same time, the <k>pickup</k> request (<k>reqexit(TOKENID)</k>) arrives from the SpringController to the ClientService. It stores the request in its message queue, to be performed as soon as the moveToPark dispatch is sent to the trolley:
+<pre>
+connQakTcp | request= msg(reqexit,request,springcontroller,clientservice,<k>reqexit(117082021120000)</k>,28)
+	%%%  ActorBasicFsm clientservice |  <k>added msg(reqexit,request,springcontroller,clientservice,reqexit(117082021120000),28) in msgQueueStore</k>
+clientservice waiting ...
+</pre>
+				As soon as it's ready, the ClientService accepts the reqext, transitioning in the <k>handleOutRequest</k> state: checks if the TOKENID is valid and succesfully answer to the SpringController after the check:
+<pre>
+<k>clientservice in handleOutRequest</k> | msg(reqexit,request,springcontroller,clientservice,reqexit(117082021120000),28)
+clientservice reply to reqexit
+connQakTcp | answer= msg(exit,reply,clientservice,springcontroller,'{"code":0,"message":"Success"}',30)
+	MockHttpServletRequest:
+			HTTP Method = GET
+			Request URI = /client/reqexit
+			Parameters = {tokenid=[117082021120000]}
+			[...]
+	MockHttpServletResponse:
+			<k>Status = 200</k>
+</pre>
+
+				The ClientService also sends a <k>moveToPark(1)</k> dispatch to the trolley to move it to collect the requested parked car, followed by a <k>moveToInOutdoor(outdoor)</k> to move it to the outdoor area; the trolley performs the action immediately:
+<pre>
+clientservice moves the car from SLOTNUM = 1
+<k>trolley</k> in working | msg(moveToPark,dispatch,clientservice,trolley,moveToPark(1),31)
+<k>trolley moveToPark(1)</k>
+setGoal 1,1 while robot in cell: 1,2 direction=downDir
+plannerUtil doPlan actions=[r, r, w]
+<k>trolley in working</k> | msg(moveToInOutdoor,dispatch,clientservice,trolley,moveToInOutdoor(outdoor),38)
+<k>trolley trip to OUTDOOR start</k>
+setGoal 6,4 while robot in cell: 1,1 direction=upDir
+plannerUtil doPlan actions=[l, l, w, w, w, l, w, w, w, w, w]
+<k>trolley trip to OUTDOOR end</k>
+</pre>
+				Finally, the trolley is free to return to its home, as there are no more requests to satisfy; it transits to the IDLE state, plans a path to the HOME, and performs it:
+<pre>
+<k>trolley IDLE</k>
+<k>setGoal 0,0</k></setGoal> while robot in cell: 6,4 direction=rightDir
+plannerUtil doPlan actions=[l, w, w, w, w, l, w, w, w, w, w, w]
+<k>trolley at HOME</k>
+</pre>
+			<h4>How we automated the test</h4>
+					For the test, we launched two coroutines in parallel (one for the SpringMockMVC which does the requests and one for the testing observer to receive coap state updates from the trolley): this was
+					needed as we wanted to test both the HTTP responses to the APIs and the trolley states and position on the map at the same time.<br>
+					As always we used the CoapObserverForTesting to be notified of the trolley state changes, and we tested that all the states and messages were sent by the troelly in the correct order and how we expected them.<br>
+					Firstly, created the observer and a channel for the observer, so that no messages from the trolley were lost; then, we sent the requests, using the MockMVC and spacing them out by 2 s as requested while, at the same time, we
+					observed the trolley state (through its CoAP resource) and position (through the planner and map).
 			<h2>Deployment</h2>
-			
+				As this sprint will end the project, we now present the full deployment plan and diagram. We decided to divide our system in 6 nodes:
+				<ul>
+					<li>The <em>indoorarea</em> node: holds the WeightSensorMock its configuration files</li>
+					<li>The <em>outdoorarea</em> node: holds the SonarMock and its configuration files</li>
+					<li>The <em>parkingarea</em> node: holds the ThermometerMock, FanMock and their configuration files</li>
+					<li>The <em>parkmanagerservice</em> node: holds two artifacts:
+						<ul>
+							<li><tt>parkmanagerservice-1.0.tar</tt>: contains the ClientService, ManagerService, Trolley, WeightSensor/Sonar/Fan/Thermometer Interfaces and Controllers and their configuration files. Also contains the prolog knowledge base for the qak infrastructure</li>
+							<li><tt>parkmanagerservice-boot-1.0.tar</tt>: contains the SpringBoot components: BaseController, SpringController, SpringSecurity and the SpringModel (e.g. ParkingSlot.kt, ApiError.kt, etc...)</li>
+						</ul>
+						Depends on the indoorarea, outdoorarea, parkingarea and basicrobot.
+					</li>
+					<li>The <em>basicrobot</em> node: holds the BasicRobot; depends on wenv</li>
+					<li>The <em>wenv</em> node: holds the WEnv and the virtual robot</li>
+				</ul>
+				See the image below for a deployment diagram:<br>
+				<center><img id="Deployment" src="./img/Sprint4Deployment.png" width="70%"></center>
+				
+				We also decided to proceed with the deployment using the Docker container technology. See the <a href="../../it.unibo.sembrava_qualcuno.sprint3/userDocs/BongiovanniDeCola_Sprint3.html#dockerDepl">deployment section</a> of Sprint3 to know how to build and run the
+				indoorarea, outdoorarea and parkmanagerservice docker images.
+				<h3>parkingarea Dockerfile</h3>
+					We provide a <a href="../parkingarea/Dockerfile">Dockerfile</a> to build and run a Docker image for the parkingarea area.<br>
+					
+<pre><tt># To build (in the parkingarea/ folder):</tt>
+docker build --rm -t parkingarea .
+<tt># To run:</tt>
+docker run -rm -i -p8027:8027 parkingarea 
+</pre>			
+					
+				<h3>Deployment using Docker</h3>
+					Also see the <a href="../../it.unibo.sembrava_qualcuno.sprint3/userDocs/BongiovanniDeCola_Sprint3.html#compose">deployment section</a> of Sprint3 to know how to use the <a href="../automatedcarparking.yaml">script</a> to automatically deploy the system using one container per node.<br>
+			There is one last feature introduced in this sprint to end the project: to have maximum flexibility in deployment and configuration, we decided to set all the previously embedded configuration variables in a <a href="../variables.env">variables.env</a> file. A preview of the file is here presented:
+<pre>
+<tt># Parking area hostname and port</tt>
+PARKINGAREA_HOSTNAME=parkingarea
+PARKINGAREA_PORT=8027
+
+<tt># Weight sensor hostname and port</tt>
+WEIGHTSENSOR_HOSTNAME=indoorarea
+WEIGHTSENSOR_PORT=8025
+
+<tt># Sonar hostname and port</tt>
+SONAR_HOSTNAME=outdoorarea
+SONAR_PORT=8026
+
+<tt># Manager credentials</tt>
+MANAGER_USERNAME=manager
+MANAGER_PASSWORD=admin
+
+<tt># Resources start values</tt>
+THERMOMETER_START_VALUE=25
+FAN_START_VALUE=false
+WEIGHTSENSOR_START_VALUE=0
+SONAR_START_VALUE=false
+
+<tt># Requirements alarm trigger values</tt>
+TMAX=30
+DTFREE=60
+</pre>
+			The values contained in this file are loaded in every container environment at the time of the <tt>docker-compose -f automatedcarparking.yaml up</tt>; in case of problems in loading the variables, default values to be used are embedded in the code.
 			<h2>Sprint Summary</h2>
 			
 			The coming figure represents the final outline resulting from the Sprint4. The dashed lines that group components together gives a glance of the physical deployment organization<br> 			<div>
 				<td style="width:50%">
-					<center><img id="Final outline" src="./img/FullSprint4Outline.png" width="70%"></center>
+					<center><img id="Final outline" src="./img/Sprint4Outline.png" width="70%"></center>
 				</td>
 			</div>
 			<hr>
 			<div class="remark">
-						<center><k>This sprint is considered done and, with this sprint we consider whole project finished</center><br>
+				<center><k>This sprint is considered done and, with this sprint we consider whole project finished</k></center><br>
 			</div>
 			
 			<h3>Summary table</h3>
@@ -371,14 +673,20 @@
 						<tbody>
 							<tr>
 								<td>
-									<center><a href="./img/FullSprint4Outline.png">FullSprint4Outline.png</a></center>
+									<center><a href="./img/Sprint4Outline.png">Sprint4Outline.png</a></center>
 								</td>
 								<td>
 									<center><a target="code" href="../parkmanagerservice/src/parkingArea.qak">parkingArea.qak</a></center>
 								</td>
 								<td>
 								<center>
-									
+									<a href="../parkmanagerservice/src/test/kotlin/parkmanagerservice/Sprint4ParkingAreaTests.kt">Sprint4ParkingAreaTests.kt</a><br>
+									<a href="../parkmanagerservice/src/test/kotlin/parkmanagerservice/Sprint4TrolleyTests.kt">Sprint4TrolleyTests.kt</a><br>
+									<a href="../parkmanagerservice/src/test/kotlin/thermometer/ThermometerControllerTest.kt">ThermometerControllerTest.kt</a><br>
+									<a href="../parkmanagerservice/src/test/kotlin/thermometer/CoapThermometerTest.kt">CoapThermometerTest.kt</a><br>
+									<a href="../parkingarea/src/test/kotlin/thermometer/ThermometerMockTest.kt">ThermometerMockTest.kt</a><br>
+									<a href="../parkmanagerservice/src/test/kotlin/fan/CoapFanTest.kt">CoapFanTest.kt</a><br>
+									<a href="../parkingarea/src/test/kotlin/fan/FanMockTest.kt">FanMockTest.kt</a><br>
 								</center>
 								</td>
 							</tr>
@@ -386,7 +694,40 @@
 					</table>
 				<hr>
 			<h3>Workload division</h3>
+				For every Sprint, <em>Luca Bongiovanni</em> took care of the development of the:
+					<ul>
+						<li>SpringController and REST-API docs</li>
+						<li>BaseController</li>
+						<li>Bootstrap views</li>
+						<li>Most of the js files</li>
+						<li>WebSocket connections</li>
+						<li>Sensors controllers, interafaces and mocks</li>
+					</ul>
+				For every Sprint, <em>Gian Marco De Cola</em> took care of the development of the:
+					<ul>
+						<li>Trolley qak</li>
+						<li>ManagerService qak</li>
+						<li>ClientService qak</li>
+						<li>SpringSecurity</li>
+						<li>Diagrams and Documentation</li>
+					</ul>
+				The workload division reflects the single efforts of the components of the group, but there was collaboration on every task by both the components, so the presented division has been purely practical.
+				All the tasks performed by one component was supervised by the other after the commit. All the sprints analysis/project phases were done together. Tests and Docker files were also developed by both the components.
+				
+				<h3>Technology used</h3>
+					<ul>
+						<li><em>Git/GitHub</em>: version control system</li>
+						<li><em>Gradle</em>: system build</li>
+						<li><em>Discord</em> server: video calls/screen share</li>
+						<li><em>Eclipse/Intellij IDEA</em>: IDEs</li>
+						<li><em>Microsoft Visio</em>: project diagrams</li>
+						<li><em>Docker/DockerHub</em>: deployment</li>
+						<li><em>SpringFramework/SpringBoot</em>: server-side web application</li>
+						<li><em>Bootstrap</em>: client-side web application</li>
+						<li><a href="https://mockoon.com/"><em>Mockoon</em></a>: mockAPIs for test</li>
+					</ul>
 		</div>
+		<hr>
 		<div class="footer">
 			<center>			
 				<table style="background-color:rgba(30, 22, 255, 0.9); width:60%;text-align:center;color:white">	

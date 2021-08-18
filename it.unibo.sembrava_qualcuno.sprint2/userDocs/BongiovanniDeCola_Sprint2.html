@@ -375,7 +375,7 @@
 						</td></tr>
 					</table>
 				
-			<h2>Testing</h2>
+			<h2 id="tests">Testing</h2>
 			To exploit the qak CoAP observable resources for testing purposes, as already done during the <a href="../../it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html#tests">first test plans</a> of the analysis phase<br> and the <a href="../../it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html#tests">tests of the sprint1</a>, the <a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a> has been reintroduced in this sprint tests.
 			For all the tests we assumed these starting conditions:
 				<ul>
@@ -386,7 +386,7 @@
 				</ul>
 				These conditions were individually changed by the single tests if they needed some other context, as described below.<br>
 				We decided to implement the tests relative to this sprint under three test classes: one that holds tests concerning the SonarController and mock, the ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2ParkingAreaTests.kt">Sprint1ParkingAreaTests.kt</a>),
-				one that holds tests concerning the Trolley, BasicRobot, ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2TrolleyTests.kt">Sprint1TrolleyTests.kt</a>) and one for the SonarController/Mock unit tests (<a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/SonarTests.kt">SonarTests.kt</a>), in order to fire tests without having to start up every qak context if not needed for the current test.
+				one that holds tests concerning the Trolley, BasicRobot, ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/Sprint2TrolleyTests.kt">Sprint1TrolleyTests.kt</a>) and one for the SonarController/Mock unit tests (<a href="../test/it/unibo/sembrava_qualcuno/sprint2/test/SonarTests.kt">SonarTests.kt</a>).
 				<br>Hereafter is a description of the functional tests for this <a href="#sprint2"> sprint requirements</a>:
 			<ul>
 				<li>Test that, if there is at least one parked car, the trolley is not stopped and the OUTDOOR area is not engaged (<k>F6</k>), a reqexit client request is accepted by the ClientService, as per <k>F2</k>-<k>NF5</k>. If not, the SpringController should return a <tt>403 forbidden http error code</tt></li>

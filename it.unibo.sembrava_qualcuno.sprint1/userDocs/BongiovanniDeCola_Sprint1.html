@@ -459,7 +459,7 @@ ParkingAreaKb.slot = inps.readObject() as MutableMap<Int, String>
 				</ul>
 				These conditions were individually changed by the single tests if they needed some other context, as described below.<br>
 				We decided to implement the tests relative to this sprint under two test classes: one that holds tests concerning the WeightSensor, the ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1ParkingAreaTests.kt">Sprint1ParkingAreaTests.kt</a>)
-				and one that holds tests concerning the Trolley, BasicRobot, ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1TrolleyTests.kt">Sprint1TrolleyTests.kt</a>), in order to fire tests without having to start up every qak context if not needed for the current test.
+				and one that holds tests concerning the Trolley, BasicRobot, ClientService and the SpringController (<a href="../test/it/unibo/sembrava_qualcuno/sprint1/test/Sprint1TrolleyTests.kt">Sprint1TrolleyTests.kt</a>).
 				<br>Hereafter is a description of the functional tests for this <a href="#sprint1"> sprint requirements</a>:
 			<ul>
 				<li>Test if there are no parking slots available, a proper response is returned by the SpringController (e.g. {slotnum:0}), as per <k>F3</k></li>
