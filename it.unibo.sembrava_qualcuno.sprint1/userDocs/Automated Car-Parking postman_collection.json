@@ -1,0 +1,795 @@
+{
+	"info": {
+		"_postman_id": "bd82fae6-88ae-4d39-a1a8-cc0c2062a4dc",
+		"name": "Automated Car-Parking",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "client",
+			"item": [
+				{
+					"name": "Request to enter a car",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/client/reqenter",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"client",
+								"reqenter"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "message",
+									"value": "6",
+									"disabled": true
+								}
+							]
+						},
+						"description": "The client request to park his/her car"
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/client/reqenter",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"client",
+										"reqenter"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"parkingSlot\": 1\n}"
+						},
+						{
+							"name": "The service can't perform this operation at the moment:\n- The trolley is stopped\n - The indoor area is engaged",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/client/reqenter",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"client",
+										"reqenter"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"code\": 1,\n \"message\": \"Error message\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Enter a car",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/client/carenter?slotnum=13992970",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"client",
+								"carenter"
+							],
+							"query": [
+								{
+									"key": "slotnum",
+									"value": "13992970",
+									"description": "(Required) The parking slot number"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/client/carenter?slotnum=13992970",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"client",
+										"carenter"
+									],
+									"query": [
+										{
+											"key": "slotnum",
+											"value": "13992970"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"tokenId\": \"\"\n}"
+						},
+						{
+							"name": "Invalid parking slot number",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/client/carenter?slotnum=13992970",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"client",
+										"carenter"
+									],
+									"query": [
+										{
+											"key": "slotnum",
+											"value": "13992970"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"code\": 1,\n \"message\": \"Error message\"\n}"
+						},
+						{
+							"name": "The service can't perform this operation at the moment:\n- The indoor area is free\n - No reqenter request has been sent",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/client/carenter?slotnum=13992970",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"client",
+										"carenter"
+									],
+									"query": [
+										{
+											"key": "slotnum",
+											"value": "13992970"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"code\": 1,\n \"message\": \"Error message\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Request to exit a car",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/client/reqexit?tokenid=tempor Ut velit est ipsum",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"client",
+								"reqexit"
+							],
+							"query": [
+								{
+									"key": "tokenid",
+									"value": "tempor Ut velit est ipsum",
+									"description": "(Required) The client's car corresponding tokenId"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/client/reqexit?tokenid=tempor Ut velit est ipsum",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"client",
+										"reqexit"
+									],
+									"query": [
+										{
+											"key": "tokenid",
+											"value": "tempor Ut velit est ipsum"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Invalid tokenId",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/client/reqexit?tokenid=tempor Ut velit est ipsum",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"client",
+										"reqexit"
+									],
+									"query": [
+										{
+											"key": "tokenid",
+											"value": "tempor Ut velit est ipsum"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "*/*"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "The service can't perform this operation at the moment:\n- The trolley is stopped\n - The outdoor area is engaged",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/client/reqexit?tokenid=tempor Ut velit est ipsum",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"client",
+										"reqexit"
+									],
+									"query": [
+										{
+											"key": "tokenid",
+											"value": "tempor Ut velit est ipsum"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "*/*"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "manager",
+			"item": [
+				{
+					"name": "Logs manager into the system",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/manager/login?username=tempor Ut velit est ipsum&password=tempor Ut velit est ipsum",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manager",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "tempor Ut velit est ipsum",
+									"description": "(Required) The user name for login"
+								},
+								{
+									"key": "password",
+									"value": "tempor Ut velit est ipsum",
+									"description": "(Required) The password for login in clear text"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/manager/login?username=tempor Ut velit est ipsum&password=tempor Ut velit est ipsum",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"manager",
+										"login"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "tempor Ut velit est ipsum"
+										},
+										{
+											"key": "password",
+											"value": "tempor Ut velit est ipsum"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Invalid username/password supplied",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/manager/login?username=tempor Ut velit est ipsum&password=tempor Ut velit est ipsum",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"manager",
+										"login"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "tempor Ut velit est ipsum"
+										},
+										{
+											"key": "password",
+											"value": "tempor Ut velit est ipsum"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"code\": 1,\n \"message\": \"Error message\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Logs out current logged in manager session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/manager/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"manager",
+								"logout"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/manager/logout",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"manager",
+										"logout"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "parking Area",
+			"item": [
+				{
+					"name": "trolley",
+					"item": [
+						{
+							"name": "Get the trolley state",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/parkingArea/trolley",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"parkingArea",
+										"trolley"
+									]
+								},
+								"description": "An authenticated manager can check out the trolley state"
+							},
+							"response": [
+								{
+									"name": "Successful operation",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/parkingArea/trolley",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"parkingArea",
+												"trolley"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": ""
+								},
+								{
+									"name": "Unauthorized",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/parkingArea/trolley",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"parkingArea",
+												"trolley"
+											]
+										}
+									},
+									"status": "Unauthorized",
+									"code": 401,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Update the current trolley status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"state\": \"idle\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/parkingArea/trolley",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"parkingArea",
+										"trolley"
+									]
+								},
+								"description": "An authenticated manager can start or stop the trolley"
+							},
+							"response": [
+								{
+									"name": "Invalid state supplied",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"state\": \"idle\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/parkingArea/trolley",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"parkingArea",
+												"trolley"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n \"code\": 1,\n \"message\": \"Error message\"\n}"
+								},
+								{
+									"name": "Unauthorized",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"state\": \"idle\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/parkingArea/trolley",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"parkingArea",
+												"trolley"
+											]
+										}
+									},
+									"status": "Unauthorized",
+									"code": 401,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "{\n \"code\": 1,\n \"message\": \"Error message\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Get the parking area state",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/parkingArea",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"parkingArea"
+							]
+						},
+						"description": "An authenticated manager can check out the parking area state"
+					},
+					"response": [
+						{
+							"name": "Successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/parkingArea",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"parkingArea"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "*/*"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Unauthorized",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/parkingArea",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"parkingArea"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "*/*"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://github.com/sembrava-qualcuno/issLab21"
+		}
+	]
+}

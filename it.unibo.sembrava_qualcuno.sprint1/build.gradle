@@ -90,6 +90,12 @@ application {
 	mainClass = 'it.unibo.sembrava_qualcuno.sprint1.Sprint1ApplicationKt'
 }
 
+task(runWeightSensor, dependsOn: 'classes', type: JavaExec) {
+	main = 'it.unibo.sembrava_qualcuno.weightsensor.WeightSensorMockKt'
+	classpath = sourceSets.main.runtimeClasspath
+	standardInput(System.in)
+}
+
 test {
 	useJUnitPlatform()
 }

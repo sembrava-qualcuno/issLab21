@@ -30,6 +30,7 @@ class WeightSensorMock(port: Int) : CoapResource("weightSensor") {
 fun main() {
     val mock = WeightSensorMock(8025, 1000)
 
+    println("WeightSensorMock started with default value 1000")
     while (true) {
         try {
             val weight = readLine()!!.toInt()
