@@ -469,6 +469,18 @@
 							<li>Stop/Resume the behavior of the trolley from the ParkServiceStatusGUI (POR <em class="al">manage</em>)</li>
 							<li>Being identified and authenticated by the system (POR <em class="al">authorize</em>) before letting me perform any of the above actions</li>
 						</ul>
+				<h3>Third party software</h3>
+					The product owner has provided us with a plethora of already developed software and components ready to use.<br>
+					Specifically, we aknowledge that the parking area can be modeled as a properly simulated space in a <k>virtual environment</k>. This can be helpful for prototype developement, as well as punctually create a model to be used to develop the first working instances of our application.
+					The virtual environment <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/master/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html"> WEnv</a> is provided by the customer and can be easily
+					configured by the application designer and an example that matches our requirements is available at <a href="./parkingAreaConfig.js">parkingAreaConfig.js</a>.<br/>
+					A <k>robot simulation</k> is also available in the WEnv; details on how to communicate with this virtual component can be found in the <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/master/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html#interaction">virtual robot section</a>.<br/>
+					A <k>robot instructor</k> is provided in the form of the <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html">BasicRobot</a> component.
+					This is an observable kotlin actor which is already well integrated with the WEnv service and has the capability of communicating in a high level message-based way both with HTTP and WS protocols, both supported by the WEnv, which expose the 8090 port to accept HTTP requests and the 8091 port to accept synchronous/asynchronous messages via WS. 
+					Finally, the product owner also provides us a <k>custom modelling language (DSL) and metamodel</k>, the <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/userDocs/LabQakIntro2021.html" >QAKactor metamodel</a>. This helps building a model of the system exploiting actors technology, as a substitute for the usual object technology, to achieve 
+					high-level interaction between components, as the actors possess an inward message queue which can be used to communicate with a specific message-based application level protocol, which sits on top of the usual, most used transport and application level protocols (HTTP, WS, TCP, UDP, etc.). 
+				<h3>Early phase model of the requirements</h3>
+					A first, embrional model of the system can be derived by the atop requirements, and can be found in <a href="">requirementModel.qak</a>
 				<h3>First test plan ideas</h3>
 					<ul>
 						<li><em>moveToIn</em>: check on the map if the position of the trolley corresponds with the indoor area (6,0) (<lr>F5</lr>)</li>
@@ -486,12 +498,12 @@
 						<li>Check that a correct notification is sent to the parking manager if a car remains in the OUTDOOR area for more than DTFREE time (<lr>F11</lr>)</li>
 						<li>Check that the trolley does not pick up a car from the INDOOR area, if the client says there's a car but no confirmation arrived from the weight sensor (<lr>F17</lr>)</li>	
 					</ul>
+					<div class="remark">
+						These tests should all be implemented in the subsequent sprints, as are envisioned by the analysts to be the most basic functional tests given the requirements. Other useful tests may be developed as well.
+					</div>
 			<h2>Problem Analysis</h2>
 				<h3>Main problems</h3>
 					<h4>Components</h4>
-						Talking with the product owner, we aknowledge that the parking area is a properly simulated space in a <k>virtual environment</k>.
-						The virtual environment <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/master/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html"> WEnv</a> is provided by the customer and can be easily
-						configured by the application designer and an example that matches our requirements is available at <a href="./parkingAreaConfig.js">parkingAreaConfig.js</a>.<br/>
 						
 						<div class="remark">
 								<k>NOTE THAT</k> even though we are working in a virtual environment and with virtual components, this should be done with a fair amount of abstraction that insures 
@@ -500,9 +512,8 @@
 						</div>
 						
 						<h5 id="trolleyFSM">Trolley</h5>
-							A trolley simulation is also available in the WEnv; details on how to communicate with this virtual component can be found in the <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/master/it.unibo.virtualRobot2020/userDocs/VirtualRobot2021.html#interaction">virtual robot section</a>.<br/>
 							Our job is to design and develop a component that communicates with the virtual robot and instructs it properly to match our system's needs.  <br/> 
-							By requirements, this trolley should have 3 states that match the actual state of the robot: <k>idle</k>, <k>working</k> and <k>stopped</k>. The possible state transitions and details are presented in the coming state diagram.
+							By requirements, this "trolley" should have 3 states that match the actual state of the robot: <k>idle</k>, <k>working</k> and <k>stopped</k>. The possible state transitions and details are presented in the coming state diagram.
 							
 							<td style="width:50%">
 								<center><img src="./img/TrolleyFSM.png" width="70%"></center>
@@ -760,8 +771,9 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 						</tbody>
 						
 					</table>
-					To implement the trolley component, a notable example is presented in <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2021/blob/main/it.unibo.qak21.basicrobot/userDocs/basicrobot2021.html">BasicRobot.html</a>. This component is an observable kotlin actor which is already well integrated with the WEnv service and has the capability of communicating in a high level message-based way both with HTTP and WS protocols.
-					It also can be easily configured to work with diverse real robots as well as the virtual one, which satisfies the needs of abstraction already specified earlier in the analysis phase. Finally, some of the functionalities that comes with this component can actually <tt>fill the abstraction gap</tt> identified in the analysis phase:
+					The logic architecture is deliberately vague about the nature of the Robot component, to abstract concepts and not constrain the analysis to a single implementation. If we wanted to delve in the virtual enviroment case, exploiting the product owner software, the Robot component should be replaced by the WEnv (which also holds the virtual robot component).<br>
+					Talking about the trolley component, could be useful to split it in two sub-components to separate the buisness logic and communication patterns of the trolley with the main service from the "robot instructor" logic. This will grant decoupling of components, as well as reusability; the afore mentioned BasicRobot component could be also used to implement the robot instructor.<br>
+					As a matter of fact, the Basic Robot can be also easily configured to work with diverse real robots as well as the virtual one, which satisfies the needs of abstraction already specified earlier in the analysis phase. Moreover, some of the functionalities that comes with this component can actually <tt>fill the abstraction gap</tt> identified in the analysis phase:
 					the BasicRobot has the ability to move by "steps" of the same length as the robot. This would allow the robot to also create and interact with a virtual map in which each cell is of the same leght as the step and the robot itself (so that every step would result in a one-cell movement).
 					<div class="remark">
 						<k>Carefully note</k> that the term "observable" is here used to express the need of accessing some information without waiting for or stopping the observed entity. How this should be 
@@ -882,8 +894,8 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 					</table>
 				This sprint should end the development cycle and should be done in <k>5 days</k>.
 			<h2>First executable model</h2>
-				Before starting with the design and production, a working prototype can be useful to begin laying down some functional test plans and to show the product owner our understanding of (part of) the requirements in a more disambiguous way. To do so, an executable model of our domain should be designed. <br>
-				We will achieve this with the help of the <a href="https://htmlpreview.github.io?https://github.com/anatali/issLab2021/blob/main/it.unibo.qakactor/userDocs/LabQakIntro2021.html" >QAKactor metamodel</a>, which consist in a custom modelling language (DSL) that will help creating a smaller executable version of our domain model in which every component will be substituted by actors communicating with each other and executing tasks by the means of a Moore's Finite State Machine.<br>
+				Before starting with the design and production, a working prototype can be useful to begin laying down some functional test plans and to show the product owner our understanding of (part of) the requirements in a more disambiguous way and test out our analysis . To do so, an executable model of our domain should be designed. <br>
+				We will achieve this with the help of the afore mentioned QAK Metamodel, that will help creating a smaller executable version of our domain model in which every component will be substituted by actors communicating with each other and executing tasks by the means of a Moore's Finite State Machine.<br>
 				An overview of the architecture used in this section is the following:
 				<div class="remark">
 					<center><k>THE COMING FIGURE IS A SEMPLIFICATION OF THE SYSTEM WE SHOWED IN THE ANALYSIS PHASE</k></center> 
