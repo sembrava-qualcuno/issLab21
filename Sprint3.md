@@ -1,5 +1,3 @@
-# 
-
 To run this sprint you can use **Gradle** or **Docker**
 
 ## Gradle
