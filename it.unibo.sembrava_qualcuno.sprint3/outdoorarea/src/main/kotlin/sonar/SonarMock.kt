@@ -29,6 +29,7 @@ class SonarMock(port: Int) : CoapResource("sonar") {
 fun main() {
     val mock = SonarMock(8026, false)
 
+    println("SonarMock started with default value false")
     while (true) {
         val engaged = readLine().toBoolean()
         println("Sonar engaged: $engaged")
