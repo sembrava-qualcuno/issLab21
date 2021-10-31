@@ -1,4 +1,4 @@
-package it.unibo.utils.it.unibo.sembrava_qualcuno.sonar
+package it.unibo.sembrava_qualcuno.sonar
 
 import org.eclipse.californium.core.CoapResource
 import org.eclipse.californium.core.CoapServer
@@ -29,6 +29,7 @@ class SonarMock(port: Int) : CoapResource("sonar") {
 fun main() {
     val mock = SonarMock(8026, false)
 
+    println("SonarMock started with default value false")
     while (true) {
         val engaged = readLine().toBoolean()
         println("Sonar engaged: $engaged")

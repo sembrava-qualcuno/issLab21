@@ -1,4 +1,4 @@
-package it.unibo.utils.it.unibo.sembrava_qualcuno.sonar
+package it.unibo.sembrava_qualcuno.sonar
 
 import org.eclipse.californium.core.CoapClient
 

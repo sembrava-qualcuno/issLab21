@@ -5,8 +5,8 @@ import it.unibo.kactor.*
 import alice.tuprolog.*
 import it.unibo.sembrava_qualcuno.model.Message
 import it.unibo.sembrava_qualcuno.sprint2.ParkingAreaKb
-import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.CoapSonar
-import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.SonarController
+import it.unibo.sembrava_qualcuno.sonar.CoapSonar
+import it.unibo.sembrava_qualcuno.sonar.SonarController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

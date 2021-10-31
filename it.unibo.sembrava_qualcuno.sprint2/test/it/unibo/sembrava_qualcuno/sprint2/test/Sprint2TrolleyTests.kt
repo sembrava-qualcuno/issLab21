@@ -10,7 +10,7 @@ import it.unibo.sembrava_qualcuno.model.TokenId
 import it.unibo.sembrava_qualcuno.sprint2.ParkingAreaKb
 import it.unibo.sembrava_qualcuno.utils.ApplMessageUtil
 import it.unibo.sembrava_qualcuno.weightsensor.WeightSensorMock
-import it.unibo.utils.it.unibo.sembrava_qualcuno.sonar.SonarMock
+import it.unibo.sembrava_qualcuno.sonar.SonarMock
 import itunibo.planner.plannerUtil
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
