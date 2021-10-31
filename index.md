@@ -1,10 +1,15 @@
+---
+layout: page
+title: Automated Car-Parking
+---
+
 ## Start
 
 [Docs](https://htmlpreview.github.io/?https://github.com/sembrava-qualcuno/issLab21/blob/master/it.unibo.sembrava_qualcuno.tf21Start/userDocs/BongiovanniDeCola_tf21Start.html)
 
 ## Sprint1
 
-[Usage](/Sprint1.html)
+[Usage](issLab21/Sprint1.html)
 
 [Docs](https://htmlpreview.github.io/?https://github.com/sembrava-qualcuno/issLab21/blob/master/it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html)
 
