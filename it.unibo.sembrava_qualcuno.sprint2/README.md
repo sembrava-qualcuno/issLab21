@@ -14,7 +14,13 @@ To run this sprint, run the following commands each on their own shell:
    gradlew runWeightSensor
    ```
 
-3. Run the application
+3. Run the sonar mock
+   
+   ```shell
+   gradlew runSonar   
+   ```
+
+4. Run the application
    
    ```shell
    gradlew run
