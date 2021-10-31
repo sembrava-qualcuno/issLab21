@@ -1,39 +1,19 @@
-[Sprint1 Usage](https://github.com/sembrava-qualcuno/issLab21/blob/master/it.unibo.sembrava_qualcuno.sprint1/README.md)
+# Documentation
 
-## Welcome to GitHub Pages
+## Sprint1
 
-You can use the [editor on GitHub](https://github.com/sembrava-qualcuno/issLab21/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+[Sprint1 Usage](/Sprint1)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+[Sprint1 Docs]([GitHub &amp; BitBucket HTML Preview](https://htmlpreview.github.io/?https://github.com/sembrava-qualcuno/issLab21/blob/master/it.unibo.sembrava_qualcuno.sprint1/userDocs/BongiovanniDeCola_Sprint1.html))
 
-### Markdown
+## Sprint2
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
 
-# Header 1
-## Header 2
-### Header 3
+## Sprint3
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
 
-**Bold** and _Italic_ and `Code` text
+## Sprint4
 
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/sembrava-qualcuno/issLab21/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+# 
