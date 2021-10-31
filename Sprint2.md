@@ -1,4 +1,4 @@
-# Usage
+# 
 
 To run this sprint, run the following commands each on their own shell:
 

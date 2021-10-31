@@ -1,5 +1,3 @@
-# Usage
-
 To run this sprint, run the following commands each on their own shell:
 
 1. Run the **WEnv** and the **BasicRobot**
