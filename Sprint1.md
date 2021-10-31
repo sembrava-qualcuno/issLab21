@@ -1,6 +1,6 @@
 ---
 title: Sprint1
-description: 
+description: Sprint1 Usage
 ---
 
 To run this sprint, run the following commands each on their own shell:
