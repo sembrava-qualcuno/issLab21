@@ -1,5 +1,4 @@
 ---
-layout: page
 title: Sprint1
 description: 
 ---
