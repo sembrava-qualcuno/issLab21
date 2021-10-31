@@ -1,6 +1,6 @@
 ---
 title: Sprint3
-description: Sprint4 Usage
+description: Sprint3 Usage
 ---
 
 To run this sprint you can use **Gradle** or **Docker**
