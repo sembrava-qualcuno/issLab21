@@ -1,6 +1,10 @@
 # Usage
 
-To run this sprint, run the following commands each on their own shell:
+To run this sprint you can use **Gradle** or **Docker**
+
+## Gradle
+
+Run the following commands each on their own shell:
 
 1. Run the **WEnv** and the **BasicRobot**
    
@@ -8,25 +12,46 @@ To run this sprint, run the following commands each on their own shell:
    docker-compose -f basicrobotVirtual.yaml
    ```
 
-2. Run the **weight sensor** mock
+2. Run the **indoorarea**
    
    ```shell
-   gradlew runWeightSensor
+   gradlew indoorarea:run
    ```
 
-3. Run the sonar mock
+3. Run the **outdoorarea**
    
    ```shell
-   gradlew runSonar   
+   gradlew outdoorarea:run
    ```
 
-4. Run the application
+4. Run the **parkmanagerservice**
    
    ```shell
-   gradlew run
+   gradlew parkmanagerservice:run
    ```
 
-## Weight Sensor Mock
+## Docker
+
+First you have to create a docker image for each subproject:
+
+```shell
+cd indoorarea
+docker build --rm -t indoorarea .
+
+cd outdoorarea
+docker build --rm -t outdoorarea .
+
+cd parkmanagerservice
+docker build --rm -t parkmanagerservice .
+```
+
+Then you can just run the docker compose file:
+
+```shell
+docker-compose -f automatedcarparking.yaml
+```
+
+## Indoorarea
 
 To update the weight you have to insert an `integer`:
 
@@ -35,7 +60,7 @@ To update the weight you have to insert an `integer`:
 Weight updated to 10
 ```
 
-## Sonar Mock
+## Outdoorarea
 
 To update the sonar state you have to insert `true` or `false`:
 

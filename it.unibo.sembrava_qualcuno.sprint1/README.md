@@ -2,13 +2,13 @@
 
 To run this sprint, run the following commands each on their own shell:
 
-1. Run the WEnv and the BasicRobot
+1. Run the **WEnv** and the **BasicRobot**
    
    ```shell
    docker-compose -f basicrobotVirtual.yaml
    ```
 
-2. Run the weight sensor mock
+2. Run the **weight sensor** mock
    
    ```shell
    gradlew runWeightSensor
@@ -19,6 +19,17 @@ To run this sprint, run the following commands each on their own shell:
    ```shell
    gradlew run
    ```
+
+## Weight Sensor Mock
+
+To update the weight you have to insert an `integer`:
+
+```shell
+> 10
+Weight updated to 10
+```
+
+## REST-API
 
 To send commands throught the REST-API you can use:
 
