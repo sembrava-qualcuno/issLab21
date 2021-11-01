@@ -9,7 +9,7 @@ Run the following commands each on their own shell:
 1. Run the **WEnv** and the **BasicRobot**
    
    ```shell
-   docker-compose -f basicrobotVirtual.yaml
+   docker-compose -f basicrobotVirtual.yaml up
    ```
 
 2. Run the **indoorarea**
@@ -41,7 +41,7 @@ Run the following commands each on their own shell:
 You can use the images hosted on [Docker Hub](https://hub.docker.com/u/sembravaqualcuno) running the docker compose file:
 
 ```shell
-docker-compose -f automatedcarparking.yaml
+docker-compose -f automatedcarparking.yaml up
 ```
 
 Otherwise, you can create a docker image for each subproject:
