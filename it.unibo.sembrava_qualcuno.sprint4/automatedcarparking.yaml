@@ -34,7 +34,7 @@ services:
     ports:
       - 8027:8027/udp
   parkmanagerservice:
-    image: docker.io/sembravaqualcuno/automatedcarparking-parkmanagerservice:1.0
+    image: docker.io/sembravaqualcuno/automatedcarparking-parkmanagerservice:1.1
     env_file:
       - variables.env
     ports:
