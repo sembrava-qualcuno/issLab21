@@ -109,6 +109,12 @@ dependencies {
 	implementation 'org.webjars:jquery:3.1.1-1'
 }
 
+run {
+	environment("PARKINGAREA_HOSTNAME", "localhost")
+	environment("SONAR_HOSTNAME", "localhost")
+	environment("WEIGHTSENSOR_HOSTNAME", "localhost")
+}
+
 application {
 	// Define the main class for the application.
 	mainClass = 'parkmanagerservice.Sprint4ApplicationKt'

@@ -1,9 +1,11 @@
 package sonar
 
+import com.andreapivetta.kolor.Color
+import com.andreapivetta.kolor.Kolor
+import com.andreapivetta.kolor.yellow
 import org.eclipse.californium.core.CoapResource
 import org.eclipse.californium.core.CoapServer
 import org.eclipse.californium.core.server.resources.CoapExchange
-import kotlin.system.exitProcess
 
 class SonarMock(port: Int) : CoapResource("sonar") {
     var engaged: Boolean = false
@@ -32,12 +34,12 @@ class SonarMock(port: Int) : CoapResource("sonar") {
 
 fun main() {
     val START_VALUE= (System.getenv("SONAR_START_VALUE")).toBoolean()
-    println("SonarMock: Start with start value $START_VALUE")
+    println("SonarMock: Start with start value $START_VALUE".yellow())
     val mock = SonarMock(8026, START_VALUE)
 
     while (true) {
         val engaged = readLine().toBoolean()
-        println("Sonar engaged: $engaged")
+        println("Sonar engaged: " + Kolor.foreground("$engaged", if (engaged) Color.GREEN else Color.RED))
         mock.updateResource(engaged)
     }
 }

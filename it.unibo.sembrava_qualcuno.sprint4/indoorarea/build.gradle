@@ -32,6 +32,14 @@ dependencies {
 	compile group: 'org.eclipse.californium', name: 'californium-proxy', version: '2.0.0-M12'
 	//LOG4j
 	compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+
+	//STRING COLORS
+	// https://mvnrepository.com/artifact/com.andreapivetta.kolor/kolor
+	implementation 'com.andreapivetta.kolor:kolor:1.0.0'
+}
+
+run {
+	standardInput = System.in
 }
 
 application {

@@ -1,5 +1,8 @@
 package weightsensor
 
+import com.andreapivetta.kolor.green
+import com.andreapivetta.kolor.red
+import com.andreapivetta.kolor.yellow
 import org.eclipse.californium.core.CoapResource
 import org.eclipse.californium.core.CoapServer
 import org.eclipse.californium.core.server.resources.CoapExchange
@@ -31,20 +34,20 @@ class WeightSensorMock(port: Int) : CoapResource("weightSensor") {
 fun main() {
     try {
         val START_VALUE= (System.getenv("WEIGHTSENSOR_START_VALUE") ?: "0").toInt()
-        println("WeightSensorMock: Start with start value $START_VALUE")
+        println("WeightSensorMock: Start with start value $START_VALUE".yellow())
         val mock = WeightSensorMock(8025, START_VALUE)
 
         while (true) {
             try {
                 val weight = readLine()!!.toInt()
-                println("Weight updated to $weight")
+                println("Weight updated to $weight".green())
                 mock.updateResource(weight)
             } catch (e: NumberFormatException) {
-                println("Error: weight must be an integer")
+                println("Error: weight must be an integer".red())
             }
         }
     } catch (e: NumberFormatException) {
-        println("START_VALUE must be an integer")
+        println("START_VALUE must be an integer".red())
         exitProcess(1)
     }
 }
