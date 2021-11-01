@@ -1,14 +1,11 @@
----
-title: Sprint2
-description: Sprint2 Usage
----
+# Usage
 
 To run this sprint, run the following commands each on their own shell:
 
 1. Run the **WEnv** and the **BasicRobot**
    
    ```shell
-   docker-compose -f basicrobotVirtual.yaml
+   docker-compose -f basicrobotVirtual.yaml up
    ```
 
 2. Run the **weight sensor** mock

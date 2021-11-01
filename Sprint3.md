@@ -1,7 +1,4 @@
----
-title: Sprint3
-description: Sprint3 Usage
----
+# Usage
 
 To run this sprint you can use **Gradle** or **Docker**
 
@@ -12,7 +9,7 @@ Run the following commands each on their own shell:
 1. Run the **WEnv** and the **BasicRobot**
    
    ```shell
-   docker-compose -f basicrobotVirtual.yaml
+   docker-compose -f basicrobotVirtual.yaml up
    ```
 
 2. Run the **indoorarea**
@@ -51,7 +48,7 @@ docker build --rm -t parkmanagerservice .
 Then you can just run the docker compose file:
 
 ```shell
-docker-compose -f automatedcarparking.yaml
+docker-compose -f automatedcarparking.yaml up
 ```
 
 ## Indoorarea
