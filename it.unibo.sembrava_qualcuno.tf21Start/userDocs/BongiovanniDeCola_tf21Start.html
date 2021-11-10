@@ -643,7 +643,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 					In case of CoAP protocol usage, the californium library for java/kotlin can be a good choice for its renowned use in IoT environments and IETF usage for the standardization of the CoAP protocol.<br/>
 					<div class="remark">
 						Libraries that allow the means of communication required by the system are common in many high-level 
-						programming languages;  this fact implies that <k>no abstraction gap</k> on the communications side is identified. An abstraction gap is found on the 
+						programming languages;  this fact, united with the possibility to exploit the qak metamodel and the Actor component provided by the prodcut owner, implies that <k>no abstraction gap</k> on the communications side is identified. An abstraction gap is found on the 
 						functional/testing side, as our system has no clue on where the trolley is in the virtual/real space at all times and on how to create a sequence of actions to move to robot from point A to point B: this is crucial to our system's functions
 						and with regard to our first testing plan ideas.
 						The choice of which language to use is delegated to the project phase but, indipendently on the choice, 
@@ -670,7 +670,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 							<h4>ParkManagerService</h4>
 							<ul>
 								<li>Service that holds the business logic to reply to the users requests by using all the other components in the system</li>
-								<li>Communicates with 3 Browsers (two ParkServiceGUI and one ParkServiceStatusGUI) with a request/response pattern</li>
+								<li>Communicates with 3 Browsers (two ParkServiceGUI and one ParkServiceStatusGUI) with a request/response pattern implementing a client/server architecture with the ParkService/ServiceStatusGUIs</li>
 								<li>Communicates with the Trolley using dispatches</li>
 								<li>Communicates with the WeightSensorInterface and the SonarController with a request/response pattern to obtain their data</li>
 								<li>Accepts dispatches from the Sensors controllers when something irregular happens (e.g. TA > TMAX, car in the outdoor area for more than DTFREE. etc.)</li>
