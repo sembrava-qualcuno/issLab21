@@ -23,6 +23,6 @@ jobs:
         distribution: 'adopt'
         cache: gradle
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      run: chmod +x ./it.unibo.sembrava_qualcuno.sprint4/gradlew
     - name: Build with Gradle
       run: ./it.unibo.sembrava_qualcuno.sprint4/gradlew build
