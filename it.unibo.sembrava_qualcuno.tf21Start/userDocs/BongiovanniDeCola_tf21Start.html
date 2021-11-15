@@ -912,7 +912,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 			<h2 id="tests">Test Plan</h2>
 			Before beginning the test plan we realized that, for the qak system to be fully working and testable, we needed some way to synchronize the tests and the actors of the qak model. This is because, once a qak context is run, every actor inside it starts at the same time and there are no way to implement unit test or to test one functionality at the time. To achieve this goal we introduced a "listening" state on every actor we intended to test: this state is empty and it consists in waiting for a proper message to trigger a specific state change; 
 			in this way, we can systematically and sequentially trigger states to test by sending messages both from the testing class and other actors, to perform integration tests. This "listening" state should be engaged at an actor startup and every time it ends a task. <br>
-			Since qakactor are natively a CoAP-observable resources, we also thought to utilize a CoapObserver for each qakactor we wanted to observe for testing purposes. Its code is available at <a href="../test/it.sembrava_qualcuno.unibo.tf21Start/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a><br>
+			Since qakactor are natively a CoAP-observable resources, we also thought to utilize a CoapObserver for each qakactor we wanted to observe for testing purposes. Its code is available at <a href="../test/it.sembrava_qualcuno.tf21Start/CoapObserverForTesting.kt">CoapObserverForTesting.kt</a><br>
 			Finally, we divided our tests into unit tests and integration tests that also coincide with functional tests (as they test specific requirements or use cases).
 			
 			<h3>Unit tests</h3>
@@ -925,7 +925,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 				</ul>
 				These conditions were individually changed by the single tests if they needed some other context, as described below. 
 				<h4>Trolley</h4>
-				Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TrolleyUnitTest.kt">TrolleyUnitTest.kt</a><br>
+				Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.tf21Start/TrolleyUnitTest.kt">TrolleyUnitTest.kt</a><br>
 				<ul>
 					<li>Test if the trolley returns in idle state at the end of a task</li>
 					<li>Test the ability of the trolley to queue requests in case one arrives during the execution of a task</li>
@@ -934,7 +934,7 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 					<li>Test if once the trolley is in stopped state, whatever request arrives it continues to stay in the stopped state, unless a resume event arrives</li>
 				</ul>
 				<h4>ClientService</h4>
-					Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/ClientServiceUnitTest.kt">ClientServiceUnitTest.kt</a>
+					Test code can be found at <a trget="code" href="../test/it.sembrava_qualcuno.tf21Start/ClientServiceUnitTest.kt">ClientServiceUnitTest.kt</a>
 					<ul>
 						<li>Test that a client request to park a car (<k>requenter</k>) doesn't continue if the INDOOR area is not free (<k>enter</k> reply give back SLOTNUM=0, no subsequent <k>carenter</k> request, instead I expect a goToWork dispatch)</li>
 						<li>Test that a client request to park a car (<k>requenter</k>) doesn't continue if there are no free parking slots available (<k>enter</k> reply give back SLOTNUM=0, no subsequent <k>carenter</k> request, instead I expect a goToWork dispatch)</li>
@@ -945,20 +945,20 @@ var slotState = mutableMapOf(1 to "TOKENID1", 2 to "empty", 3 to "TOKENID3", etc
 						<li>Test if the service doesn't instruct the trolley to moveToOut if the inserted token is invalid (e.g. that a exit(0) reply is sent)
 					</ul>
 				<h4>ManagerService</h4>
-					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/ManagerServiceUnitTest.kt">ManagerServiceUnitTest.kt</a>
+					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.tf21Start/ManagerServiceUnitTest.kt">ManagerServiceUnitTest.kt</a>
 					<ul>
 						<li>Test if the service, basing on the trolley state, emits the right events after a toggle dispatch arrives (both from the CoAP-observable state and the Kwnoledge base)</li>
 					</ul>
 			<h3>Integration tests / Functional tests</h3>
 				<h4>Test Plan 1</h4>
 					This test plan will work as an integration test for the ParkServiceStatusGUI, ManagerService and Trolley components; it will also work as a functional test for the Parking Manager use cases (POR <em>manage</em>). <br>
-					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan1.kt">TestPlan1.kt</a>
+					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.tf21Start/TestPlan1.kt">TestPlan1.kt</a>
 				<h4>Test Plan 2</h4>
 					This test plan will work as an integration test for the IndoorParkingServiceGUI, ClientService and Trolley components; it will also work as a functional test for client "Parking Phase" use case (PORs <em>acceptIN</em>, <em>informIN</em>, <em>moveToIn</em>, <em>moveToSlotIn and <em>receipt</em></em>). <br>
-					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan2.kt">TestPlan2.kt</a>
+					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.tf21Start/TestPlan2.kt">TestPlan2.kt</a>
 				<h4>Test Plan 3</h4>
 					This test plan will work as an integration test for the OutdoorParkingServiceGUI, ClientService and Trolley components; it will also work as a functional test for client "Car Pickup" use case (PORs <em>acceptOUT</em> and <em>moveToSlotOut</em>). <br>
-					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.unibo.tf21Start/TestPlan3.kt">TestPlan3.kt</a><br>
+					Test code can be found at <a target="code" href="../test/it.sembrava_qualcuno.tf21Start/TestPlan3.kt">TestPlan3.kt</a><br>
 		</div>
 		<h2>Summary of the Analysis phase</h2>
 			<table class="sprint">
