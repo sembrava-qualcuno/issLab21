@@ -62,6 +62,22 @@ docker build --rm -t parkmanagerservice .
 
 and then you can just run the same docker compose file changing the images.
 
+Once started the containers, if you want to change the sensors' values you have to attach to the standard in/out of each container throught the command `docker attach <container>`, here there is an example:
+
+```shell
+> docker ps
+CONTAINER ID   IMAGE                                                         COMMAND                  CREATED          STATUS          PORTS                                            NAMES
+322358afbda9   sembravaqualcuno/automatedcarparking-parkmanagerservice:1.1   "bash parkmanagerser…"   40 minutes ago   Up 21 minutes   0.0.0.0:8080->8080/tcp, 0.0.0.0:8080->8080/udp   itunibosembrava_qualcunosprint4_parkmanagerservice_1
+54a55e0f95fc   sembravaqualcuno/automatedcarparking-outdoorarea:1.0          "bash /outdoorarea-1…"   40 minutes ago   Up 21 minutes   8026/tcp, 0.0.0.0:8026->8026/udp                 itunibosembrava_qualcunosprint4_outdoorarea_1
+808028c3ba08   sembravaqualcuno/automatedcarparking-parkingarea:1.0          "bash /parkingarea-1…"   40 minutes ago   Up 21 minutes   8027/tcp, 0.0.0.0:8027->8027/udp                 itunibosembrava_qualcunosprint4_parkingarea_1
+65a633c4da93   sembravaqualcuno/automatedcarparking-indoorarea:1.0           "bash /indoorarea-1.…"   40 minutes ago   Up 21 minutes   8025/tcp, 0.0.0.0:8025->8025/udp                 itunibosembrava_qualcunosprint4_indoorarea_1
+a1819aac00d5   natbodocker/basicrobot21virtual:1.0                           "bash it.unibo.qak21…"   3 months ago     Up 21 minutes   0.0.0.0:8020->8020/tcp, 0.0.0.0:8020->8020/udp   itunibosembrava_qualcunosprint4_basicrobot_1
+63fff39a051a   natbodocker/virtualrobotdisi:2.0                              "docker-entrypoint.s…"   3 months ago     Up 21 minutes   0.0.0.0:8090-8091->8090-8091/tcp                 itunibosembrava_qualcunosprint4_wenv_1
+> docker attach 65a633c4da93
+10
+Weight updated to 10
+```
+
 ## Indoorarea
 
 To update the weight you have to insert an `integer`:
@@ -87,6 +103,22 @@ To update the temperature you have to insert an `integer`:
 ```shell
 > 30
 Temperature updated to 30
+```
+
+## Manager credentials
+
+The default manager credentials are:
+
+    username: **manager**
+
+    password: **admin**
+
+They can be changed throught the `variables.env` file:
+
+```properties
+# Manager credentials
+MANAGER_USERNAME=manager
+MANAGER_PASSWORD=admin
 ```
 
 ## REST-API
